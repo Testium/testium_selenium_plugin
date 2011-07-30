@@ -4,66 +4,66 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.HasCapabilities;
-import org.openqa.selenium.HasInputDevices;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keyboard;
-import org.openqa.selenium.Mouse;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.ActionChainsGenerator;
-import org.openqa.selenium.internal.FindsByClassName;
-import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.internal.FindsById;
-import org.openqa.selenium.internal.FindsByLinkText;
-import org.openqa.selenium.internal.FindsByName;
-import org.openqa.selenium.internal.FindsByTagName;
-import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testium.configuration.SeleniumConfiguration;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.TestStepCommandExecutor;
+import org.testium.executor.webdriver.commands.*;
 import org.testium.systemundertest.SutInterface;
+import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.ParameterNotFoundException;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 
 /**
- * @author Arjan
+ * Class that represents the Web-based interface of the System Under Test
+ * It uses Selenium 2.0 (aka WebDriver) commands to address the interface via a browser.
  *
- *	Facade class to the RemoteWebDriver class of Selenium2.0.
- *  It has to be a facade, because the RemoteWebDriver opens the browser upon creation.
- *  We want it to open the browser only when needed.
- *  It uses the same interfaces as RemoteWebDriver.
+ * It only opens the browser when needed.
+ *  
+ * @author Arjan Kranenburg
+ *
  */
-public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor,
-									 FindsById, FindsByClassName, FindsByLinkText, FindsByName,
-									 FindsByCssSelector, FindsByTagName, FindsByXPath,
-									 HasInputDevices, HasCapabilities // TODO ,TakesScreenshot
+public class WebInterface implements SutInterface
 {
 	private RemoteWebDriver myDriver;
 	private String myDriverName;
+	private BROWSER_TYPE myBrowserType;
 
 	private Hashtable<String, TestStepCommandExecutor> myCommandExecutors;
 
 	/**
 	 * 
 	 */
-	public WebInterface( String aName )
+	public WebInterface( SeleniumConfiguration aConfig )
 	{
-		myDriverName = aName;
+		myDriverName = aConfig.getInterfaceName();
+		myBrowserType = aConfig.getBrowserType();
 
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
-		add( new GetCommand( this ) );
+		add( new CheckCurrentUrlCommand( this ) );
+		add( new CheckTitleCommand( this ) );
+		add( new ClearCommand( this ) );
 		add( new CloseCommand( this ) );
+		add( new FindElementCommand( this ) );
+		add( new FindElementsCommand( this ) );
+		add( new GetCommand( this ) );
+		add( new GetCurrentUrlCommand( this ) );
+		add( new GetTitleCommand( this ) );
+		add( new BackCommand( this ) );
+		add( new ForwardCommand( this ) );
+		add( new QuitCommand( this ) );
+		add( new SavePageSourceCommand( this ) );
+		add( new SendKeysCommand( this ) );
+		add( new SubmitCommand( this ) );
 	}
 
-	public RemoteWebDriver getDriver()
+	public RemoteWebDriver getDriver( )
 	{
 		if ( myDriver == null )
 		{
@@ -71,6 +71,57 @@ public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor
 		}
 		
 		return myDriver;
+	}
+
+	public void closeWindow( TestStepResult aTestStepResult )
+	{
+		if ( myDriver == null )
+		{
+			return; // Nothing to close (getDriver() would have created one first)
+		}
+		
+		this.setTestStepResult(aTestStepResult);
+		
+		int openWindows = myDriver.getWindowHandles().size();
+		myDriver.close();
+		if ( openWindows == 1 )
+		{
+			this.quitDriver( aTestStepResult );
+		}
+
+		this.setTestStepResult(null);
+	}
+
+	public void quitDriver( TestStepResult aTestStepResult )
+	{
+		if ( myDriver == null )
+		{
+			return; // Nothing to quit (getDriver() would have created one first)
+		}
+		this.setTestStepResult(aTestStepResult);
+		
+		myDriver.quit();
+		this.setTestStepResult(null);
+
+		myDriver = null;
+	}
+
+	/**
+	 * @param aRemoteWebDriver
+	 * @param aTestStepResult
+	 */
+	public void setTestStepResult( TestStepResult aTestStepResult )
+	{
+		if ( myDriver == null )
+		{
+			return;
+		}
+
+		if( myDriver.getClass().isAssignableFrom(TestiumLogger.class) )
+		{
+			TestiumLogger logger = (TestiumLogger) myDriver;
+			logger.setTestStepResult(aTestStepResult);
+		}
 	}
 
 	@Override
@@ -86,261 +137,11 @@ public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor
 	{
 		return myDriverName;
 	}
-
 	
-	
-	
-	public void get( String anUrl )
-	{
-		getDriver().get(anUrl);		
-	}
 
-	@Override
-	public void close()
-	{
-		getDriver().close();
-	}
-
-	@Override
-	public WebElement findElement(By aBy)
-	{
-		return getDriver().findElement(aBy);
-	}
-
-	@Override
-	public List<WebElement> findElements(By aBy)
-	{
-		return getDriver().findElements(aBy);
-	}
-
-	@Override
-	public String getCurrentUrl()
-	{
-		return getDriver().getCurrentUrl();
-	}
-
-	@Override
-	public String getPageSource()
-	{
-		return getDriver().getPageSource();
-	}
-
-	@Override
-	public String getTitle()
-	{
-		return getDriver().getTitle();
-	}
-
-	@Override
-	public String getWindowHandle()
-	{
-		return getDriver().getWindowHandle();
-	}
-
-	@Override
-	public Set<String> getWindowHandles()
-	{
-		return getDriver().getWindowHandles();
-	}
-
-	@Override
-	public Options manage()
-	{
-		return getDriver().manage();
-	}
-
-	@Override
-	public Navigation navigate()
-	{
-		return getDriver().navigate();
-	}
-
-	@Override
-	public void quit()
-	{
-		getDriver().quit();
-	}
-
-	@Override
-	public TargetLocator switchTo()
-	{
-		return getDriver().switchTo();
-	}
-
-	@Override
-	public Object executeAsyncScript(String aScript, Object... anArgs)
-	{
-		return getDriver().executeAsyncScript(aScript, anArgs);
-	}
-
-	@Override
-	public Object executeScript(String aScript, Object... anArgs)
-	{
-		return getDriver().executeScript(aScript, anArgs);
-	}
-
-	@Override
-	public boolean isJavascriptEnabled()
-	{
-		return getDriver().isJavascriptEnabled();
-	}
-
-	@Override
-	public WebElement findElementById(String aUsing)
-	{
-		return getDriver().findElementById(aUsing);
-	}
-
-	@Override
-	public List<WebElement> findElementsById(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByClassName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByClassName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByLinkText(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByPartialLinkText(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByLinkText(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByPartialLinkText(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByCssSelector(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByCssSelector(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByTagName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByTagName(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public WebElement findElementByXPath(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<WebElement> findElementsByXPath(String using)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public ActionChainsGenerator actionsBuilder()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Keyboard getKeyboard()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Mouse getMouse()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Capabilities getCapabilities()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+	 * Methods below is an implementation of SutInterface
+	 */
 
 	@Override
 	public ArrayList<String> getCommands()
@@ -359,7 +160,7 @@ public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor
 
 	public boolean verifyParameters( String aCommand,
 	                                 ParameterArrayList aParameters )
-		   throws ParameterNotFoundException
+		   throws TestSuiteException
 	{
 		TestStepCommandExecutor executor = this.getCommandExecutor(aCommand);
 		return executor.verifyParameters(aParameters);
@@ -375,7 +176,43 @@ public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor
 	private void createDriver()
 	{
 		Trace.println( Trace.UTIL );
-		myDriver = new FirefoxDriver();
+		try
+		{
+			if ( myBrowserType.equals( BROWSER_TYPE.FIREFOX ) )
+			{
+				myDriver = new TestiumFirefoxDriver();
+			}
+			else if ( myBrowserType.equals( BROWSER_TYPE.CHROME ) )
+			{
+				// TODO had a ChromeNotRunningException at the end of the tests
+				myDriver = new TestiumChromeDriver();
+			}
+	//		else if ( myBrowserType.equals( BROWSER_TYPE.HTMLUNIT ) )
+	//		{
+	//			myDriver = new TestiumHtmlUnitDriver();
+	//		}
+	//		else if ( myBrowserType.equals( BROWSER_TYPE.IPHONE ) )
+	//		{
+	//			try
+	//			{
+	//				myDriver = new IPhoneDriver();
+	//			}
+	//			catch (Exception e)
+	//			{
+	//				// TODO We should end (and error) the test
+	//				e.printStackTrace();
+	//			}
+	//		}
+			else if ( myBrowserType.equals( BROWSER_TYPE.IE ) )
+			{
+				myDriver = new TestiumIEDriver();
+			}
+		}
+		catch ( WebDriverException e )
+		{ 
+			// TODO How to react?
+			throw new Error( "Browser of type " + myBrowserType + " is not found.\n" + e.getMessage() );
+		}
 	}
 
 	private void add( TestStepCommandExecutor aCommandExecutor )
@@ -383,5 +220,67 @@ public class WebInterface implements SutInterface, WebDriver, JavascriptExecutor
 		Trace.println( Trace.UTIL );
 		String command = aCommandExecutor.getCommand();
 		myCommandExecutors.put(command, aCommandExecutor);
+	}
+
+	@Override
+	public Parameter createParameter( String aName,
+	                                  String aType,
+	                                  String aValue )
+			throws TestSuiteException
+	{
+		if ( aValue.isEmpty() )
+		{
+			throw new TestSuiteException( "Value of " + aName + " cannot be empty for type " + aType,
+			                              this.getInterfaceName() );
+		}
+
+		if ( aType.equalsIgnoreCase( "id" ) )
+		{
+			return new Parameter(aName, By.id(aValue) );
+		}
+		
+		if ( aType.equalsIgnoreCase( "name" ) )
+		{
+			return new Parameter(aName, By.name(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "linktext" ) )
+		{
+			return new Parameter(aName, By.linkText(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
+		{
+			return new Parameter(aName, By.partialLinkText(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "tagname" ) )
+		{
+			return new Parameter(aName, By.tagName(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "xpath" ) )
+		{
+			return new Parameter(aName, By.xpath(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "classname" ) )
+		{
+			return new Parameter(aName, By.className(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "cssselector" ) )
+		{
+			return new Parameter(aName, By.cssSelector(aValue) );
+		}
+
+		if ( aType.equalsIgnoreCase( "string" ) )
+		{
+			return new Parameter(aName, (String) aValue);
+		}			
+
+		throw new TestSuiteException( "Parameter type " + aType
+		                              + " is not supported for interface "
+		                              + this.getInterfaceName(), aName );
 	}
 }
