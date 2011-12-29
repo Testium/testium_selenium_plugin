@@ -5,7 +5,7 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -18,9 +18,7 @@ import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Executes the Selenium 2.0 getTitle command
- * 
- * @author Arjan Kranenburg
+ * @author Arjan
  *
  */
 public class GetTitleCommand extends WebDriverCommandExecutor
@@ -45,7 +43,7 @@ public class GetTitleCommand extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
 
 		ParameterVariable titlePar = (ParameterVariable) parameters.get(PAR_TITLE);
 		String variableName = titlePar.getVariableName();
@@ -71,7 +69,17 @@ public class GetTitleCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 
-		verifyParameterVariable(titlePar);
+		if ( ! titlePar.getClass().equals( ParameterVariable.class ) )
+		{
+			throw new TestSuiteException( "Parameter " + PAR_TITLE + " is not defined as a variable",
+			                              getInterfaceName() + "." + COMMAND );
+		}
+
+		if ( ((ParameterVariable) titlePar).getVariableName().isEmpty() )
+		{
+			throw new TestSuiteException( "Variable name of " + PAR_TITLE + " cannot be empty",
+			                              getInterfaceName() + "." + COMMAND );
+		}
 
 		return true;
 	}

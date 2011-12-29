@@ -6,16 +6,16 @@ import java.util.Collections;
 import java.util.Hashtable;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testium.configuration.SeleniumConfiguration;
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import org.testium.executor.CustomizableInterface;
 import org.testium.executor.TestStepCommandExecutor;
 import org.testium.executor.webdriver.commands.*;
 import org.testium.systemundertest.SutInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 
@@ -28,9 +28,9 @@ import org.testtoolinterfaces.utils.Trace;
  * @author Arjan Kranenburg
  *
  */
-public class WebInterface implements SutInterface, CustomizableInterface
+public class WebInterface implements SutInterface
 {
-	private WebDriver myDriver;
+	private RemoteWebDriver myDriver;
 	private String myDriverName;
 	private BROWSER_TYPE myBrowserType;
 
@@ -39,10 +39,10 @@ public class WebInterface implements SutInterface, CustomizableInterface
 	/**
 	 * 
 	 */
-	public WebInterface( String aName, BROWSER_TYPE aType )
+	public WebInterface( SeleniumConfiguration aConfig )
 	{
-		myDriverName = aName;
-		myBrowserType = aType;
+		myDriverName = aConfig.getInterfaceName();
+		myBrowserType = aConfig.getBrowserType();
 
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
@@ -63,7 +63,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		add( new SubmitCommand( this ) );
 	}
 
-	public WebDriver getDriver( )
+	public RemoteWebDriver getDriver( )
 	{
 		if ( myDriver == null )
 		{
@@ -187,10 +187,10 @@ public class WebInterface implements SutInterface, CustomizableInterface
 				// TODO had a ChromeNotRunningException at the end of the tests
 				myDriver = new TestiumChromeDriver();
 			}
-			else if ( myBrowserType.equals( BROWSER_TYPE.HTMLUNIT ) )
-			{
-				myDriver = new TestiumHtmlUnitDriver();
-			}
+	//		else if ( myBrowserType.equals( BROWSER_TYPE.HTMLUNIT ) )
+	//		{
+	//			myDriver = new TestiumHtmlUnitDriver();
+	//		}
 	//		else if ( myBrowserType.equals( BROWSER_TYPE.IPHONE ) )
 	//		{
 	//			try
@@ -215,8 +215,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		}
 	}
 
-	@Override
-	public void add( TestStepCommandExecutor aCommandExecutor )
+	private void add( TestStepCommandExecutor aCommandExecutor )
 	{
 		Trace.println( Trace.UTIL );
 		String command = aCommandExecutor.getCommand();
@@ -224,7 +223,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 	}
 
 	@Override
-	public ParameterImpl createParameter( String aName,
+	public Parameter createParameter( String aName,
 	                                  String aType,
 	                                  String aValue )
 			throws TestSuiteException
@@ -237,47 +236,47 @@ public class WebInterface implements SutInterface, CustomizableInterface
 
 		if ( aType.equalsIgnoreCase( "id" ) )
 		{
-			return new ParameterImpl(aName, By.id(aValue) );
+			return new Parameter(aName, By.id(aValue) );
 		}
 		
 		if ( aType.equalsIgnoreCase( "name" ) )
 		{
-			return new ParameterImpl(aName, By.name(aValue) );
+			return new Parameter(aName, By.name(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "linktext" ) )
 		{
-			return new ParameterImpl(aName, By.linkText(aValue) );
+			return new Parameter(aName, By.linkText(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
 		{
-			return new ParameterImpl(aName, By.partialLinkText(aValue) );
+			return new Parameter(aName, By.partialLinkText(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "tagname" ) )
 		{
-			return new ParameterImpl(aName, By.tagName(aValue) );
+			return new Parameter(aName, By.tagName(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "xpath" ) )
 		{
-			return new ParameterImpl(aName, By.xpath(aValue) );
+			return new Parameter(aName, By.xpath(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "classname" ) )
 		{
-			return new ParameterImpl(aName, By.className(aValue) );
+			return new Parameter(aName, By.className(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "cssselector" ) )
 		{
-			return new ParameterImpl(aName, By.cssSelector(aValue) );
+			return new Parameter(aName, By.cssSelector(aValue) );
 		}
 
 		if ( aType.equalsIgnoreCase( "string" ) )
 		{
-			return new ParameterImpl(aName, (String) aValue);
+			return new Parameter(aName, (String) aValue);
 		}			
 
 		throw new TestSuiteException( "Parameter type " + aType

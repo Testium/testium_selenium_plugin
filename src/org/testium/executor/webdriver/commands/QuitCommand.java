@@ -14,9 +14,7 @@ import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * Executes the Selenium 2.0 quit command
- * 
- * @author Arjan Kranenburg
+ * @author Arjan
  *
  */
 public class QuitCommand extends WebDriverCommandExecutor

@@ -8,13 +8,12 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -22,8 +21,6 @@ import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Executes the Selenium 2.0 findElements command
- *
  * @author Arjan Kranenburg
  *
  */
@@ -51,9 +48,9 @@ public class FindElementsCommand extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
 
-		ParameterImpl byPar = (ParameterImpl) parameters.get(PAR_BY);
+		Parameter byPar = parameters.get(PAR_BY);
 		By by = byPar.getValueAs(By.class);
 
 		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_ELEMENTS);
@@ -74,20 +71,13 @@ public class FindElementsCommand extends WebDriverCommandExecutor
 	public boolean verifyParameters( ParameterArrayList aParameters ) throws TestSuiteException
 	{
 		// Check the Value Parameter
-		Parameter valuePar_tmp = aParameters.get(PAR_BY);
-		if ( valuePar_tmp == null )
+		Parameter valuePar = aParameters.get(PAR_BY);
+		if ( valuePar == null )
 		{
 			throw new TestSuiteException( "Parameter " + PAR_BY + " is not set",
 			                              getInterfaceName() + "." + COMMAND );
 		}
-
-		if ( ! ParameterImpl.class.isInstance( valuePar_tmp ) )
-		{
-			throw new TestSuiteException( "Parameter " + PAR_BY + " is not a value",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		ParameterImpl valuePar = (ParameterImpl) valuePar_tmp;
+		
 		if ( ! valuePar.getValueType().toString().startsWith( By.class.toString() ) )
 		{
 			throw new TestSuiteException( "Parameter " + PAR_BY + " must be of type 'id', 'name'," +
@@ -103,8 +93,18 @@ public class FindElementsCommand extends WebDriverCommandExecutor
 			throw new TestSuiteException( "Parameter " + PAR_ELEMENTS + " is not set",
 			                              getInterfaceName() + "." + COMMAND );
 		}
+		
+		if ( ! elementsPar.getClass().equals( ParameterVariable.class ) )
+		{
+			throw new TestSuiteException( "Parameter " + PAR_ELEMENTS + " is not defined as a variable",
+			                              getInterfaceName() + "." + COMMAND );
+		}
 
-		verifyParameterVariable(elementsPar);
+		if ( ((ParameterVariable) elementsPar).getVariableName().isEmpty() )
+		{
+			throw new TestSuiteException( "Variable name of " + PAR_ELEMENTS + " cannot be empty",
+			                              getInterfaceName() + "." + COMMAND );
+		}
 
 		return true;
 	}

@@ -5,22 +5,18 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestResult;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.ParameterImpl;
-import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * Executes the Selenium 2.0 getCurrentUrl command and validates the result against a parameter
- * 
- * @author Arjan Kranenburg
+ * @author Arjan
  *
  */
 public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
@@ -45,27 +41,14 @@ public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
 
-		String expectedUrl = "";
 		Parameter urlPar = parameters.get(PAR_URL);
-		if ( ParameterVariable.class.isInstance( urlPar ) )
-		{
-			expectedUrl = getVariableValueAs(String.class, urlPar, aVariables);
-		}
-		else if ( ParameterImpl.class.isInstance( urlPar ) )
-		{
-			expectedUrl = ((ParameterImpl) urlPar).getValueAsString();
-		}
-		else
-		{
-			throw new TestSuiteException( "parameter must be value or variable: " + urlPar.getName() );
-		}
 
 		String currentUrl = webDriver.getCurrentUrl();
 		setTestStepResult( null );
 
-		if ( currentUrl.equals( expectedUrl ) )
+		if ( currentUrl.equals( urlPar.getValueAsString() ) )
 		{
 			result.setResult(TestResult.PASSED);
 		}
@@ -73,7 +56,7 @@ public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
 		{
 			result.setResult(TestResult.FAILED);
 			result.setComment( PAR_URL + " has value '" + currentUrl
-			                   + "'. Expected '" + expectedUrl + "'" );
+			                   + "'. Expected '" + urlPar.getValueAsString() + "'" );
 		}
 
 		return result;
@@ -84,20 +67,23 @@ public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
 				   throws TestSuiteException
 	{
 		// Check the Value Parameter
-		Parameter urlPar = aParameters.get(PAR_URL);
-		if ( urlPar == null )
+		Parameter valuePar = aParameters.get(PAR_URL);
+		if ( valuePar == null )
 		{
 			throw new TestSuiteException( "Parameter " + PAR_URL + " is not set",
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( urlPar.getClass().equals( ParameterVariable.class ) )
+		if ( ! valuePar.getValueType().equals( String.class ) )
 		{
-			verifyParameterVariable(urlPar);
+			throw new TestSuiteException( "Parameter " + PAR_URL + " must be a String",
+			                              getInterfaceName() + "." + COMMAND );
 		}
-		else
+
+		if ( valuePar.getValueAsString().isEmpty() )
 		{
-			verifyParameterValue(urlPar, String.class);
+			throw new TestSuiteException( PAR_URL + " cannot be empty",
+			                              getInterfaceName() + "." + COMMAND );
 		}
 
 		return true;

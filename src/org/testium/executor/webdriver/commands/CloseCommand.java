@@ -14,8 +14,6 @@ import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * Executes the Selenium 2.0 close command
- * 
  * @author Arjan Kranenburg
  *
  */

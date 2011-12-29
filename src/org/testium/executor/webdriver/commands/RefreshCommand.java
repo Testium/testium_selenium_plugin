@@ -5,7 +5,7 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -15,9 +15,7 @@ import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * Executes the Selenium 2.0 refresh command
- * 
- * @author Arjan Kranenburg
+ * @author Arjan
  *
  */
 public class RefreshCommand extends WebDriverCommandExecutor
@@ -41,7 +39,7 @@ public class RefreshCommand extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
 
 		webDriver.navigate().refresh();
 		setTestStepResult( null );

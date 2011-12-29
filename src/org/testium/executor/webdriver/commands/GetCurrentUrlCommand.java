@@ -5,7 +5,7 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -18,8 +18,6 @@ import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Executes the Selenium 2.0 getCurrentUrl command
- * 
  * @author Arjan Kranenburg
  *
  */
@@ -45,7 +43,7 @@ public class GetCurrentUrlCommand  extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
 
 		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_URL);
 		String variableName = variablePar.getVariableName();
@@ -71,7 +69,17 @@ public class GetCurrentUrlCommand  extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 
-		verifyParameterVariable(urlPar);
+		if ( ! urlPar.getClass().equals( ParameterVariable.class ) )
+		{
+			throw new TestSuiteException( "Parameter " + PAR_URL + " is not defined as a variable",
+			                              getInterfaceName() + "." + COMMAND );
+		}
+
+		if ( ((ParameterVariable) urlPar).getVariableName().isEmpty() )
+		{
+			throw new TestSuiteException( "Variable name of " + PAR_URL + " cannot be empty",
+			                              getInterfaceName() + "." + COMMAND );
+		}
 
 		return true;
 	}
