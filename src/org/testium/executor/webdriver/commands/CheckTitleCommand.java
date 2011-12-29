@@ -5,17 +5,21 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestResult;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.testsuite.ParameterImpl;
+import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
+ * Executes the Selenium 2.0 getTitle command and validates the result against a parameter
+ * 
  * @author Arjan Kranenburg
  *
  */
@@ -41,14 +45,27 @@ public class CheckTitleCommand  extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
+		WebDriver webDriver = this.getDriverAndSetResult(result);
 
+		String expectedTitle = "";
 		Parameter titlePar = parameters.get(PAR_TITLE);
+		if ( titlePar.getClass().equals( ParameterVariable.class ) )
+		{
+			expectedTitle = getVariableValueAs(String.class, titlePar, aVariables);
+		}
+		else if ( ParameterImpl.class.isInstance( titlePar ) )
+		{
+			expectedTitle = ((ParameterImpl) titlePar).getValueAsString();
+		}
+		else
+		{
+			throw new TestSuiteException( "parameter must be value or variable: " + titlePar.getName() );
+		}
 
 		String title = webDriver.getTitle();
 		setTestStepResult( null );
 
-		if ( title.equals( titlePar.getValueAsString() ) )
+		if ( title.equals( expectedTitle ) )
 		{
 			result.setResult(TestResult.PASSED);
 		}
@@ -56,7 +73,7 @@ public class CheckTitleCommand  extends WebDriverCommandExecutor
 		{
 			result.setResult(TestResult.FAILED);
 			result.setComment( PAR_TITLE + " has value '" + title
-			                   + "'. Expected '" + titlePar.getValueAsString() + "'" );
+			                   + "'. Expected '" + expectedTitle + "'" );
 		}
 
 		return result;
@@ -73,16 +90,13 @@ public class CheckTitleCommand  extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! valuePar.getValueType().equals( String.class ) )
+		if ( valuePar.getClass().equals( ParameterVariable.class ) )
 		{
-			throw new TestSuiteException( "Parameter " + PAR_TITLE + " must be a String",
-			                              getInterfaceName() + "." + COMMAND );
+			verifyParameterVariable(valuePar);
 		}
-
-		if ( valuePar.getValueAsString().isEmpty() )
+		else
 		{
-			throw new TestSuiteException( PAR_TITLE + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
+			verifyParameterValue(valuePar, String.class);
 		}
 
 		return true;

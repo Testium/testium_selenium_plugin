@@ -18,7 +18,9 @@ import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * @author Arjan
+ * Executes the Selenium 2.0 submit command
+ * 
+ * @author Arjan Kranenburg
  *
  */
 public class SubmitCommand extends WebDriverCommandExecutor
@@ -45,20 +47,7 @@ public class SubmitCommand extends WebDriverCommandExecutor
 		TestStepResult result = new TestStepResult( aStep );
 
 		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_ELEMENT);
-		String variableName = variablePar.getVariableName();
-
-		if ( ! aVariables.containsKey(variableName) )
-		{
-			throw new TestSuiteException( "Variable " + variableName + " is not set",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		WebElement element = aVariables.getValueAs( WebElement.class, variableName);
-		if ( element == null )
-		{
-			throw new TestSuiteException( "Variable " + variableName + " is not a WebElement",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		WebElement element = getVariableValueAs(WebElement.class, variablePar, aVariables);
 
 		try
 		{
@@ -85,17 +74,7 @@ public class SubmitCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! elementPar.getClass().equals( ParameterVariable.class ) )
-		{
-			throw new TestSuiteException( "Parameter " + PAR_ELEMENT + " is not defined as a variable",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		if ( ((ParameterVariable) elementPar).getVariableName().isEmpty() )
-		{
-			throw new TestSuiteException( "Variable name of " + PAR_ELEMENT + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		verifyParameterVariable(elementPar);
 
 		return true;
 	}

@@ -1,31 +1,68 @@
 package org.testium.configuration;
 
-import java.util.Hashtable;
+import java.io.File;
 
+import org.testium.Testium;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import org.testium.executor.SupportedInterfaceList;
+import org.testium.executor.TestStepMetaExecutor;
+import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
+/**
+ * @author Arjan Kranenburg 
+ * 
+ *  <SeleniumConfiguration>
+ *    <DefaultBrowser>...</DefaultBrowser>
+ *    <Interfaces>...</Interfaces>
+ *  ...
+ *  </SeleniumConfiguration>
+ * 
+ */
 
 public class SeleniumConfigurationXmlHandler extends XmlHandler
 {
 	private static final String START_ELEMENT = "SeleniumConfiguration";
 
-	private SeleniumInterfaceXmlHandler myInterfaceXmlHandler;
-	private Hashtable<String, SeleniumConfiguration> myConfigurations = null;
+	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
+	private static final String SELENIUM_LIBS_DIR_ELEMENT = "SeleniumLibsDir";
 
-	public SeleniumConfigurationXmlHandler(XMLReader anXmlReader, RunTimeData anRtData)
+	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
+	private GenericTagAndStringXmlHandler mySeleniumLibsDirXmlHandler;
+	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
+	
+	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
+	private File mySeleniumLibsDir;
+
+	private RunTimeData myRtData;
+	
+	public SeleniumConfigurationXmlHandler( XMLReader anXmlReader, 
+	                                        SupportedInterfaceList anInterfaceList,
+	                                        TestStepMetaExecutor aTestStepMetaExecutor,
+	                                        RunTimeData anRtData )
 	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    myConfigurations = new Hashtable<String, SeleniumConfiguration>();
+		File pluginsDir = anRtData.getValueAsFile(Testium.PLUGINSDIR);
+		mySeleniumLibsDir = new File( pluginsDir, "SeleniumLibs" );
+		myRtData = anRtData;
+		
+	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
+		this.addStartElementHandler(DEF_BROWSER_ELEMENT, myDefaultBrowserXmlHandler);
+		myDefaultBrowserXmlHandler.addEndElementHandler(DEF_BROWSER_ELEMENT, this);
 
-	    myInterfaceXmlHandler = new SeleniumInterfaceXmlHandler(anXmlReader, anRtData);
-		this.addStartElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, myInterfaceXmlHandler);
-		myInterfaceXmlHandler.addEndElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, this);
+		mySeleniumLibsDirXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_LIBS_DIR_ELEMENT);
+		this.addStartElementHandler(SELENIUM_LIBS_DIR_ELEMENT, mySeleniumLibsDirXmlHandler);
+		mySeleniumLibsDirXmlHandler.addEndElementHandler(SELENIUM_LIBS_DIR_ELEMENT, this);
+
+		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
+		this.addStartElementHandler(SeleniumInterfacesXmlHandler.START_ELEMENT, myInterfacesXmlHandler);
+		myInterfacesXmlHandler.addEndElementHandler(SeleniumInterfacesXmlHandler.START_ELEMENT, this);
 	}
 
 	@Override
@@ -64,11 +101,25 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
 		    	      aQualifiedName + " )", true);
 		    
-		if (aQualifiedName.equalsIgnoreCase( myInterfaceXmlHandler.getStartElement() ))
+		if (aQualifiedName.equalsIgnoreCase( DEF_BROWSER_ELEMENT ))
     	{
-			SeleniumConfiguration configuration = myInterfaceXmlHandler.getConfiguration();
-			myConfigurations.put(configuration.getInterfaceName(), configuration );
-			myInterfaceXmlHandler.reset();
+			myDefaultBrowser = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, myDefaultBrowserXmlHandler.getValue() );
+			myInterfacesXmlHandler.setDefaultBrowser( myDefaultBrowser );
+
+			myDefaultBrowserXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_LIBS_DIR_ELEMENT ))
+    	{
+			String SeleniumLibsDirName = mySeleniumLibsDirXmlHandler.getValue();
+			SeleniumLibsDirName = myRtData.substituteVars(SeleniumLibsDirName);
+			mySeleniumLibsDir = new File( SeleniumLibsDirName );
+
+			mySeleniumLibsDirXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( myInterfacesXmlHandler.getStartElement() ))
+    	{
+			// The interfaceList is already updated
+			myInterfacesXmlHandler.reset();
     	}
 		else
     	{ // Programming fault
@@ -77,8 +128,8 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 		}
 	}
 	
-	public Hashtable<String, SeleniumConfiguration> getConfigurations()
+	public SeleniumConfiguration getConfiguration()
 	{
-		return myConfigurations;
+		return new SeleniumConfiguration( myDefaultBrowser, mySeleniumLibsDir );
 	}
 }

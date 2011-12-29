@@ -1,0 +1,97 @@
+package org.testium.configuration;
+
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import org.testium.executor.SupportedInterfaceList;
+import org.testium.executor.TestStepMetaExecutor;
+import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.XmlHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.XMLReader;
+
+
+/**
+ * @author Arjan Kranenburg 
+ * 
+ *  <Interfaces>
+ *    <Interface>...</Interface>
+ *    <Interface>...</Interface>
+ *    <Interface>...</Interface>
+ *  ...
+ *  </Interfaces>
+ * 
+ */
+public class SeleniumInterfacesXmlHandler extends XmlHandler
+{
+	public static final String START_ELEMENT = "SeleniumInterfaces";
+
+	private SeleniumInterfaceXmlHandler myInterfaceXmlHandler;
+	public SeleniumInterfacesXmlHandler(XMLReader anXmlReader, SupportedInterfaceList anInterfaceList, TestStepMetaExecutor aTestStepMetaExecutor)
+	{
+	    super(anXmlReader, START_ELEMENT);
+	    Trace.println(Trace.CONSTRUCTOR);
+
+	    myInterfaceXmlHandler = new SeleniumInterfaceXmlHandler( anXmlReader, anInterfaceList, aTestStepMetaExecutor );
+		this.addStartElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, myInterfaceXmlHandler);
+		myInterfaceXmlHandler.addEndElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, this);
+
+	    reset();
+	}
+
+	@Override
+	public void handleStartElement(String aQualifiedName)
+	{
+		// nop
+	}
+
+	@Override
+	public void handleCharacters(String aValue)
+	{
+		// nop
+	}
+
+	@Override
+	public void handleEndElement(String aQualifiedName)
+	{
+		// nop
+	}
+
+	@Override
+	public void processElementAttributes(String aQualifiedName, Attributes att)
+	{
+		// nop
+	}
+
+	@Override
+	public void handleGoToChildElement(String aQualifiedName)
+	{
+		// nop
+	}
+
+	@Override
+	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
+	{
+	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
+		    	      aQualifiedName + " )", true);
+		    
+		if (aQualifiedName.equalsIgnoreCase(SeleniumInterfaceXmlHandler.START_ELEMENT))
+    	{
+			// The interfaceList is already updated
+			myInterfaceXmlHandler.reset();
+    	}
+		else
+    	{ // Programming fault
+			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
+			                 "in the Constructor but not handled in handleReturnFromChildElement()");
+		}
+	}
+
+	public void reset()
+	{
+		myInterfaceXmlHandler.reset();
+	}
+
+	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
+	{
+		myInterfaceXmlHandler.setDefaultBrowser( aBrowser );
+	}
+}

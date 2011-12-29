@@ -12,13 +12,16 @@ import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * @author Arjan
+ * Executes the Selenium 2.0 sendKeys command
+ * 
+ * @author Arjan Kranenburg
  *
  */
 public class SendKeysCommand extends WebDriverCommandExecutor
@@ -45,24 +48,23 @@ public class SendKeysCommand extends WebDriverCommandExecutor
 
 		TestStepResult result = new TestStepResult( aStep );
 
+		String keysToSend = "";
 		Parameter keysPar = parameters.get(PAR_KEYS);
-		String keysToSend = keysPar.getValueAsString();
-
-		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_ELEMENT);
-		String variableName = variablePar.getVariableName();
-
-		if ( ! aVariables.containsKey(variableName) )
+		if ( keysPar.getClass().equals( ParameterVariable.class ) )
 		{
-			throw new TestSuiteException( "Variable " + variableName + " is not set",
-			                              getInterfaceName() + "." + COMMAND );
+			keysToSend = getVariableValueAs(String.class, keysPar, aVariables);
+		}
+		else if ( ParameterImpl.class.isInstance( keysPar ) )
+		{
+			keysToSend = ((ParameterImpl) keysPar).getValueAsString();
+		}
+		else
+		{
+			throw new TestSuiteException( "parameter must be value or variable: " + keysPar.getName() );
 		}
 
-		WebElement element = aVariables.getValueAs( WebElement.class, variableName);
-		if ( element == null )
-		{
-			throw new TestSuiteException( "Variable " + variableName + " is not a WebElement",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		Parameter elementPar = parameters.get(PAR_ELEMENT);
+		WebElement element = getVariableValueAs(WebElement.class, elementPar, aVariables);
 
 		try
 		{
@@ -89,16 +91,13 @@ public class SendKeysCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! keysPar.getValueType().equals( String.class ) )
+		if ( keysPar.getClass().equals( ParameterVariable.class ) )
 		{
-			throw new TestSuiteException( "Parameter " + PAR_KEYS + " must be a String",
-			                              getInterfaceName() + "." + COMMAND );
+			verifyParameterVariable(keysPar);
 		}
-
-		if ( keysPar.getValueAsString().isEmpty() )
+		else
 		{
-			throw new TestSuiteException( PAR_KEYS + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
+			verifyParameterValue(keysPar, String.class);
 		}
 
 		// Check the Element Parameter Variable which is returned with the found web-element
@@ -109,19 +108,8 @@ public class SendKeysCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! elementPar.getClass().equals( ParameterVariable.class ) )
-		{
-			throw new TestSuiteException( "Parameter " + PAR_ELEMENT + " is not defined as a variable",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		if ( ((ParameterVariable) elementPar).getVariableName().isEmpty() )
-		{
-			throw new TestSuiteException( "Variable name of " + PAR_ELEMENT + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		verifyParameterVariable(elementPar);
 
 		return true;
 	}
-
 }
