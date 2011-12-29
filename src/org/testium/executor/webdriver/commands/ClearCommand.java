@@ -12,13 +12,14 @@ import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * @author Arjan
+ * Executes the Selenium 2.0 clear command
+ * 
+ * @author Arjan Kranenburg
  *
  */
 public class ClearCommand extends WebDriverCommandExecutor
@@ -44,21 +45,8 @@ public class ClearCommand extends WebDriverCommandExecutor
 
 		TestStepResult result = new TestStepResult( aStep );
 
-		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_ELEMENT);
-		String variableName = variablePar.getVariableName();
-
-		if ( ! aVariables.containsKey(variableName) )
-		{
-			throw new TestSuiteException( "Variable " + variableName + " is not set",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		WebElement element = aVariables.getValueAs( WebElement.class, variableName);
-		if ( element == null )
-		{
-			throw new TestSuiteException( "Variable " + variableName + " is not a WebElement",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		Parameter elementPar = parameters.get(PAR_ELEMENT);
+		WebElement element = getVariableValueAs(WebElement.class, elementPar, aVariables);
 
 		try
 		{
@@ -85,17 +73,7 @@ public class ClearCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! elementPar.getClass().equals( ParameterVariable.class ) )
-		{
-			throw new TestSuiteException( "Parameter " + PAR_ELEMENT + " is not defined as a variable",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-
-		if ( ((ParameterVariable) elementPar).getVariableName().isEmpty() )
-		{
-			throw new TestSuiteException( "Variable name of " + PAR_ELEMENT + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
-		}
+		verifyParameterVariable(elementPar);
 
 		return true;
 	}

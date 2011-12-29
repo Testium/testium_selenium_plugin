@@ -1,32 +1,56 @@
 package org.testium.configuration;
 
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.RunTimeData;
+import org.testium.configuration.CustomStepXmlHandler;
+import org.testium.executor.CustomizableInterface;
+import org.testium.executor.SupportedInterfaceList;
+import org.testium.executor.TestStepMetaExecutor;
+import org.testium.executor.webdriver.WebInterface;
+import org.testtoolinterfaces.testsuite.TestInterface;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
 
+/**
+ * @author Arjan Kranenburg 
+ * 
+ *  <SeleniumInterface name="..." type="...">
+ *    <customstep>...</customstep>
+ *    <customstep>...</customstep>
+ *    <customstep>...</customstep>
+ *  ...
+ *  </SeleniumInterface>
+ * 
+ */
 public class SeleniumInterfaceXmlHandler extends XmlHandler
 {
-	public static final String START_ELEMENT = "interface";
+	public static final String START_ELEMENT = "SeleniumInterface";
 
-	private static final String	ATTR_ID			= "id";
-	private static final String	ELEMENT_TYPE	= "type";
+	private static final String	ATTR_NAME			= "name";
+	private static final String	ATTR_TYPE			= "type";
 
-	private String myId;
-	private String myType;
+	private SupportedInterfaceList myInterfaceList;
+	private CustomStepXmlHandler myCustomStepXmlHandler;
 
-	public SeleniumInterfaceXmlHandler(XMLReader anXmlReader, RunTimeData anRtData)
+	private TestInterface myInterface;
+	private String myInterfaceName;
+	private BROWSER_TYPE myType;
+	private BROWSER_TYPE myDefaultType = BROWSER_TYPE.HTMLUNIT;
+	
+	public SeleniumInterfaceXmlHandler(XMLReader anXmlReader, SupportedInterfaceList anInterfaceList, TestStepMetaExecutor aTestStepMetaExecutor)
 	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    XmlHandler typeHandler = new GenericTagAndStringXmlHandler(anXmlReader, ELEMENT_TYPE);
-		this.addStartElementHandler(ELEMENT_TYPE, typeHandler);
-		typeHandler.addEndElementHandler(ELEMENT_TYPE, this);
+	    myInterfaceList = anInterfaceList;
+	    
+	    myCustomStepXmlHandler = new CustomStepXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
+		this.addStartElementHandler(CustomStepXmlHandler.START_ELEMENT, myCustomStepXmlHandler);
+		myCustomStepXmlHandler.addEndElementHandler(CustomStepXmlHandler.START_ELEMENT, this);
 
 	    reset();
 	}
@@ -46,11 +70,17 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	@Override
 	public void handleEndElement(String aQualifiedName)
 	{
-		// nop
+	    Trace.println(Trace.UTIL, "handleEndElement( " + 
+		    	      aQualifiedName + " )", true);
+		if ( myInterface == null )
+		{
+			// We now have the rare case that the interface is defined, but no custome steps were defined.
+			createInterface();
+		}
 	}
 
 	@Override
-	public void processElementAttributes(String aQualifiedName, Attributes att)
+	public void processElementAttributes(String aQualifiedName, Attributes att) throws TTIException
 	{
 		Trace.print(Trace.SUITE, "processElementAttributes( " 
 		            + aQualifiedName, true );
@@ -59,9 +89,33 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 			    for (int i = 0; i < att.getLength(); i++)
 			    {
 		    		Trace.append( Trace.SUITE, ", " + att.getQName(i) + "=" + att.getValue(i) );
-			    	if (att.getQName(i).equalsIgnoreCase(ATTR_ID))
+			    	if (att.getQName(i).equalsIgnoreCase(ATTR_NAME))
 			    	{
-			        	myId = att.getValue(i);
+			    		myInterfaceName = att.getValue(i);
+			    	} // else ignore
+			    	else if (att.getQName(i).equalsIgnoreCase(ATTR_TYPE))
+			    	{
+			        	String type = att.getValue(i);
+			    		try
+			    		{
+			    			myType = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, type );
+			    		}
+			    		catch ( Exception e )
+			    		{
+			    			String allTypes = "";
+			    			for( BROWSER_TYPE supportedType : BROWSER_TYPE.values() )
+			    			{
+			    				if (allTypes.isEmpty())
+			    				{
+			    					allTypes = supportedType.toString();
+			    				}
+			    				else
+			    				{
+			    					allTypes += ", " + supportedType;
+			    				}
+			    			}
+			    			throw new TTIException( "ELEMENT_TYPE " + type + " is not supported. Supported types are " + allTypes );
+			    		}
 			    	} // else ignore
 			    	else
 			    	{
@@ -76,19 +130,42 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	@Override
 	public void handleGoToChildElement(String aQualifiedName)
 	{
-		// nop
+	    Trace.println(Trace.UTIL, "handleGoToChildElement( " + 
+		    	      aQualifiedName + " )", true);
+		if ( myInterface == null )
+		{
+			createInterface();
+		}
 	}
 
 	@Override
-	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
+	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler) throws TTIException
 	{
 	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
 		    	      aQualifiedName + " )", true);
 		    
-		if (aQualifiedName.equalsIgnoreCase(ELEMENT_TYPE))
+		if (aQualifiedName.equalsIgnoreCase(CustomStepXmlHandler.START_ELEMENT))
     	{
-			myType = aChildXmlHandler.getValue();
-			aChildXmlHandler.reset();
+    		if ( myInterface == null )
+    		{
+    			throw new TTIException( "The interface is not defined. Unable to add a step to an unknown interface" );
+    		}
+    		
+    		if ( ! CustomizableInterface.class.isInstance(myInterface) )
+    		{
+    			throw new TTIException( "The " + myInterface.getInterfaceName() + " interface is not customizable. "
+    			                        + "Unable to add a step to it." );
+    		}
+
+			try
+			{
+				myCustomStepXmlHandler.addTestStepExecutor( (CustomizableInterface) myInterface );
+			}
+			catch (TestSuiteException e)
+			{
+    			throw new TTIException( "Unable to add a step: " + e.getMessage(), e );
+			}
+			myCustomStepXmlHandler.reset();
     	}
 		else
     	{ // Programming fault
@@ -96,50 +173,31 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 			                 "in the Constructor but not handled in handleReturnFromChildElement()");
 		}
 	}
-
-	/**
-	 * @return the Selenium Configuration
-	 */
-	public SeleniumConfiguration getConfiguration()
+	
+	private void createInterface()
 	{
-		if ( myId.isEmpty() )
+		if ( myInterfaceName.isEmpty() )
 		{
-			throw new Error( "Attribute " + ATTR_ID + " is not defined for Selenium Interface" );
+			throw new Error( "Attribute " + ATTR_NAME + " is not defined for Selenium Interface" );
 		}
-		if ( myType.isEmpty() )
+		myInterface = myInterfaceList.getInterface(myInterfaceName);
+		if ( myInterface == null )
 		{
-			throw new Error( ELEMENT_TYPE + " is not defined for Interface " + myId );
+			// Create new interface
+			myInterface = new WebInterface( myInterfaceName, myType );
+			myInterfaceList.add(myInterface);
 		}
-
-		BROWSER_TYPE type;
-		try
-		{
-			type = BROWSER_TYPE.valueOf( myType );
-		}
-		catch ( Exception e )
-		{
-			String allTypes = "";
-			for( BROWSER_TYPE supportedType : BROWSER_TYPE.values() )
-			{
-				if (allTypes.isEmpty())
-				{
-					allTypes = supportedType.toString();
-				}
-				else
-				{
-					allTypes += ", " + supportedType;
-				}
-			}
-			throw new Error( "ELEMENT_TYPE " + myType + " is not supported. Supported types are " + allTypes );
-		}
-		
-		return new SeleniumConfiguration( myId, type );
 	}
-
 
 	public void reset()
 	{
-		myId = "";
-		myType = "";
+		myInterface = null;
+		myInterfaceName = "";
+		myType = myDefaultType;
+	}
+
+	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
+	{
+		myDefaultType = aBrowser;
 	}
 }

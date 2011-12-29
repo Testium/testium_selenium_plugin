@@ -5,17 +5,21 @@ package org.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriver;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.testsuite.ParameterImpl;
+import org.testtoolinterfaces.testsuite.ParameterVariable;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.testsuite.TestStepSimple;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
+ * Executes the Selenium 2.0 get command
+ * 
  * @author Arjan Kranenburg
  *
  */
@@ -41,10 +45,22 @@ public class GetCommand extends WebDriverCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		RemoteWebDriver webDriver = this.getDriverAndSetResult(result);
+		WebDriver webDriver = this.getDriverAndSetResult(result);
 
+		String url = "";
 		Parameter urlPar = parameters.get(PAR_URL);
-		String url = urlPar.getValueAsString();
+		if ( urlPar.getClass().equals( ParameterVariable.class ) )
+		{
+			url = getVariableValueAs(String.class, urlPar, aVariables);
+		}
+		else if ( ParameterImpl.class.isInstance( urlPar ) )
+		{
+			url = ((ParameterImpl) urlPar).getValueAsString();
+		}
+		else
+		{
+			throw new TestSuiteException( "parameter must be value or variable: " + urlPar.getName() );
+		}
 
 		webDriver.get(url);
 		setTestStepResult( null );
@@ -64,18 +80,15 @@ public class GetCommand extends WebDriverCommandExecutor
 			                              getInterfaceName() + "." + COMMAND );
 		}
 		
-		if ( ! urlPar.getValueType().equals( String.class ) )
+		if ( urlPar.getClass().equals( ParameterVariable.class ) )
 		{
-			throw new TestSuiteException( "Parameter " + PAR_URL + " must be a String",
-			                              getInterfaceName() + "." + COMMAND );
+			verifyParameterVariable(urlPar);
+		}
+		else
+		{
+			verifyParameterValue(urlPar, String.class);
 		}
 
-		if ( urlPar.getValueAsString().isEmpty() )
-		{
-			throw new TestSuiteException( PAR_URL + " cannot be empty",
-			                              getInterfaceName() + "." + COMMAND );
-		}
-		
 		return true;
 	}
 
