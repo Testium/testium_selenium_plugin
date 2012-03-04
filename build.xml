@@ -8,7 +8,7 @@
 	<target name="CreateJarFileWithExternalLibrary">
 
 		<delete file="../../../Testium_Plugins/SeleniumPlugin.jar"/>
-		<property name="version.num" value="0.1.0"/>
+		<property name="version.num" value="0.3.0"/>
 	    <buildnumber file="build.num"/>
 		
 		<!--

@@ -14,7 +14,7 @@ import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
-import org.testtoolinterfaces.testsuite.TestStepSimple;
+import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
@@ -36,7 +36,7 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 	private WebInterface myInterface;
 
 	@Override
-	abstract public TestStepResult execute( TestStepSimple aStep,
+	abstract public TestStepResult execute( TestStep aStep,
 	                                        RunTimeData aVariables,
 	                                        File aLogDir )
 					throws TestSuiteException;

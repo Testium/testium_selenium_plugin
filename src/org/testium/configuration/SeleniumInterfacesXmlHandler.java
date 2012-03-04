@@ -31,8 +31,7 @@ public class SeleniumInterfacesXmlHandler extends XmlHandler
 	    Trace.println(Trace.CONSTRUCTOR);
 
 	    myInterfaceXmlHandler = new SeleniumInterfaceXmlHandler( anXmlReader, anInterfaceList, aTestStepMetaExecutor );
-		this.addStartElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, myInterfaceXmlHandler);
-		myInterfaceXmlHandler.addEndElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(SeleniumInterfaceXmlHandler.START_ELEMENT, myInterfaceXmlHandler);
 
 	    reset();
 	}

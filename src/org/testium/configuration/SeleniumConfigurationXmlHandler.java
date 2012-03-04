@@ -53,16 +53,13 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 		myRtData = anRtData;
 		
 	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
-		this.addStartElementHandler(DEF_BROWSER_ELEMENT, myDefaultBrowserXmlHandler);
-		myDefaultBrowserXmlHandler.addEndElementHandler(DEF_BROWSER_ELEMENT, this);
+		this.addElementHandler(DEF_BROWSER_ELEMENT, myDefaultBrowserXmlHandler);
 
 		mySeleniumLibsDirXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_LIBS_DIR_ELEMENT);
-		this.addStartElementHandler(SELENIUM_LIBS_DIR_ELEMENT, mySeleniumLibsDirXmlHandler);
-		mySeleniumLibsDirXmlHandler.addEndElementHandler(SELENIUM_LIBS_DIR_ELEMENT, this);
+		this.addElementHandler(SELENIUM_LIBS_DIR_ELEMENT, mySeleniumLibsDirXmlHandler);
 
 		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
-		this.addStartElementHandler(SeleniumInterfacesXmlHandler.START_ELEMENT, myInterfacesXmlHandler);
-		myInterfacesXmlHandler.addEndElementHandler(SeleniumInterfacesXmlHandler.START_ELEMENT, this);
+		this.addElementHandler(SeleniumInterfacesXmlHandler.START_ELEMENT, myInterfacesXmlHandler);
 	}
 
 	@Override
