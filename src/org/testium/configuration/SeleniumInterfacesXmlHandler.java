@@ -1,6 +1,5 @@
 package org.testium.configuration;
 
-import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.SupportedInterfaceList;
 import org.testium.executor.TestStepMetaExecutor;
 import org.testtoolinterfaces.utils.Trace;
@@ -89,8 +88,8 @@ public class SeleniumInterfacesXmlHandler extends XmlHandler
 		myInterfaceXmlHandler.reset();
 	}
 
-	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
-	{
-		myInterfaceXmlHandler.setDefaultBrowser( aBrowser );
-	}
+//	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
+//	{
+//		myInterfaceXmlHandler.setDefaultBrowser( aBrowser );
+//	}
 }

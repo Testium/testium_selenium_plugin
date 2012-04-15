@@ -6,6 +6,8 @@ package org.testium.executor.webdriver.commands;
 import java.io.File;
 
 import org.openqa.selenium.WebDriver;
+import org.testium.configuration.SeleniumConfiguration;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -44,14 +46,16 @@ public class GetCurrentUrlCommand  extends WebDriverCommandExecutor
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
+		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
 
 		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_URL);
 		String variableName = variablePar.getVariableName();
 
 		String currentUrl = webDriver.getCurrentUrl();
-		setTestStepResult( null );
+		setTestStepResult( null, browserType );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( variableName, currentUrl );
 		aVariables.add(rtVariable);

@@ -4,14 +4,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.CustomizableInterface;
 import org.testium.executor.TestStepCommandExecutor;
-import org.testium.executor.webdriver.commands.*;
+import org.testium.executor.webdriver.commands.BackCommand;
+import org.testium.executor.webdriver.commands.CheckCurrentUrlCommand;
+import org.testium.executor.webdriver.commands.CheckTitleCommand;
+import org.testium.executor.webdriver.commands.ClearCommand;
+import org.testium.executor.webdriver.commands.CloseCommand;
+import org.testium.executor.webdriver.commands.FindElementCommand;
+import org.testium.executor.webdriver.commands.FindElementsCommand;
+import org.testium.executor.webdriver.commands.ForwardCommand;
+import org.testium.executor.webdriver.commands.GetCommand;
+import org.testium.executor.webdriver.commands.GetCurrentUrlCommand;
+import org.testium.executor.webdriver.commands.GetTitleCommand;
+import org.testium.executor.webdriver.commands.QuitCommand;
+import org.testium.executor.webdriver.commands.SavePageSourceCommand;
+import org.testium.executor.webdriver.commands.SendKeysCommand;
+import org.testium.executor.webdriver.commands.SubmitCommand;
 import org.testium.systemundertest.SutInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
@@ -32,17 +48,18 @@ public class WebInterface implements SutInterface, CustomizableInterface
 {
 	private WebDriver myDriver;
 	private String myDriverName;
-	private BROWSER_TYPE myBrowserType;
+//	private BROWSER_TYPE myBrowserType;
 
 	private Hashtable<String, TestStepCommandExecutor> myCommandExecutors;
 
 	/**
 	 * 
 	 */
-	public WebInterface( String aName, BROWSER_TYPE aType )
+//	public WebInterface( String aName, BROWSER_TYPE aType )
+	public WebInterface(String aName)
 	{
 		myDriverName = aName;
-		myBrowserType = aType;
+//		myBrowserType = aType;
 
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
@@ -50,6 +67,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		add( new CheckTitleCommand( this ) );
 		add( new ClearCommand( this ) );
 		add( new CloseCommand( this ) );
+//		add( new GenericCommandExecuter )
 		add( new FindElementCommand( this ) );
 		add( new FindElementsCommand( this ) );
 		add( new GetCommand( this ) );
@@ -63,11 +81,11 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		add( new SubmitCommand( this ) );
 	}
 
-	public WebDriver getDriver( )
+	public WebDriver getDriver( BROWSER_TYPE aType )
 	{
 		if ( myDriver == null )
 		{
-			createDriver();
+			createDriver( aType );
 		}
 		
 		return myDriver;
@@ -82,11 +100,12 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		
 		this.setTestStepResult(aTestStepResult);
 		
-		int openWindows = myDriver.getWindowHandles().size();
-		myDriver.close();
+		Set<String> windowHandles = myDriver.getWindowHandles();
+		int openWindows = windowHandles.size();
+			myDriver.close();
 		if ( openWindows == 1 )
 		{
-			this.quitDriver( aTestStepResult );
+			myDriver = null;
 		}
 
 		this.setTestStepResult(null);
@@ -99,7 +118,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 			return; // Nothing to quit (getDriver() would have created one first)
 		}
 		this.setTestStepResult(aTestStepResult);
-		
+
 		myDriver.quit();
 		this.setTestStepResult(null);
 
@@ -173,21 +192,45 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		return myCommandExecutors.get(aCommand);
 	}
 
-	private void createDriver()
+	private void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
 		try
 		{
-			if ( myBrowserType.equals( BROWSER_TYPE.FIREFOX ) )
+			if ( aType.equals( BROWSER_TYPE.FIREFOX ) )
 			{
 				myDriver = new TestiumFirefoxDriver();
 			}
-			else if ( myBrowserType.equals( BROWSER_TYPE.CHROME ) )
+			else if ( aType.equals( BROWSER_TYPE.CHROME ) )
 			{
-				// TODO had a ChromeNotRunningException at the end of the tests
-				myDriver = new TestiumChromeDriver();
+				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+
+				// Got rid of the Welcome-page (Getting started with Chrome) by editing:
+				// C:\Program Files (x86)\Google\Chrome\Application\master_preferences
+				// and setting the show_welcome_page to false
+				//
+				// Tried that as well with: 
+				//				capabilities.setCapability("show-welcome-page", false);
+				// and
+				//				Hashtable<String, Boolean> prefs = new Hashtable<String, Boolean>();
+				//				prefs.put("show-welcome-page", false);
+				//				capabilities.setCapability("chrome.prefs", prefs);
+				// and
+				//				Hashtable<String, Boolean> distribution = new Hashtable<String, Boolean>();
+				//				distribution.put("show-welcome-page", false);
+				//				Hashtable<String, Object> prefs = new Hashtable<String, Object>();
+				//				prefs.put("distribution", distribution);
+				//				capabilities.setCapability("chrome.prefs", prefs);
+				// and
+				//				switches.add( "no-first-run" );
+				// But that all failed.
+				
+				ArrayList<String> switches = new ArrayList<String>();
+				switches.add( "disable-translate" );
+				capabilities.setCapability("chrome.switches", switches);
+				myDriver = new TestiumChromeDriver( capabilities );
 			}
-			else if ( myBrowserType.equals( BROWSER_TYPE.HTMLUNIT ) )
+			else if ( aType.equals( BROWSER_TYPE.HTMLUNIT ) )
 			{
 				myDriver = new TestiumHtmlUnitDriver();
 			}
@@ -203,15 +246,17 @@ public class WebInterface implements SutInterface, CustomizableInterface
 	//				e.printStackTrace();
 	//			}
 	//		}
-			else if ( myBrowserType.equals( BROWSER_TYPE.IE ) )
+			else if ( aType.equals( BROWSER_TYPE.IE ) )
 			{
-				myDriver = new TestiumIEDriver();
+				DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+				capabilities.setCapability( TestiumIEDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+				myDriver = new TestiumIEDriver( capabilities );
 			}
 		}
 		catch ( WebDriverException e )
 		{ 
 			// TODO How to react?
-			throw new Error( "Browser of type " + myBrowserType + " is not found.\n" + e.getMessage() );
+			throw new Error( "Browser of type " + aType + " is not found.\n" + e.getMessage() );
 		}
 	}
 
@@ -229,8 +274,14 @@ public class WebInterface implements SutInterface, CustomizableInterface
 	                                  String aValue )
 			throws TestSuiteException
 	{
+		if ( aType.equalsIgnoreCase( "string" ) )
+		{
+			return new ParameterImpl(aName, (String) aValue);
+		}			
+
 		if ( aValue.isEmpty() )
 		{
+			// Strings can be empty, so that's handled before.
 			throw new TestSuiteException( "Value of " + aName + " cannot be empty for type " + aType,
 			                              this.getInterfaceName() );
 		}
@@ -274,11 +325,6 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		{
 			return new ParameterImpl(aName, By.cssSelector(aValue) );
 		}
-
-		if ( aType.equalsIgnoreCase( "string" ) )
-		{
-			return new ParameterImpl(aName, (String) aValue);
-		}			
 
 		throw new TestSuiteException( "Parameter type " + aType
 		                              + " is not supported for interface "

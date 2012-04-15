@@ -31,15 +31,15 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	public static final String START_ELEMENT = "SeleniumInterface";
 
 	private static final String	ATTR_NAME			= "name";
-	private static final String	ATTR_TYPE			= "type";
+//	private static final String	ATTR_TYPE			= "type";
 
 	private SupportedInterfaceList myInterfaceList;
 	private CustomStepXmlHandler myCustomStepXmlHandler;
 
 	private TestInterface myInterface;
 	private String myInterfaceName;
-	private BROWSER_TYPE myType;
-	private BROWSER_TYPE myDefaultType = BROWSER_TYPE.HTMLUNIT;
+//	private BROWSER_TYPE myType;
+//	private BROWSER_TYPE myDefaultType = BROWSER_TYPE.HTMLUNIT;
 	
 	public SeleniumInterfaceXmlHandler(XMLReader anXmlReader, SupportedInterfaceList anInterfaceList, TestStepMetaExecutor aTestStepMetaExecutor)
 	{
@@ -73,7 +73,7 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		    	      aQualifiedName + " )", true);
 		if ( myInterface == null )
 		{
-			// We now have the rare case that the interface is defined, but no custome steps were defined.
+			// We now have the rare case that the interface is defined, but no custom steps were defined.
 			createInterface();
 		}
 	}
@@ -91,31 +91,31 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 			    	if (att.getQName(i).equalsIgnoreCase(ATTR_NAME))
 			    	{
 			    		myInterfaceName = att.getValue(i);
-			    	} // else ignore
-			    	else if (att.getQName(i).equalsIgnoreCase(ATTR_TYPE))
-			    	{
-			        	String type = att.getValue(i);
-			    		try
-			    		{
-			    			myType = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, type );
-			    		}
-			    		catch ( Exception e )
-			    		{
-			    			String allTypes = "";
-			    			for( BROWSER_TYPE supportedType : BROWSER_TYPE.values() )
-			    			{
-			    				if (allTypes.isEmpty())
-			    				{
-			    					allTypes = supportedType.toString();
-			    				}
-			    				else
-			    				{
-			    					allTypes += ", " + supportedType;
-			    				}
-			    			}
-			    			throw new TTIException( "ELEMENT_TYPE " + type + " is not supported. Supported types are " + allTypes );
-			    		}
-			    	} // else ignore
+			    	}
+//			    	else if (att.getQName(i).equalsIgnoreCase(ATTR_TYPE))
+//			    	{
+//			        	String type = att.getValue(i);
+//			    		try
+//			    		{
+//			    			myType = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, type );
+//			    		}
+//			    		catch ( Exception e )
+//			    		{
+//			    			String allTypes = "";
+//			    			for( BROWSER_TYPE supportedType : BROWSER_TYPE.values() )
+//			    			{
+//			    				if (allTypes.isEmpty())
+//			    				{
+//			    					allTypes = supportedType.toString();
+//			    				}
+//			    				else
+//			    				{
+//			    					allTypes += ", " + supportedType;
+//			    				}
+//			    			}
+//			    			throw new TTIException( "ELEMENT_TYPE " + type + " is not supported. Supported types are " + allTypes );
+//			    		}
+//			    	} // else ignore
 			    	else
 			    	{
 						throw new Error( "The attribute '" + att.getQName(i) 
@@ -183,7 +183,8 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		if ( myInterface == null )
 		{
 			// Create new interface
-			myInterface = new WebInterface( myInterfaceName, myType );
+//			myInterface = new WebInterface( myInterfaceName, myType );
+			myInterface = new WebInterface( myInterfaceName );
 			myInterfaceList.add(myInterface);
 		}
 	}
@@ -192,11 +193,11 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	{
 		myInterface = null;
 		myInterfaceName = "";
-		myType = myDefaultType;
+//		myType = myDefaultType;
 	}
 
-	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
-	{
-		myDefaultType = aBrowser;
-	}
+//	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
+//	{
+//		myDefaultType = aBrowser;
+//	}
 }

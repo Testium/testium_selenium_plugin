@@ -3,12 +3,12 @@
 <project name="SeleniumInterface" default="CreateJarFileWithExternalLibrary">
 
 	<!-- Change these properties, if needed, when new versions of libs are used -->
-	<property name="selenium-file" value="lib/selenium-java-2.0b3.jar"/>
+	<property name="selenium-file" value="lib/selenium-java-2.20.0.jar"/>
 
 	<target name="CreateJarFileWithExternalLibrary">
 
 		<delete file="../../../Testium_Plugins/SeleniumPlugin.jar"/>
-		<property name="version.num" value="0.3.0"/>
+		<property name="version.num" value="0.3.1"/>
 	    <buildnumber file="build.num"/>
 		
 		<!--

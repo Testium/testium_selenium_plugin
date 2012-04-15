@@ -8,6 +8,8 @@ import java.io.File;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver;
+import org.testium.configuration.SeleniumConfiguration;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -48,8 +50,10 @@ public class FindElementCommand extends WebDriverCommandExecutor
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
+		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
 
 		ParameterImpl byPar = (ParameterImpl) parameters.get(PAR_BY);
 		By by = byPar.getValueAs(By.class);
@@ -58,7 +62,7 @@ public class FindElementCommand extends WebDriverCommandExecutor
 		String variableName = variablePar.getVariableName();
 
 		WebElement element = webDriver.findElement(by);
-		setTestStepResult( null );
+		setTestStepResult( null, browserType );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( variableName, element );
 		aVariables.add(rtVariable);

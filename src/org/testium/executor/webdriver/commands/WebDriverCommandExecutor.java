@@ -6,6 +6,7 @@ package org.testium.executor.webdriver.commands;
 import java.io.File;
 
 import org.openqa.selenium.WebDriver;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.TestStepCommandExecutor;
 import org.testium.executor.webdriver.TestiumLogger;
 import org.testium.executor.webdriver.WebInterface;
@@ -70,11 +71,11 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 		return myInterface.getInterfaceName();
 	}
 
-	protected WebDriver getDriverAndSetResult( TestStepResult aTestStepResult )
+	protected WebDriver getDriverAndSetResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
 	{
-		WebDriver webDriver = myInterface.getDriver();
+		WebDriver webDriver = myInterface.getDriver( aBrowserType );
 
-		setTestStepResult( aTestStepResult );
+		setTestStepResult( aTestStepResult, aBrowserType );
 		
 		return webDriver;
 	}
@@ -83,9 +84,9 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 	 * @param aRemoteWebDriver
 	 * @param aTestStepResult
 	 */
-	protected void setTestStepResult( TestStepResult aTestStepResult )
+	protected void setTestStepResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
 	{
-		WebDriver webDriver = myInterface.getDriver();
+		WebDriver webDriver = myInterface.getDriver( aBrowserType );
 		if( webDriver.getClass().isAssignableFrom(TestiumLogger.class) )
 		{
 			TestiumLogger logger = (TestiumLogger) webDriver;

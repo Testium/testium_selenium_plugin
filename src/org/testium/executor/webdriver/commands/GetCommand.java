@@ -6,6 +6,8 @@ package org.testium.executor.webdriver.commands;
 import java.io.File;
 
 import org.openqa.selenium.WebDriver;
+import org.testium.configuration.SeleniumConfiguration;
+import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
@@ -44,8 +46,10 @@ public class GetCommand extends WebDriverCommandExecutor
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
+		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+		
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result);
+		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
 
 		String url = "";
 		Parameter urlPar = parameters.get(PAR_URL);
@@ -63,7 +67,7 @@ public class GetCommand extends WebDriverCommandExecutor
 		}
 
 		webDriver.get(url);
-		setTestStepResult( null );
+		setTestStepResult( null, browserType );
 
 		result.setResult( VERDICT.PASSED );
 		return result;

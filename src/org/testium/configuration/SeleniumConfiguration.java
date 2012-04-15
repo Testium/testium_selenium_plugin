@@ -73,6 +73,8 @@ public class SeleniumConfiguration
 //	public final static BROWSER_TYPE IPHONE		= BROWSER_TYPE.IPHONE;
 	public final static BROWSER_TYPE IE			= BROWSER_TYPE.IE;
 
+	public final static String BROWSERTYPE		= "browsertype";
+
 //	private String myInterfaceName;
 	private BROWSER_TYPE myBrowser;
 	private File mySeleniumLibsDir;
