@@ -81,6 +81,18 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		add( new SubmitCommand( this ) );
 	}
 
+	/**
+	 * @return the WebDriver. null if not set.
+	 */
+	public WebDriver getDriver()
+	{
+		return myDriver;
+	}
+
+	/**
+	 * @param aType
+	 * @return the WebDriver. It is created if it does not exist.
+	 */
 	public WebDriver getDriver( BROWSER_TYPE aType )
 	{
 		if ( myDriver == null )
@@ -93,16 +105,16 @@ public class WebInterface implements SutInterface, CustomizableInterface
 
 	public void closeWindow( TestStepResult aTestStepResult )
 	{
-		if ( myDriver == null )
+		if ( this.getDriver() == null )
 		{
 			return; // Nothing to close (getDriver() would have created one first)
 		}
 		
 		this.setTestStepResult(aTestStepResult);
 		
-		Set<String> windowHandles = myDriver.getWindowHandles();
+		Set<String> windowHandles = this.getDriver().getWindowHandles();
 		int openWindows = windowHandles.size();
-			myDriver.close();
+			this.getDriver().close();
 		if ( openWindows == 1 )
 		{
 			myDriver = null;
@@ -113,13 +125,13 @@ public class WebInterface implements SutInterface, CustomizableInterface
 
 	public void quitDriver( TestStepResult aTestStepResult )
 	{
-		if ( myDriver == null )
+		if ( this.getDriver() == null )
 		{
 			return; // Nothing to quit (getDriver() would have created one first)
 		}
 		this.setTestStepResult(aTestStepResult);
 
-		myDriver.quit();
+		this.getDriver().quit();
 		this.setTestStepResult(null);
 
 		myDriver = null;
@@ -131,14 +143,14 @@ public class WebInterface implements SutInterface, CustomizableInterface
 	 */
 	public void setTestStepResult( TestStepResult aTestStepResult )
 	{
-		if ( myDriver == null )
+		if ( this.getDriver() == null )
 		{
 			return;
 		}
 
-		if( myDriver.getClass().isAssignableFrom(TestiumLogger.class) )
+		if( this.getDriver().getClass().isAssignableFrom(TestiumLogger.class) )
 		{
-			TestiumLogger logger = (TestiumLogger) myDriver;
+			TestiumLogger logger = (TestiumLogger) this.getDriver();
 			logger.setTestStepResult(aTestStepResult);
 		}
 	}
@@ -192,7 +204,7 @@ public class WebInterface implements SutInterface, CustomizableInterface
 		return myCommandExecutors.get(aCommand);
 	}
 
-	private void createDriver( BROWSER_TYPE aType )
+	protected void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
 		try
