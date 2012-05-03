@@ -4,11 +4,12 @@
 
 	<!-- Change these properties, if needed, when new versions of libs are used -->
 	<property name="selenium-file" value="lib/selenium-java-2.20.0.jar"/>
+	<property name="selenium-support-file" value="lib/testium-selenium-support-0.1.0.0-src.jar"/>
 
 	<target name="CreateJarFileWithExternalLibrary">
 
 		<delete file="../../../Testium_Plugins/SeleniumPlugin.jar"/>
-		<property name="version.num" value="0.3.2"/>
+		<property name="version.num" value="0.3.3"/>
 	    <buildnumber file="build.num"/>
 		
 		<!--
@@ -33,6 +34,7 @@
 
 	    <!-- Read mf entries -->
 	    <loadmf jar="${selenium-file}" prefix="selenium-mf."/>
+	    <loadmf jar="${selenium-support-file}" prefix="selenium-support-mf."/>
 
 		<jar destfile="../../../Testium_Plugins/SeleniumPlugin.jar" duplicate="preserve" index="true">
 			<fileset dir="src" />
@@ -46,6 +48,7 @@
 			    <include name="License_lgpl-3.0.txt"/>
 			</fileset>
 			<zipfileset src="${selenium-file}" />
+			<zipfileset src="${selenium-support-file}" />
 			<manifest>
 		        <attribute name="Created-By" value="Testium.org"/>
 		        <attribute name="Built-By" value="${user.name}"/>
