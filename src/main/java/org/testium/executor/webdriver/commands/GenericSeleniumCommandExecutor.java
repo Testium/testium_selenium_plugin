@@ -43,6 +43,10 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		myInterface = aWebInterface;
 	}
 
+	protected WebDriver getDriver() {
+		return myInterface.getDriver();
+	}
+
 	protected WebDriver getDriverAndSetResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
 	{
 		WebDriver webDriver = myInterface.getDriver( aBrowserType );

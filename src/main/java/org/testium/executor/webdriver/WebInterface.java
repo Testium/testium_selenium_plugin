@@ -16,6 +16,7 @@ import org.testium.executor.CustomizableInterface;
 import org.testium.executor.TestStepCommandExecutor;
 import org.testium.executor.webdriver.commands.BackCommand;
 import org.testium.executor.webdriver.commands.CheckCurrentUrlCommand;
+import org.testium.executor.webdriver.commands.CheckText;
 import org.testium.executor.webdriver.commands.CheckTitleCommand;
 import org.testium.executor.webdriver.commands.ClearCommand;
 import org.testium.executor.webdriver.commands.Click;
@@ -71,6 +72,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
 		add( new CheckCurrentUrlCommand( this ) );
+		add( new CheckText( this ) );
 		add( new CheckTitleCommand( this ) );
 		add( new ClearCommand( this ) );
 		add( new Click( this ) );
