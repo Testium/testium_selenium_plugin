@@ -10,6 +10,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.CustomizableInterface;
@@ -98,6 +102,11 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		return myDriver;
 	}
 
+	public void setDriver( WebDriver aDriver )
+	{
+		myDriver = aDriver;
+	}
+
 	/**
 	 * @param aType
 	 * @return the WebDriver. It is created if it does not exist.
@@ -126,7 +135,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			this.getDriver().close();
 		if ( openWindows == 1 )
 		{
-			myDriver = null;
+			setDriver(null);
 		}
 
 		this.setTestStepResult(null);
@@ -143,7 +152,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		this.getDriver().quit();
 		this.setTestStepResult(null);
 
-		myDriver = null;
+		setDriver(null);
 	}
 
 	/**
@@ -208,6 +217,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		return myCommandExecutors.get(aCommand);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
@@ -215,7 +225,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		{
 			if ( aType.equals( BROWSER_TYPE.FIREFOX ) )
 			{
-				myDriver = new TestiumFirefoxDriver( this );
+				setDriver(  new RemoteTestiumDriver( new FirefoxDriver(), this ) );
 			}
 			else if ( aType.equals( BROWSER_TYPE.CHROME ) )
 			{
@@ -244,11 +254,11 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 				ArrayList<String> switches = new ArrayList<String>();
 				switches.add( "disable-translate" );
 				capabilities.setCapability("chrome.switches", switches);
-				myDriver = new TestiumChromeDriver( this, capabilities );
+				setDriver(  new RemoteTestiumDriver( new ChromeDriver( capabilities ), this ) );
 			}
 			else if ( aType.equals( BROWSER_TYPE.HTMLUNIT ) )
 			{
-				myDriver = new TestiumHtmlUnitDriver( this );
+				setDriver(  new TestiumDriver( new HtmlUnitDriver(), this ) );
 			}
 	//		else if ( myBrowserType.equals( BROWSER_TYPE.IPHONE ) )
 	//		{
@@ -265,8 +275,8 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			else if ( aType.equals( BROWSER_TYPE.IE ) )
 			{
 				DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
-				capabilities.setCapability( TestiumIEDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-				myDriver = new TestiumIEDriver( this, capabilities );
+				capabilities.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+				setDriver(  new RemoteTestiumDriver( new InternetExplorerDriver( capabilities ), this ) );
 			}
 		}
 		catch ( WebDriverException e )

@@ -1,21 +1,19 @@
 package org.testium.executor.webdriver;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testium.selenium.FieldPublisher;
+import org.testium.selenium.WebDriverDecorator;
 import org.testtoolinterfaces.testresult.TestStepResult;
 
-public class TestiumIEDriver extends InternetExplorerDriver implements TestiumLogger, FieldPublisher
+public class TestiumDriver extends WebDriverDecorator implements TestiumLogger, FieldPublisher 
 {
-	TestStepResult myTestStepResult = null;
-
+	private TestStepResult myTestStepResult = null;
 	private final WebInterface myInterface;
 	
-	public TestiumIEDriver(WebInterface anInterface, DesiredCapabilities capabilities)
-	{
-		super( capabilities );
+	public TestiumDriver( WebDriver aDriver, WebInterface anInterface ) {
+		super( aDriver );
 		myInterface = anInterface;
 	}
 
