@@ -23,7 +23,7 @@ import org.testtoolinterfaces.utils.RunTimeData;
  */
 public class CheckText extends GenericSeleniumCommandExecutor {
 	private static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
-			"element", SmartWebElement.class, false, false, true, false );
+			"element", WebElement.class, false, false, true, false );
 
 	private static final SpecifiedParameter PARSPEC_EXPECTED = new SpecifiedParameter( 
 			"expected", String.class, false, true, true, false );
@@ -42,7 +42,7 @@ public class CheckText extends GenericSeleniumCommandExecutor {
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception {
 
-		WebElement element = (WebElement) obtainValue( aVariables, parameters, PARSPEC_ELEMENT );
+		WebElement element = obtainElement( aVariables, parameters, PARSPEC_ELEMENT );
 		String expectedText = (String) obtainValue( aVariables, parameters, PARSPEC_EXPECTED );
 
 		if ( element == null ) {

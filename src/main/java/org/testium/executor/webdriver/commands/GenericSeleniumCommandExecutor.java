@@ -3,13 +3,16 @@ package org.testium.executor.webdriver.commands;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testium.configuration.SeleniumConfiguration;
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.general.GenericCommandExecutor;
 import org.testium.executor.general.SpecifiedParameter;
 import org.testium.executor.webdriver.TestiumLogger;
 import org.testium.executor.webdriver.WebInterface;
+import org.testium.selenium.SmartWebElement;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
@@ -93,5 +96,47 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		}
 
 		return result;
+	}
+	
+	/**
+	 * @param aVariables
+	 * @param parameters
+	 * @param aParSpec
+	 * 
+	 * @return the value as a WebElement (can be null, if optional).
+	 * If the element is a SmartWebElement the element is reloaded.
+	 * @throws Exception when not an element or when mandatory parameter is not found
+	 */
+	protected WebElement obtainElement( RunTimeData aVariables,
+									  ParameterArrayList parameters,
+									  SpecifiedParameter paramSpec ) throws Exception
+	{
+		WebElement element = (WebElement) super.obtainValue( aVariables, parameters, paramSpec );
+
+		if ( element == null )
+		{
+			if ( paramSpec.isOptional() )
+			{
+				return null;
+			}
+			throw new Exception( "Mandatory element was not found or was not a WebElement: " + paramSpec.getName() );
+		}
+		// element != null
+		
+		if ( ! (element instanceof SmartWebElement) )
+		{
+			return element;
+		}
+		// SmartWebElement
+		
+		SmartWebElement smartElm = (SmartWebElement) element;
+		By by = smartElm.getBy();
+		element = this.getDriver().findElement(by);
+		if ( element == null && ! paramSpec.isOptional() )
+		{
+			throw new Exception( "Mandatory element could not be found: " + by.toString() );
+		}
+
+		return element;
 	}
 }

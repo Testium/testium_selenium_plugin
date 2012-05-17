@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.testium.configuration.SeleniumConfiguration;
 import org.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import org.testium.executor.webdriver.WebInterface;
+import org.testium.selenium.SimplePageElement;
+import org.testium.selenium.SmartWebElement;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testsuite.Parameter;
@@ -62,9 +64,10 @@ public class FindElementCommand extends WebDriverCommandExecutor
 		String variableName = variablePar.getVariableName();
 
 		WebElement element = webDriver.findElement(by);
+		SmartWebElement smartElement = new SimplePageElement( element, by );
 		setTestStepResult( null, browserType );
 
-		RunTimeVariable rtVariable = new RunTimeVariable( variableName, element );
+		RunTimeVariable rtVariable = new RunTimeVariable( variableName, smartElement );
 		aVariables.add(rtVariable);
 
 		result.setResult( VERDICT.PASSED );
