@@ -119,7 +119,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
     	{
 //			myDefaultBrowser = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, myDefaultBrowserXmlHandler.getValue() );
 //			myInterfacesXmlHandler.setDefaultBrowser( myDefaultBrowser );
-			BROWSER_TYPE browserType = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, myDefaultBrowserXmlHandler.getValue() );
+			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( BROWSER_TYPE.class, myDefaultBrowserXmlHandler.getValue() );
 			RunTimeVariable browserTypeVar = new RunTimeVariable(SeleniumConfiguration.BROWSERTYPE, browserType);
 			myRtData.add(browserTypeVar);
 

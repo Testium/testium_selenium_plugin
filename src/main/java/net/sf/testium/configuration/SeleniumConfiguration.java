@@ -27,8 +27,8 @@ public class SeleniumConfiguration
 			return super.toString().toLowerCase();
 		}
 
-		public static BROWSER_TYPE valueOf(Class<BROWSER_TYPE> enumType,
-		                                            String aType)
+		//overriding valueOf gives a compile error
+		public static BROWSER_TYPE enumOf(Class<BROWSER_TYPE> enumType, String aType)
 		{
 			BROWSER_TYPE value = BROWSER_TYPE.HTMLUNIT;
 			if ( aType == null )
