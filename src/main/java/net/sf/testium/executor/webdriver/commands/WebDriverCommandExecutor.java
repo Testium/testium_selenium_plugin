@@ -33,8 +33,8 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 		SUBPARAMETER,
 	}
 
-	private String myCommand;
-	private WebInterface myInterface;
+	private final String myCommand;
+	private final WebInterface myInterface;
 
 	abstract public TestStepResult execute( TestStep aStep,
 	                                        RunTimeData aVariables,

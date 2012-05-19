@@ -17,7 +17,8 @@ public class RemoteTestiumDriver extends TestiumDriver implements JavascriptExec
 															  FindsByTagName,
 															  FindsByXPath,
 															  HasInputDevices,
-															  HasCapabilities {
+															  HasCapabilities,
+															  TakesScreenshot {
 
 	private final RemoteWebDriver driver;
 	
@@ -141,5 +142,14 @@ public class RemoteTestiumDriver extends TestiumDriver implements JavascriptExec
 		By by = By.id(using);
 		List<WebElement> elms = driver.findElementsByClassName(using);
 		return new SmartElementList( by, elms );
+	}
+
+	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+		return ((TakesScreenshot) driver).getScreenshotAs(target);
+	}
+	
+	public String getPageSource()
+	{
+		return driver.getPageSource();
 	}
 }
