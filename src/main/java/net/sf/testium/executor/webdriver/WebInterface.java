@@ -225,7 +225,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		{
 			if ( aType.equals( BROWSER_TYPE.FIREFOX ) )
 			{
-				setDriver(  new RemoteTestiumDriver( new FirefoxDriver(), this ) );
+				setDriver(  new TestiumFirefoxDriver() );
 			}
 			else if ( aType.equals( BROWSER_TYPE.CHROME ) )
 			{
@@ -254,11 +254,11 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 				ArrayList<String> switches = new ArrayList<String>();
 				switches.add( "disable-translate" );
 				capabilities.setCapability("chrome.switches", switches);
-				setDriver(  new RemoteTestiumDriver( new ChromeDriver( capabilities ), this ) );
+				setDriver( new TestiumChromeDriver( capabilities ) );
 			}
 			else if ( aType.equals( BROWSER_TYPE.HTMLUNIT ) )
 			{
-				setDriver(  new TestiumDriver( new HtmlUnitDriver(), this ) );
+				setDriver(  new TestiumUnitDriver() );
 			}
 	//		else if ( myBrowserType.equals( BROWSER_TYPE.IPHONE ) )
 	//		{
@@ -276,7 +276,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			{
 				DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
 				capabilities.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-				setDriver(  new RemoteTestiumDriver( new InternetExplorerDriver( capabilities ), this ) );
+				setDriver(  new TestiumIeDriver( capabilities ) );
 			}
 		}
 		catch ( WebDriverException e )
