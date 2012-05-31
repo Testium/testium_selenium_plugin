@@ -49,7 +49,7 @@ public class CheckTitleCommand  extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		String expectedTitle = "";
 		Parameter titlePar = parameters.get(PAR_TITLE);
@@ -67,7 +67,6 @@ public class CheckTitleCommand  extends WebDriverCommandExecutor
 		}
 
 		String title = webDriver.getTitle();
-		setTestStepResult( null, browserType );
 
 		if ( title.equals( expectedTitle ) )
 		{

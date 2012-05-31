@@ -49,7 +49,7 @@ public class GetCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 		
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		String url = "";
 		Parameter urlPar = parameters.get(PAR_URL);
@@ -67,7 +67,6 @@ public class GetCommand extends WebDriverCommandExecutor
 		}
 
 		webDriver.get(url);
-		setTestStepResult( null, browserType );
 
 		result.setResult( VERDICT.PASSED );
 		return result;

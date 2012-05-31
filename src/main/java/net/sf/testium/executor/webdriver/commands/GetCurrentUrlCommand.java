@@ -49,13 +49,12 @@ public class GetCurrentUrlCommand  extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		ParameterVariable variablePar = (ParameterVariable) parameters.get(PAR_URL);
 		String variableName = variablePar.getVariableName();
 
 		String currentUrl = webDriver.getCurrentUrl();
-		setTestStepResult( null, browserType );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( variableName, currentUrl );
 		aVariables.add(rtVariable);

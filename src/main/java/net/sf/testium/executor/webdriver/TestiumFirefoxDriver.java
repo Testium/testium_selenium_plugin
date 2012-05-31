@@ -2,6 +2,7 @@ package net.sf.testium.executor.webdriver;
 
 import java.util.List;
 
+import net.sf.testium.selenium.FieldPublisher;
 import net.sf.testium.selenium.SimplePageElement;
 import net.sf.testium.selenium.SmartElementList;
 import net.sf.testium.selenium.SmartWebElement;
@@ -10,7 +11,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-public class TestiumFirefoxDriver extends FirefoxDriver {
+public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublisher {
+
+	private final WebInterface myInterface;
+	
+	public TestiumFirefoxDriver( WebInterface anInterface ) {
+		super();
+		myInterface = anInterface;
+	}
 
 	@Override
 	public SmartElementList findElements(By by) {
@@ -140,5 +148,17 @@ public class TestiumFirefoxDriver extends FirefoxDriver {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByClassName(using);
 		return new SmartElementList( elms, by );
+	}
+
+	public void addElement(String varName, WebElement element) {
+		myInterface.addElement(varName, element);
+	}
+
+	public void addElement(String varName, List<WebElement> elements) {
+		myInterface.addElement(varName, elements);
+	}
+
+	public WebElement getElement(String varName) {
+		return myInterface.getElement(varName);
 	}
 }

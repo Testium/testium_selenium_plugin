@@ -49,13 +49,12 @@ public class GetTitleCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		ParameterVariable titlePar = (ParameterVariable) parameters.get(PAR_TITLE);
 		String variableName = titlePar.getVariableName();
 
 		String title = webDriver.getTitle();
-		setTestStepResult( null, browserType );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( variableName, title );
 		aVariables.add(rtVariable);

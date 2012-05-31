@@ -39,5 +39,4 @@ public class Click extends GenericSeleniumCommandExecutor
 		WebElement element = obtainElement(aVariables, parameters, PARSPEC_ELEMENT);
 		element.click();
 	}
-
 }

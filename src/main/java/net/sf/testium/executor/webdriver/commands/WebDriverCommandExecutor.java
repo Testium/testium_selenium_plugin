@@ -8,7 +8,6 @@ import java.io.File;
 import org.openqa.selenium.WebDriver;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.TestStepCommandExecutor;
-import net.sf.testium.executor.webdriver.TestiumLogger;
 import net.sf.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.Parameter;
@@ -68,29 +67,12 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 		return myInterface.getInterfaceName();
 	}
 
-	protected WebDriver getDriverAndSetResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
+	protected WebDriver getDriver( BROWSER_TYPE aBrowserType )
 	{
 		WebDriver webDriver = myInterface.getDriver( aBrowserType );
-
-		setTestStepResult( aTestStepResult, aBrowserType );
 		
 		return webDriver;
 	}
-
-	/**
-	 * @param aRemoteWebDriver
-	 * @param aTestStepResult
-	 */
-	protected void setTestStepResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
-	{
-		WebDriver webDriver = myInterface.getDriver( aBrowserType );
-		if( webDriver.getClass().isAssignableFrom(TestiumLogger.class) )
-		{
-			TestiumLogger logger = (TestiumLogger) webDriver;
-			logger.setTestStepResult(aTestStepResult);
-		}
-	}
-
 
 	/**
 	 * @param aPar

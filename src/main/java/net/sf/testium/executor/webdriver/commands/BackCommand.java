@@ -44,10 +44,9 @@ public class BackCommand extends WebDriverCommandExecutor
 
 		TestStepResult result = new TestStepResult( aStep );
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		webDriver.navigate().back();
-		setTestStepResult( null, browserType );
 
 		result.setResult( VERDICT.PASSED );
 		return result;

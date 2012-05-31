@@ -55,7 +55,7 @@ public class FindElementCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		ParameterImpl byPar = (ParameterImpl) parameters.get(PAR_BY);
 		By by = byPar.getValueAs(By.class);
@@ -65,7 +65,6 @@ public class FindElementCommand extends WebDriverCommandExecutor
 
 		WebElement element = webDriver.findElement(by);
 		SmartWebElement smartElement = new SimplePageElement( element, by );
-		setTestStepResult( null, browserType );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( variableName, smartElement );
 		aVariables.add(rtVariable);

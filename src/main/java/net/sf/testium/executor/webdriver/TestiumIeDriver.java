@@ -2,6 +2,7 @@ package net.sf.testium.executor.webdriver;
 
 import java.util.List;
 
+import net.sf.testium.selenium.FieldPublisher;
 import net.sf.testium.selenium.SimplePageElement;
 import net.sf.testium.selenium.SmartElementList;
 import net.sf.testium.selenium.SmartWebElement;
@@ -11,14 +12,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class TestiumIeDriver extends InternetExplorerDriver {
+public class TestiumIeDriver extends InternetExplorerDriver implements FieldPublisher {
 
-	public TestiumIeDriver() {
+	private final WebInterface myInterface;
+	
+	public TestiumIeDriver( WebInterface anInterface ) {
 		super();
+		myInterface = anInterface;
 	}
 
-	public TestiumIeDriver(DesiredCapabilities capabilities) {
+	public TestiumIeDriver( WebInterface anInterface, DesiredCapabilities capabilities) {
 		super( capabilities );
+		myInterface = anInterface;
 	}
 
 	@Override
@@ -149,5 +154,17 @@ public class TestiumIeDriver extends InternetExplorerDriver {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByClassName(using);
 		return new SmartElementList( elms, by );
+	}
+
+	public void addElement(String varName, WebElement element) {
+		myInterface.addElement(varName, element);
+	}
+
+	public void addElement(String varName, List<WebElement> elements) {
+		myInterface.addElement(varName, elements);
+	}
+
+	public WebElement getElement(String varName) {
+		return myInterface.getElement(varName);
 	}
 }

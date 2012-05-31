@@ -4,39 +4,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
+
+import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import net.sf.testium.executor.CustomizableInterface;
+import net.sf.testium.executor.TestStepCommandExecutor;
+import net.sf.testium.executor.webdriver.commands.*;
+import net.sf.testium.selenium.FieldPublisher;
+import net.sf.testium.systemundertest.SutInterface;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import net.sf.testium.executor.CustomizableInterface;
-import net.sf.testium.executor.TestStepCommandExecutor;
-import net.sf.testium.executor.webdriver.commands.BackCommand;
-import net.sf.testium.executor.webdriver.commands.CheckCurrentUrlCommand;
-import net.sf.testium.executor.webdriver.commands.CheckText;
-import net.sf.testium.executor.webdriver.commands.CheckTitleCommand;
-import net.sf.testium.executor.webdriver.commands.ClearCommand;
-import net.sf.testium.executor.webdriver.commands.Click;
-import net.sf.testium.executor.webdriver.commands.CloseCommand;
-import net.sf.testium.executor.webdriver.commands.FindElementCommand;
-import net.sf.testium.executor.webdriver.commands.FindElementsCommand;
-import net.sf.testium.executor.webdriver.commands.ForwardCommand;
-import net.sf.testium.executor.webdriver.commands.GetCommand;
-import net.sf.testium.executor.webdriver.commands.GetCurrentUrlCommand;
-import net.sf.testium.executor.webdriver.commands.GetTitleCommand;
-import net.sf.testium.executor.webdriver.commands.QuitCommand;
-import net.sf.testium.executor.webdriver.commands.SavePageSourceCommand;
-import net.sf.testium.executor.webdriver.commands.SendKeysCommand;
-import net.sf.testium.executor.webdriver.commands.SubmitCommand;
-import net.sf.testium.selenium.FieldPublisher;
-import net.sf.testium.systemundertest.SutInterface;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
@@ -166,11 +149,11 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			return;
 		}
 
-		if( this.getDriver().getClass().isAssignableFrom(TestiumLogger.class) )
-		{
-			TestiumLogger logger = (TestiumLogger) this.getDriver();
-			logger.setTestStepResult(aTestStepResult);
-		}
+//		if( this.getDriver().getClass().isAssignableFrom(TestiumLogger.class) )
+//		{
+//			TestiumLogger logger = (TestiumLogger) this.getDriver();
+//			logger.setTestStepResult(aTestStepResult);
+//		}
 	}
 
 	public ArrayList<TestStepCommandExecutor> getCommandExecutors()
@@ -217,7 +200,6 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		return myCommandExecutors.get(aCommand);
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
@@ -225,7 +207,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		{
 			if ( aType.equals( BROWSER_TYPE.FIREFOX ) )
 			{
-				setDriver(  new TestiumFirefoxDriver() );
+				setDriver(  new TestiumFirefoxDriver( this ) );
 			}
 			else if ( aType.equals( BROWSER_TYPE.CHROME ) )
 			{
@@ -254,11 +236,11 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 				ArrayList<String> switches = new ArrayList<String>();
 				switches.add( "disable-translate" );
 				capabilities.setCapability("chrome.switches", switches);
-				setDriver( new TestiumChromeDriver( capabilities ) );
+				setDriver( new TestiumChromeDriver( this, capabilities ) );
 			}
 			else if ( aType.equals( BROWSER_TYPE.HTMLUNIT ) )
 			{
-				setDriver(  new TestiumUnitDriver() );
+				setDriver(  new TestiumUnitDriver( this ) );
 			}
 	//		else if ( myBrowserType.equals( BROWSER_TYPE.IPHONE ) )
 	//		{
@@ -276,7 +258,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			{
 				DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
 				capabilities.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-				setDriver(  new TestiumIeDriver( capabilities ) );
+				setDriver(  new TestiumIeDriver( this, capabilities ) );
 			}
 		}
 		catch ( WebDriverException e )
@@ -362,6 +344,15 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		}
 		
 		RunTimeVariable rtVar = new RunTimeVariable( varName, element );
+		myRtData.add( rtVar );
+	}
+
+	public void addElement(String varName, List<WebElement> elements) {
+		if( elements == null ) {
+			return;
+		}
+		
+		RunTimeVariable rtVar = new RunTimeVariable( varName, elements );
 		myRtData.add( rtVar );
 	}
 

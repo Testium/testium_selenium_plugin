@@ -3,18 +3,15 @@ package net.sf.testium.executor.webdriver.commands;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.general.GenericCommandExecutor;
 import net.sf.testium.executor.general.SpecifiedParameter;
-import net.sf.testium.executor.webdriver.TestiumLogger;
 import net.sf.testium.executor.webdriver.WebInterface;
-import net.sf.testium.selenium.SmartWebElement;
-import org.testtoolinterfaces.testresult.TestStepResult;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
+import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -54,22 +51,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	{
 		WebDriver webDriver = myInterface.getDriver( aBrowserType );
 
-		setTestStepResult( aTestStepResult, aBrowserType );
-		
 		return webDriver;
-	}
-
-	/**
-	 * @param aTestStepResult
-	 */
-	protected void setTestStepResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
-	{
-		WebDriver webDriver = myInterface.getDriver( aBrowserType );
-		if( webDriver.getClass().isAssignableFrom(TestiumLogger.class) )
-		{
-			TestiumLogger logger = (TestiumLogger) webDriver;
-			logger.setTestStepResult(aTestStepResult);
-		}
 	}
 
 	@Override
@@ -81,8 +63,6 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepResult( aStep );
-		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
-		this.setTestStepResult(result, browserType);
 
 		try
 		{
@@ -122,20 +102,6 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 			throw new Exception( "Mandatory element was not found or was not a WebElement: " + paramSpec.getName() );
 		}
 		// element != null
-		
-		if ( ! (element instanceof SmartWebElement) )
-		{
-			return element;
-		}
-		// SmartWebElement
-		
-		SmartWebElement smartElm = (SmartWebElement) element;
-		By by = smartElm.getBy();
-		element = this.getDriver().findElement(by);
-		if ( element == null && ! paramSpec.isOptional() )
-		{
-			throw new Exception( "Mandatory element could not be found: " + by.toString() );
-		}
 
 		return element;
 	}

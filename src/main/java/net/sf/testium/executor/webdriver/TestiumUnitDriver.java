@@ -2,6 +2,7 @@ package net.sf.testium.executor.webdriver;
 
 import java.util.List;
 
+import net.sf.testium.selenium.FieldPublisher;
 import net.sf.testium.selenium.SimplePageElement;
 import net.sf.testium.selenium.SmartElementList;
 import net.sf.testium.selenium.SmartWebElement;
@@ -9,9 +10,17 @@ import net.sf.testium.selenium.SmartWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.testtoolinterfaces.utils.RunTimeVariable;
 
-public class TestiumUnitDriver extends HtmlUnitDriver {
+public class TestiumUnitDriver extends HtmlUnitDriver implements FieldPublisher {
 
+	private final WebInterface myInterface;
+	
+	public TestiumUnitDriver( WebInterface anInterface ) {
+		super();
+		myInterface = anInterface;
+	}
+	
 	@Override
 	public SmartElementList findElements(By by) {
 		List<WebElement> elms = by.findElements(this);
@@ -126,5 +135,17 @@ public class TestiumUnitDriver extends HtmlUnitDriver {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByLinkText(using);
 		return new SmartElementList( elms, by );
+	}
+
+	public void addElement(String varName, WebElement element) {
+		myInterface.addElement(varName, element);
+	}
+
+	public void addElement(String varName, List<WebElement> elements) {
+		myInterface.addElement(varName, elements);
+	}
+
+	public WebElement getElement(String varName) {
+		return myInterface.getElement(varName);
 	}
 }

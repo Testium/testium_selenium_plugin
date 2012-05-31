@@ -5,17 +5,17 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.io.File;
 
-import org.openqa.selenium.WebDriver;
 import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.webdriver.WebInterface;
-import org.testtoolinterfaces.testresult.TestStepResult;
+
+import org.openqa.selenium.WebDriver;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
+import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.testsuite.TestStep;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
-import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
  * Executes the Selenium 2.0 forward command
@@ -46,10 +46,9 @@ public class ForwardCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		webDriver.navigate().forward();
-		setTestStepResult( null, browserType );
 
 		result.setResult( VERDICT.PASSED );
 		return result;

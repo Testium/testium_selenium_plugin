@@ -46,10 +46,9 @@ public class RefreshCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		webDriver.navigate().refresh();
-		setTestStepResult( null, browserType );
 
 		result.setResult( VERDICT.PASSED );
 		return result;

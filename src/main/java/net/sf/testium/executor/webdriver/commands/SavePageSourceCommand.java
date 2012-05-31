@@ -18,7 +18,6 @@ import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
-import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
  * Executes the Selenium 2.0 savePageSource command
@@ -49,10 +48,9 @@ public class SavePageSourceCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		String pageSource = webDriver.getPageSource();
-		setTestStepResult( null, browserType );
 
 		int i = 0;
 		String sourceLogKey = "source";

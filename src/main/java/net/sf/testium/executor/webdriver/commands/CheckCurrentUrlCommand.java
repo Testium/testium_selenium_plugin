@@ -49,7 +49,7 @@ public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
 		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriverAndSetResult(result, browserType);
+		WebDriver webDriver = this.getDriver(browserType);
 
 		String expectedUrl = "";
 		Parameter urlPar = parameters.get(PAR_URL);
@@ -67,7 +67,6 @@ public class CheckCurrentUrlCommand extends WebDriverCommandExecutor
 		}
 
 		String currentUrl = webDriver.getCurrentUrl();
-		setTestStepResult( null, browserType );
 
 		if ( currentUrl.equals( expectedUrl ) )
 		{
