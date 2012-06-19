@@ -46,10 +46,11 @@ public class GetCommand extends WebDriverCommandExecutor
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
-		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+//		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
 		
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriver(browserType);
+//		WebDriver webDriver = this.getDriver(browserType);
+		WebDriver webDriver = this.getDriver();
 
 		String url = "";
 		Parameter urlPar = parameters.get(PAR_URL);

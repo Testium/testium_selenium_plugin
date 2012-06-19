@@ -29,7 +29,7 @@ import org.xml.sax.XMLReader;
  * 
  */
 
-public class SeleniumConfigurationXmlHandler extends XmlHandler
+public class SeleniumLibsDirXmlHandler extends XmlHandler
 {
 	private static final String START_ELEMENT = "SeleniumConfiguration";
 
@@ -50,7 +50,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 	private RunTimeData myRtData;
 	
-	public SeleniumConfigurationXmlHandler( XMLReader anXmlReader, 
+	public SeleniumLibsDirXmlHandler( XMLReader anXmlReader, 
 	                                        SupportedInterfaceList anInterfaceList,
 	                                        TestStepMetaExecutor aTestStepMetaExecutor,
 	                                        RunTimeData anRtData )

@@ -42,8 +42,18 @@ public final class SeleniumPlugin implements Plugin
 		// Interfaces
 		SupportedInterfaceList interfaceList = aPluginCollection.getInterfaces();
 		TestStepMetaExecutor testStepMetaExecutor = aPluginCollection.getTestStepExecutor();
-		SeleniumConfiguration config = readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
-		File seleniumLibsDir = config.getSeleniumLibsDir();
+//		SeleniumConfiguration config = readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
+//		File seleniumLibsDir = config.getSeleniumLibsDir();
+
+// WORKAROUND
+// The interfaces can only be created when the seleniumlibs are loaded, but the interfaces are created
+// when configuration is read.
+// TODO possible solutions:
+// 1) Get seleniumLibsDir first from configuration
+// 2) Load seleniumLibs as soon as seleniumLibsDir is read (hence inside SeleniumConfigurationXmlHandler)
+		
+		File pluginsDir = anRtData.getValueAsFile( Testium.PLUGINSDIR );	
+		File seleniumLibsDir = new File( pluginsDir, "SeleniumLibs" );
 
 		try
 		{
@@ -53,6 +63,8 @@ public final class SeleniumPlugin implements Plugin
 		{
 			throw new ConfigurationException( e );
 		}
+
+		readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
 
 //		Hashtable<String, SeleniumConfiguration> configs = readConfigFiles( anRtData, interfaceList );
 //		for (Enumeration<String> ids = configs.keys(); ids.hasMoreElements();)

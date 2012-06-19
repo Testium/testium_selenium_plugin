@@ -2,24 +2,27 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.general.GenericCommandExecutor;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestStep;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecutor
 {
-	private WebInterface myInterface;
 	
 	/**
 	 * @param aVariables
@@ -40,16 +43,28 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	                               ArrayList<SpecifiedParameter> parameterSpecs )
 	{
 		super( command, aWebInterface, parameterSpecs );
-		myInterface = aWebInterface;
+	}
+
+	protected WebInterface getInterface()
+	{
+		return (WebInterface) super.getInterface();
 	}
 
 	protected WebDriver getDriver() {
-		return myInterface.getDriver();
+		return this.getInterface().getDriver();
 	}
 
+	protected WebDriver getDriver( BROWSER_TYPE aBrowserType )
+	{
+		WebDriver webDriver = this.getInterface().getDriver( aBrowserType );
+
+		return webDriver;
+	}
+
+	@Deprecated
 	protected WebDriver getDriverAndSetResult( TestStepResult aTestStepResult, BROWSER_TYPE aBrowserType )
 	{
-		WebDriver webDriver = myInterface.getDriver( aBrowserType );
+		WebDriver webDriver = this.getInterface().getDriver( aBrowserType );
 
 		return webDriver;
 	}
@@ -77,7 +92,55 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 
 		return result;
 	}
+
+	public boolean verifyParameters( ParameterArrayList aParameters)
+			   throws TestSuiteException
+	{
+		Iterator<SpecifiedParameter> paramSpecItr = this.getParametersIterator();
+		
+		while ( paramSpecItr.hasNext() )
+		{
+			SpecifiedParameter paramSpec = paramSpecItr.next();
+			Parameter par = aParameters.get( paramSpec.getName() );
 	
+			if ( ! this.verifyParameterExists( par, paramSpec ) )
+			{
+				continue; // Exception was thrown if it is mandatory
+			}
+
+			if ( paramSpec.getType().equals( By.class ) )
+			{
+				verifyBy(par, paramSpec);
+			}
+			else
+			{
+				this.verifyValueOrVariable(par, paramSpec);
+			}
+		}	
+		
+		return true;
+	}
+
+	protected void verifyBy( Parameter par, SpecifiedParameter paramSpec )
+			throws TestSuiteException
+	{
+		if ( ! (par instanceof ParameterImpl) )
+		{
+			throw new TestSuiteException( "Parameter " + paramSpec.getName() + " is not a value",
+                    toString() );
+		}
+
+		ParameterImpl valuePar = (ParameterImpl) par;
+
+		if ( ! By.class.isAssignableFrom( valuePar.getValueType() ) )
+		{
+			throw new TestSuiteException( "Parameter " + paramSpec.getName() + " must be of type 'id', 'name'," +
+			                              " 'linkText', 'partialLinkText', 'tagName', 'xPath'," +
+			                              " 'className', or 'cssSelector'",
+			                              toString() );
+		}
+	}
+
 	/**
 	 * @param aVariables
 	 * @param parameters

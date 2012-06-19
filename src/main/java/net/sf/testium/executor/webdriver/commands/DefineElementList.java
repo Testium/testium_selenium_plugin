@@ -4,7 +4,6 @@
 package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
@@ -12,7 +11,6 @@ import net.sf.testium.selenium.SimpleElementList;
 import net.sf.testium.selenium.SmartWebElementList;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
@@ -20,33 +18,28 @@ import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Executes the Selenium 2.0 findElements command
- *
+ * Command for defining a WebElement without actually finding it.
+ * 
  * @author Arjan Kranenburg
  *
  */
-public class FindElementsCommand extends GenericSeleniumCommandExecutor
-{
-	private static final String COMMAND = "findElements";
+public class DefineElementList extends GenericSeleniumCommandExecutor {
+	private static final SpecifiedParameter PARSPEC_BY = new SpecifiedParameter( 
+			"by", By.class, false, true, false, false );
 
-	public static final SpecifiedParameter PARSPEC_BY = new SpecifiedParameter( 
-			"by", By.class, false, true, true, false );
-
-	public static final SpecifiedParameter PARSPEC_ELEMENTS = new SpecifiedParameter( 
-			"elements", String.class, false, true, false, false );
+	private static final SpecifiedParameter PARSPEC_NAME = new SpecifiedParameter( 
+			"name", String.class, false, true, false, false );
 
 	public static final SpecifiedParameter PARSPEC_BASEELEMENT = new SpecifiedParameter( 
 			"baseElement", WebElement.class, true, false, true, false );
 
-    /**
-	 * 
-	 */
-	public FindElementsCommand( WebInterface aWebInterface )
-	{
+	private static final String COMMAND = "defineElementList";
+
+	public DefineElementList( WebInterface aWebInterface ) {
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
 		this.addParamSpec( PARSPEC_BY );
-		this.addParamSpec( PARSPEC_ELEMENTS );
+		this.addParamSpec( PARSPEC_NAME );
 		this.addParamSpec( PARSPEC_BASEELEMENT );
 	}
 
@@ -55,24 +48,21 @@ public class FindElementsCommand extends GenericSeleniumCommandExecutor
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception {
 
-		WebDriver driver = this.getDriver();
+		By by = (By) obtainValue( aVariables, parameters, PARSPEC_BY );
+		String name = (String) obtainValue( aVariables, parameters, PARSPEC_NAME );
 
-		By by = (By) obtainValue(aVariables, parameters, PARSPEC_BY);
-		String elementName = (String) obtainValue(aVariables, parameters, PARSPEC_ELEMENTS);
-
-		List<WebElement> elements;
+		SmartWebElementList smartElementList;
 		WebElement baseElement = this.obtainElement(aVariables, parameters, PARSPEC_BASEELEMENT);
 		if ( baseElement != null )
 		{
-			elements = baseElement.findElements(by);
+			smartElementList = new SimpleElementList( by, this.getInterface(), null, baseElement );
 		}
 		else
 		{
-			elements = driver.findElements(by);
+			smartElementList = new SimpleElementList( by, this.getInterface() );
 		}
-		SmartWebElementList smartElements = new SimpleElementList( by, this.getInterface(), elements );
 
-		RunTimeVariable rtVariable = new RunTimeVariable( elementName, smartElements );
+		RunTimeVariable rtVariable = new RunTimeVariable( name, smartElementList );
 		aVariables.add(rtVariable);
 	}
 }

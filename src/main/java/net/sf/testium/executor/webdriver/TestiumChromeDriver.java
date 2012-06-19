@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.sf.testium.selenium.FieldPublisher;
 import net.sf.testium.selenium.SimplePageElement;
-import net.sf.testium.selenium.SmartElementList;
+import net.sf.testium.selenium.SimpleElementList;
 import net.sf.testium.selenium.SmartWebElement;
 
 import org.openqa.selenium.By;
@@ -28,12 +28,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 	}
 
 	@Override
-	public SmartElementList findElements(By by) {
+	public SimpleElementList findElements(By by) {
 		List<WebElement> elms = by.findElements(this);
-		if ( elms instanceof SmartElementList ) {
-			return (SmartElementList) elms;
+		if ( elms instanceof SimpleElementList ) {
+			return (SimpleElementList) elms;
 		}
-		return new SmartElementList(elms, by);
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
@@ -42,119 +42,119 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		if ( elm instanceof SmartWebElement ) {
 			return (SmartWebElement) elm;
 		}
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
 	public SmartWebElement findElementById(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementById(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsById(String using) {
+	public SimpleElementList findElementsById(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsById(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByXPath(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByXPath(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByXPath(String using) {
+	public SimpleElementList findElementsByXPath(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByXPath(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByTagName(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByTagName(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByTagName(String using) {
+	public SimpleElementList findElementsByTagName(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByTagName(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByCssSelector(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByCssSelector(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByCssSelector(String using) {
+	public SimpleElementList findElementsByCssSelector(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByCssSelector(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByName(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByName(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByName(String using) {
+	public SimpleElementList findElementsByName(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByName(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByLinkText(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByLinkText(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
 	public SmartWebElement findElementByPartialLinkText(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByPartialLinkText(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByLinkText(String using) {
+	public SimpleElementList findElementsByLinkText(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByLinkText(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
-	public SmartElementList findElementsByPartialLinkText(String using) {
+	public SimpleElementList findElementsByPartialLinkText(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByLinkText(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	@Override
 	public SmartWebElement findElementByClassName(String using) {
 		By by = By.id(using);
 		WebElement elm = super.findElementByClassName(using);
-		return new SimplePageElement(elm, by);
+		return new SimplePageElement( by, myInterface, elm );
 	}
 
 	@Override
-	public SmartElementList findElementsByClassName(String using) {
+	public SimpleElementList findElementsByClassName(String using) {
 		By by = By.id(using);
 		List<WebElement> elms = super.findElementsByClassName(using);
-		return new SmartElementList( elms, by );
+		return new SimpleElementList( by, myInterface, elms );
 	}
 
 	public void addElement(String varName, WebElement element) {

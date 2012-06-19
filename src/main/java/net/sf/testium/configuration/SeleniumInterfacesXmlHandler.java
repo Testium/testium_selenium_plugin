@@ -12,12 +12,12 @@ import org.xml.sax.XMLReader;
 /**
  * @author Arjan Kranenburg 
  * 
- *  <Interfaces>
- *    <Interface>...</Interface>
- *    <Interface>...</Interface>
- *    <Interface>...</Interface>
+ *  <SeleniumInterfaces>
+ *    <SeleniumInterface>...</SeleniumInterface>
+ *    <SeleniumInterface>...</SeleniumInterface>
+ *    <SeleniumInterface>...</SeleniumInterface>
  *  ...
- *  </Interfaces>
+ *  </SeleniumInterfaces>
  * 
  */
 public class SeleniumInterfacesXmlHandler extends XmlHandler

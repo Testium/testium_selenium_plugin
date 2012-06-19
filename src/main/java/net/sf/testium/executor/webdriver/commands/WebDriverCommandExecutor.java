@@ -67,11 +67,17 @@ public abstract class WebDriverCommandExecutor implements TestStepCommandExecuto
 		return myInterface.getInterfaceName();
 	}
 
+	@Deprecated
 	protected WebDriver getDriver( BROWSER_TYPE aBrowserType )
 	{
 		WebDriver webDriver = myInterface.getDriver( aBrowserType );
 		
 		return webDriver;
+	}
+
+	protected WebDriver getDriver()
+	{
+		return myInterface.getDriver();
 	}
 
 	/**

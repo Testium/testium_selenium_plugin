@@ -7,11 +7,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.CustomizableInterface;
 import net.sf.testium.executor.TestStepCommandExecutor;
 import net.sf.testium.executor.webdriver.commands.*;
 import net.sf.testium.selenium.FieldPublisher;
+import net.sf.testium.selenium.WebDriverInterface;
 import net.sf.testium.systemundertest.SutInterface;
 
 import org.openqa.selenium.By;
@@ -37,7 +39,7 @@ import org.testtoolinterfaces.utils.Trace;
  * @author Arjan Kranenburg
  *
  */
-public class WebInterface implements SutInterface, CustomizableInterface, FieldPublisher
+public class WebInterface implements SutInterface, CustomizableInterface, FieldPublisher, WebDriverInterface
 {
 	private WebDriver myDriver;
 	private String myDriverName;
@@ -59,11 +61,15 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
 		add( new CheckCurrentUrlCommand( this ) );
+		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
 		add( new CheckTitleCommand( this ) );
 		add( new ClearCommand( this ) );
 		add( new Click( this ) );
 		add( new CloseCommand( this ) );
+		add( new CtrlClick( this ) );
+		add( new DefineElement( this ) );
+		add( new DefineElementList( this ) );
 		add( new FindElementCommand( this ) );
 		add( new FindElementsCommand( this ) );
 		add( new GetCommand( this ) );
@@ -74,17 +80,23 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		add( new QuitCommand( this ) );
 		add( new SavePageSourceCommand( this ) );
 		add( new SendKeysCommand( this ) );
-		add( new SubmitCommand( this ) );
+		add( new Submit( this ) );
+		add( new WaitFor( this ) );
 	}
 
 	/**
-	 * @return the WebDriver. null if not set.
+	 * @return the WebDriver. It is created if it does not exist.
 	 */
 	public WebDriver getDriver()
 	{
+		if (myDriver == null) {
+			BROWSER_TYPE browserType = myRtData.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+			createDriver( browserType );
+		}
 		return myDriver;
 	}
 
+	@Deprecated
 	public void setDriver( WebDriver aDriver )
 	{
 		myDriver = aDriver;
@@ -94,6 +106,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 	 * @param aType
 	 * @return the WebDriver. It is created if it does not exist.
 	 */
+	@Deprecated
 	public WebDriver getDriver( BROWSER_TYPE aType )
 	{
 		if ( myDriver == null )
@@ -106,16 +119,16 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 
 	public void closeWindow( TestStepResult aTestStepResult )
 	{
-		if ( this.getDriver() == null )
+		if ( this.myDriver == null )
 		{
 			return; // Nothing to close (getDriver() would have created one first)
 		}
 		
 		this.setTestStepResult(aTestStepResult);
 		
-		Set<String> windowHandles = this.getDriver().getWindowHandles();
+		Set<String> windowHandles = this.myDriver.getWindowHandles();
 		int openWindows = windowHandles.size();
-			this.getDriver().close();
+		this.myDriver.close();
 		if ( openWindows == 1 )
 		{
 			setDriver(null);
@@ -123,16 +136,16 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 
 		this.setTestStepResult(null);
 	}
-
+	
 	public void quitDriver( TestStepResult aTestStepResult )
 	{
-		if ( this.getDriver() == null )
+		if ( this.myDriver == null )
 		{
 			return; // Nothing to quit (getDriver() would have created one first)
 		}
 		this.setTestStepResult(aTestStepResult);
 
-		this.getDriver().quit();
+		this.myDriver.quit();
 		this.setTestStepResult(null);
 
 		setDriver(null);
@@ -144,16 +157,10 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 	 */
 	public void setTestStepResult( TestStepResult aTestStepResult )
 	{
-		if ( this.getDriver() == null )
+		if ( this.myDriver == null )
 		{
 			return;
 		}
-
-//		if( this.getDriver().getClass().isAssignableFrom(TestiumLogger.class) )
-//		{
-//			TestiumLogger logger = (TestiumLogger) this.getDriver();
-//			logger.setTestStepResult(aTestStepResult);
-//		}
 	}
 
 	public ArrayList<TestStepCommandExecutor> getCommandExecutors()
@@ -360,5 +367,22 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 	{
 		WebElement element = myRtData.getValueAs( WebElement.class, varName);
 		return element;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.getInterfaceName();
+	}
+
+	public void destroy()
+	{
+		if ( this.myDriver == null )
+		{
+			return; // Nothing to destroy (getDriver() would have created one first)
+		}
+		
+		this.myDriver.quit();
+		setDriver(null);
 	}
 }

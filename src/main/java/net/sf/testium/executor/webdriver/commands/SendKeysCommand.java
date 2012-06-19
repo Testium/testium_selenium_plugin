@@ -64,7 +64,17 @@ public class SendKeysCommand extends WebDriverCommandExecutor
 		}
 
 		Parameter elementPar = parameters.get(PAR_ELEMENT);
-		WebElement element = getVariableValueAs(WebElement.class, elementPar, aVariables);
+//		WebElement element = getVariableValueAs(WebElement.class, elementPar, aVariables);
+
+//		Type valueOfType = null;
+		ParameterVariable parVariable = (ParameterVariable) elementPar;
+		String variableName = parVariable.getVariableName();
+		WebElement element = aVariables.getValueAs( WebElement.class, variableName);
+		if ( ! (element instanceof WebElement) )
+		{
+			throw new TestSuiteException( "Variable " + variableName + " is not of type " + WebElement.class.getSimpleName(),
+			                              getInterfaceName() + "." + getCommand() );
+		}
 
 		try
 		{
