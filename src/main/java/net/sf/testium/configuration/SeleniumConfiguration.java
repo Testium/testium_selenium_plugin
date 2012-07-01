@@ -75,6 +75,9 @@ public class SeleniumConfiguration
 
 	public final static String BROWSERTYPE		= "browsertype";
 
+	public final static String VARNAME_SAVEPAGESOURCE = "savePageSource"; // Used as Variable Name.
+	public final static String VARNAME_SAVESCREENSHOT = "saveScreenShot"; // Used as Variable Name.
+	
 //	private String myInterfaceName;
 	private BROWSER_TYPE myBrowser;
 	private File mySeleniumLibsDir;

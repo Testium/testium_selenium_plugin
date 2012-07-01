@@ -60,6 +60,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 
 		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
+		add( new BackCommand( this ) );
 		add( new CheckCurrentUrlCommand( this ) );
 		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
@@ -72,14 +73,14 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		add( new DefineElementList( this ) );
 		add( new FindElementCommand( this ) );
 		add( new FindElementsCommand( this ) );
+		add( new ForwardCommand( this ) );
 		add( new GetCommand( this ) );
 		add( new GetCurrentUrlCommand( this ) );
 		add( new GetTitleCommand( this ) );
-		add( new BackCommand( this ) );
-		add( new ForwardCommand( this ) );
+		add( new LoadElementDefinitions( this ) );
 		add( new QuitCommand( this ) );
 		add( new SavePageSourceCommand( this ) );
-		add( new SendKeysCommand( this ) );
+		add( new SendKeys( this ) );
 		add( new Submit( this ) );
 		add( new WaitFor( this ) );
 	}
@@ -299,45 +300,49 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 			                              this.getInterfaceName() );
 		}
 
-		if ( aType.equalsIgnoreCase( "id" ) )
-		{
-			return new ParameterImpl(aName, By.id(aValue) );
+		By by = WebInterface.getBy(aType, aValue);
+		if ( by != null ) {
+			return new ParameterImpl(aName, by );
 		}
-		
-		if ( aType.equalsIgnoreCase( "name" ) )
-		{
-			return new ParameterImpl(aName, By.name(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "linktext" ) )
-		{
-			return new ParameterImpl(aName, By.linkText(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
-		{
-			return new ParameterImpl(aName, By.partialLinkText(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "tagname" ) )
-		{
-			return new ParameterImpl(aName, By.tagName(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "xpath" ) )
-		{
-			return new ParameterImpl(aName, By.xpath(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "classname" ) )
-		{
-			return new ParameterImpl(aName, By.className(aValue) );
-		}
-
-		if ( aType.equalsIgnoreCase( "cssselector" ) )
-		{
-			return new ParameterImpl(aName, By.cssSelector(aValue) );
-		}
+//		if ( aType.equalsIgnoreCase( "id" ) )
+//		{
+//			return new ParameterImpl(aName, By.id(aValue) );
+//		}
+//		
+//		if ( aType.equalsIgnoreCase( "name" ) )
+//		{
+//			return new ParameterImpl(aName, By.name(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "linktext" ) )
+//		{
+//			return new ParameterImpl(aName, By.linkText(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
+//		{
+//			return new ParameterImpl(aName, By.partialLinkText(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "tagname" ) )
+//		{
+//			return new ParameterImpl(aName, By.tagName(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "xpath" ) )
+//		{
+//			return new ParameterImpl(aName, By.xpath(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "classname" ) )
+//		{
+//			return new ParameterImpl(aName, By.className(aValue) );
+//		}
+//
+//		if ( aType.equalsIgnoreCase( "cssselector" ) )
+//		{
+//			return new ParameterImpl(aName, By.cssSelector(aValue) );
+//		}
 
 		throw new TestSuiteException( "Parameter type " + aType
 		                              + " is not supported for interface "
@@ -384,5 +389,51 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		
 		this.myDriver.quit();
 		setDriver(null);
+	}
+	
+	public static By getBy( String aType, String aValue )
+	{
+		if ( aType.equalsIgnoreCase( "id" ) )
+		{
+			return By.id(aValue);
+		}
+		
+		if ( aType.equalsIgnoreCase( "name" ) )
+		{
+			return By.name(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "linktext" ) )
+		{
+			return By.linkText(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
+		{
+			return By.partialLinkText(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "tagname" ) )
+		{
+			return By.tagName(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "xpath" ) )
+		{
+			return By.xpath(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "classname" ) )
+		{
+			return By.className(aValue);
+		}
+
+		if ( aType.equalsIgnoreCase( "cssselector" ) )
+		{
+			return By.cssSelector(aValue);
+		}
+		
+		//else
+		return null;
 	}
 }

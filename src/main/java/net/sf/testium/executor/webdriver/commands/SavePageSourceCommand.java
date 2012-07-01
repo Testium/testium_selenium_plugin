@@ -45,13 +45,23 @@ public class SavePageSourceCommand extends WebDriverCommandExecutor
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
-		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
-
 		TestStepResult result = new TestStepResult( aStep );
-		WebDriver webDriver = this.getDriver(browserType);
+		WebDriver webDriver = this.getDriver();
 
 		String pageSource = webDriver.getPageSource();
 
+		savePageSource(aLogDir, result, pageSource);
+
+		return result;
+	}
+
+	/**
+	 * @param aLogDir
+	 * @param result
+	 * @param pageSource
+	 */
+	public void savePageSource(File aLogDir, TestStepResult result,
+			String pageSource) {
 		int i = 0;
 		String sourceLogKey = "source";
 		File sourceLog = new File( aLogDir, "page_" + sourceLogKey + ".html" );
@@ -76,8 +86,6 @@ public class SavePageSourceCommand extends WebDriverCommandExecutor
 			result.setComment( "Source file could not be saved: " + e.getMessage() );
 			result.setResult( VERDICT.FAILED );
 		}
-
-		return result;
 	}
 
 	@Override

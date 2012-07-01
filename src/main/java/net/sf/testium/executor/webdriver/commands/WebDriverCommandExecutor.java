@@ -24,14 +24,6 @@ import org.testtoolinterfaces.utils.RunTimeData;
  */
 public abstract class WebDriverCommandExecutor implements TestStepCommandExecutor
 {
-	public static enum ALLOWED_PAR_TYPE
-	{
-		VALUE,
-		VARIABLE,
-		VAL_OR_VAR,
-		SUBPARAMETER,
-	}
-
 	private final String myCommand;
 	private final WebInterface myInterface;
 

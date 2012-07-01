@@ -6,6 +6,8 @@ import net.sf.testium.Testium;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.SupportedInterfaceList;
 import net.sf.testium.executor.TestStepMetaExecutor;
+
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
@@ -21,7 +23,8 @@ import org.xml.sax.XMLReader;
  *    <DefaultBrowser>...</DefaultBrowser>
  *    <ChromeDriver>...</ChromeDriver>
  *    <IeIgnoreProtectedModeSettings>...</IeIgnoreProtectedModeSettings>
- *    <saveScreenshots>...</saveScreenshots>
+ *    <SavePageSource>...</SavePageSource>
+ *    <SaveScreenshot>...</SaveScreenshot>
  *    <SeleniumLibsDir>...</SeleniumLibsDir>
  *    <SeleniumInterfaces>...</SeleniumInterfaces>
  *  ...
@@ -35,13 +38,16 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
 	private static final String IE_IGNORE_PROTECTED_MODE_SETTINGS_ELEMENT = "IeIgnoreProtectedModeSettings";
-	private static final String SAVE_SCREENSHOTS = "saveScreenshots"; // NEVER, ONFAIL, ALWAYS
+	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
+	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
 	private static final String SELENIUM_LIBS_DIR_ELEMENT = "SeleniumLibsDir";
 	private static final String CHROME_DRIVER_ELEMENT = "ChromeDriver";
 
 	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
 	private GenericTagAndStringXmlHandler mySeleniumLibsDirXmlHandler;
 	private GenericTagAndStringXmlHandler myChromeDriverXmlHandler;
+	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
+	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
 	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
@@ -72,6 +78,18 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 		myChromeDriverXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, CHROME_DRIVER_ELEMENT);
 		this.addElementHandler(myChromeDriverXmlHandler);
+
+		mySavePageSourceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_PAGESOURCE);
+		this.addElementHandler(mySavePageSourceXmlHandler);
+		// Default value
+		RunTimeVariable savePagesourceVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVEPAGESOURCE, "NEVER");
+		this.myRtData.add(savePagesourceVar);
+
+		mySaveScreenShotXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_SCREENSHOT);
+		this.addElementHandler(mySaveScreenShotXmlHandler);
+		// Default value
+		RunTimeVariable saveScreenshotsVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVESCREENSHOT, "NEVER");
+		this.myRtData.add(saveScreenshotsVar);
 
 		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader,
 		                                                           anInterfaceList,
@@ -112,6 +130,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 	@Override
 	public void handleReturnFromChildElement(String aQualifiedName, XmlHandler aChildXmlHandler)
+			throws TestSuiteException
 	{
 	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
 		    	      aQualifiedName + " )", true);
@@ -141,6 +160,36 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 			myChromeDriver = new File( ChromeDriverName );
 
 			myChromeDriverXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( SAVE_PAGESOURCE ))
+    	{
+			String savePageSource = mySavePageSourceXmlHandler.getValue();
+			if ( !savePageSource.equalsIgnoreCase("NEVER")
+					&& !savePageSource.equalsIgnoreCase("ONFAIL")
+					&& !savePageSource.equalsIgnoreCase("ALWAYS") ) {
+				throw new TestSuiteException( "\"" + savePageSource + "\" is not allowed for " + SAVE_PAGESOURCE + ". Only NEVER, ONFAIL, or ALWAYS" );
+			}
+			
+			RunTimeVariable savePageSourceVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVEPAGESOURCE,
+					savePageSource.toUpperCase());
+			this.myRtData.add(savePageSourceVar);
+
+			mySavePageSourceXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( SAVE_SCREENSHOT ))
+    	{
+			String saveScreenshots = mySaveScreenShotXmlHandler.getValue();
+			if ( !saveScreenshots.equalsIgnoreCase("NEVER")
+					&& !saveScreenshots.equalsIgnoreCase("ONFAIL")
+					&& !saveScreenshots.equalsIgnoreCase("ALWAYS") ) {
+				throw new TestSuiteException( "\"" + saveScreenshots + "\" is not allowed for " + SAVE_SCREENSHOT + ". Only NEVER, ONFAIL, or ALWAYS" );
+			}
+			
+			RunTimeVariable saveScreenshotsVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVESCREENSHOT,
+						saveScreenshots.toUpperCase());
+			this.myRtData.add(saveScreenshotsVar);
+
+			mySaveScreenShotXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( myInterfacesXmlHandler.getStartElement() ))
     	{
