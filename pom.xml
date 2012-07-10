@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sf.testium</groupId>
   <artifactId>selenium-plugin</artifactId>
-  <version>0.3.3-SNAPSHOT</version>
+  <version>0.3.3</version>
   <name>Testium Selenium Plugin</name>
   <description>Selenium Plugin for the Testium Executor</description>
   <url>http://testium.sf.net/</url>
@@ -46,27 +46,27 @@
   	<dependency>
   	  <groupId>net.sf.testium</groupId>
   	  <artifactId>testium</artifactId>
-  	  <version>0.3.4-SNAPSHOT</version>
+  	  <version>0.3.4</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>utils</artifactId>
-  	  <version>0.1.6-SNAPSHOT</version>
+  	  <version>0.1.6</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>testsuite</artifactId>
-  	  <version>0.3.2-SNAPSHOT</version>
+  	  <version>0.3.2</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>testresult</artifactId>
-  	  <version>0.3.2-SNAPSHOT</version>
+  	  <version>0.3.2</version>
   	</dependency>
   	<dependency>
   	  <groupId>net.sf.testium</groupId>
   	  <artifactId>testium-selenium-support</artifactId>
-  	  <version>0.1.1-SNAPSHOT</version>
+  	  <version>0.1.1</version>
   	</dependency>
   </dependencies>
 
