@@ -55,7 +55,7 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    myRtData = anRtData;
 	    
 	    myCustomStepXmlHandler = new CustomStepXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
-		this.addElementHandler(CustomStepXmlHandler.START_ELEMENT, myCustomStepXmlHandler);
+		this.addElementHandler(myCustomStepXmlHandler);
 
 	    reset();
 	}

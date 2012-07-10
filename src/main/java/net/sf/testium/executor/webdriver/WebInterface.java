@@ -436,4 +436,9 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		//else
 		return null;
 	}
+
+	public String getBaseUrl()
+	{
+		return "";
+	}
 }

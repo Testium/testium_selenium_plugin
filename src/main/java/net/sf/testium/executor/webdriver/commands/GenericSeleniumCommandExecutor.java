@@ -122,11 +122,13 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 			aResult.addComment(aMessage);
 		}
 
-		if ( mySavePageSource.equalsIgnoreCase("ONFAIL") ) {
+		if ( mySavePageSource.equalsIgnoreCase("ONFAIL")
+				|| mySavePageSource.equalsIgnoreCase("ALWAYS") ) {
 			this.savePageSource( aLogDir, aResult );
 		}
 
-		if ( mySaveScreenshot.equalsIgnoreCase("ONFAIL") ) {
+		if ( mySaveScreenshot.equalsIgnoreCase("ONFAIL")
+			|| mySaveScreenshot.equalsIgnoreCase("ALWAYS") ) {
 			this.saveScreenShot( aLogDir, aResult );
 		}
 	}

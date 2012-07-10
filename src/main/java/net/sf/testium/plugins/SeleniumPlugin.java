@@ -86,13 +86,14 @@ public final class SeleniumPlugin implements Plugin
 		File configFile = new File( configDir, "selenium.xml" );
 		SeleniumConfiguration config = readConfigFile( anRtData, configFile, anInterfaceList, aTestStepMetaExecutor );
 		
-//		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
-//		File userConfigFile = new File( userConfigDir, "selenium.xml" );
+		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
+		File userConfigFile = new File( userConfigDir, "selenium.xml" );
 //		SeleniumConfiguration userConfig;
-//		if ( userConfigFile.exists() )
-//		{
-//			userConfig = readConfigFile( userConfigFile, anInterfaceList );
-//		}
+		if ( userConfigFile.exists() )
+		{
+//			userConfig = 
+			readConfigFile( anRtData, userConfigFile, anInterfaceList, aTestStepMetaExecutor );
+		}
 
 //		for (Enumeration<String> ids = userConfigs.keys(); ids.hasMoreElements();)
 //		{
