@@ -1,16 +1,16 @@
+package net.sf.testium.executor.webdriver.commands;
 /**
  * 
  */
-package net.sf.testium.executor.webdriver.commands;
-
 import java.util.ArrayList;
 
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
-import net.sf.testium.selenium.SmartWebDriverWait;
 import net.sf.testium.selenium.SmartWebElement;
 
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
@@ -65,7 +65,12 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 		Long timeout = obtainOptionalValue(aVariables, parameters, PARSPEC_TIMEOUT);
 		Long sleeptime = obtainOptionalValue(aVariables, parameters, PARSPEC_SLEEPTIME);
 		
-		new SmartWebDriverWait( getDriver(), timeout, sleeptime )
-			.until(smartElement.getBy(), presentFlag);
+		if ( presentFlag ) {
+			new WebDriverWait( getDriver(), timeout, sleeptime )
+			.until( ExpectedConditions.visibilityOfElementLocated( smartElement.getBy() ) );
+		} else {
+			new WebDriverWait( getDriver(), timeout, sleeptime )
+			.until( ExpectedConditions.invisibilityOfElementLocated( smartElement.getBy() ) );
+		}
 	}
 }
