@@ -83,6 +83,8 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		add( new SendKeys( this ) );
 		add( new Submit( this ) );
 		add( new WaitFor( this ) );
+		add( new WaitForPresent( this ) );
+		add( new WaitForVisible( this ) );
 	}
 
 	/**

@@ -24,6 +24,7 @@ import org.xml.sax.XMLReader;
  *  <ElementDefinitions>
  *    <ElementDefinitionsLink>...</ElementDefinitionsLink>
  *    <DefineElement>...</DefineElement>
+ *    <DefineElementList>...</DefineElementList>
  *  </ElementDefinitions>
  * 
  */
@@ -55,7 +56,7 @@ public class LoadDefinitionsXmlHandler extends XmlHandler
 		this.addElementHandler(myDefineElementXmlHandler);
 
 		myDefineElementListXmlHandler = new DefineElementListXmlHandler(anXmlReader, anRtData, anInterface);
-		this.addElementHandler(myDefineElementXmlHandler);
+		this.addElementHandler(myDefineElementListXmlHandler);
 
 		myElementDefinitionsLinkXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, ELEMENT_DEFINITIONS_LINK_ELEMENT);
 		this.addElementHandler(myElementDefinitionsLinkXmlHandler);
@@ -118,7 +119,16 @@ public class LoadDefinitionsXmlHandler extends XmlHandler
 				throw new TTIException( "Failed to load element Definition", e );
 			}
     		myDefineElementXmlHandler.reset();
-    	}
+    	} else if ( aQualifiedName.equalsIgnoreCase(myDefineElementListXmlHandler.getStartElement()) )
+		{
+			try {
+				myDefineElementListXmlHandler.defineElementList();
+			} catch (ConfigurationException e) {
+				myDefineElementListXmlHandler.reset();
+				throw new TTIException( "Failed to load elementList Definition", e );
+			}
+			myDefineElementListXmlHandler.reset();
+		}
 		// else ignore
 	}
 

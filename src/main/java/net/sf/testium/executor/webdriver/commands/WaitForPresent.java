@@ -14,16 +14,17 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
-import org.testtoolinterfaces.utils.Warning;
 
 /**
- * Command for checking the text of a WebElement
+ * Command for waiting until the element is visible
  * 
  * @author Arjan Kranenburg
  *
  */
-public class WaitFor extends GenericSeleniumCommandExecutor
+public class WaitForPresent extends GenericSeleniumCommandExecutor
 {
+	private static final String COMMAND = "waitForPresent";
+
 	private static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
 			"element", SmartWebElement.class, false, false, true, false );
 
@@ -39,9 +40,7 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 			"sleeptime", Integer.class, true, true, true, false )
 			.setDefaultValue( 500L ); // milli-seconds
 
-	private static final String COMMAND = "waitFor";
-
-	public WaitFor( WebInterface aWebInterface ) {
+	public WaitForPresent( WebInterface aWebInterface ) {
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
 		this.addParamSpec( PARSPEC_ELEMENT );
@@ -55,8 +54,6 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception {
 
-		Warning.println( "Command \"WaitFor\" is deprecated and will be removed soon. Please replace by WaitForVisible, which is the same." );
-		
 		WebElement element = obtainElement(aVariables, parameters, PARSPEC_ELEMENT);
 		if( ! (element instanceof SmartWebElement) )
 		{
@@ -70,10 +67,10 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 		
 		if ( presentFlag ) {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.visibilityOfElementLocated( smartElement.getBy() ) );
+			.until( ExpectedConditions.presenceOfElementLocated( smartElement.getBy() ) );
 		} else {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.invisibilityOfElementLocated( smartElement.getBy() ) );
+			.until( ExpectedConditions.stalenessOf(smartElement) );
 		}
 	}
 }
