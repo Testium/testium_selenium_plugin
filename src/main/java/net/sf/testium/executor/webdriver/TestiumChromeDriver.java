@@ -27,14 +27,14 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		myInterface = anInterface;
 	}
 
-	@Override
-	public SimpleElementList findElements(By by) {
-		List<WebElement> elms = by.findElements(this);
-		if ( elms instanceof SimpleElementList ) {
-			return (SimpleElementList) elms;
-		}
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElements(By by) {
+//		List<WebElement> elms = by.findElements(this);
+//		if ( elms instanceof SimpleElementList ) {
+//			return (SimpleElementList) elms;
+//		}
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElement(By by) {
@@ -52,12 +52,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsById(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsById(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsById(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsById(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByXPath(String using) {
@@ -66,12 +66,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByXPath(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByXPath(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByXPath(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByXPath(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByTagName(String using) {
@@ -80,12 +80,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByTagName(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByTagName(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByTagName(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByTagName(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByCssSelector(String using) {
@@ -94,12 +94,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByCssSelector(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByCssSelector(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByCssSelector(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByCssSelector(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByName(String using) {
@@ -108,12 +108,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByName(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByName(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByName(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByName(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByLinkText(String using) {
@@ -129,19 +129,19 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByLinkText(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByLinkText(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
-
-	@Override
-	public SimpleElementList findElementsByPartialLinkText(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByLinkText(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByLinkText(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByLinkText(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
+//
+//	@Override
+//	public SimpleElementList findElementsByPartialLinkText(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByLinkText(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	@Override
 	public SmartWebElement findElementByClassName(String using) {
@@ -150,12 +150,12 @@ public class TestiumChromeDriver extends ChromeDriver implements FieldPublisher 
 		return new SimplePageElement( by, myInterface, elm );
 	}
 
-	@Override
-	public SimpleElementList findElementsByClassName(String using) {
-		By by = By.id(using);
-		List<WebElement> elms = super.findElementsByClassName(using);
-		return new SimpleElementList( by, myInterface, elms );
-	}
+//	@Override
+//	public SimpleElementList findElementsByClassName(String using) {
+//		By by = By.id(using);
+//		List<WebElement> elms = super.findElementsByClassName(using);
+//		return new SimpleElementList( by, myInterface, elms );
+//	}
 
 	public void addElement(String varName, WebElement element) {
 		myInterface.addElement(varName, element);

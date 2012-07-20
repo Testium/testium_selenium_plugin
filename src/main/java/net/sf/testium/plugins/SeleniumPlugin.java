@@ -3,8 +3,6 @@ package net.sf.testium.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-//import java.util.Enumeration;
-//import java.util.Hashtable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -16,7 +14,8 @@ import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfigurationXmlHandler;
 import net.sf.testium.executor.SupportedInterfaceList;
 import net.sf.testium.executor.TestStepMetaExecutor;
-//import net.sf.testium.executor.webdriver.WebInterface;
+import net.sf.testium.executor.webdriver.DefaultInterface_modified;
+
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.Trace;
 import org.xml.sax.SAXException;
@@ -72,6 +71,9 @@ public final class SeleniumPlugin implements Plugin
 //			WebInterface webInterface = new WebInterface( configs.get( ids.nextElement() ) );
 //			aPluginCollection.addSutInterface(webInterface);
 //		}
+		
+//		DefaultInterface_modified defInterface = new DefaultInterface_modified();
+//		aPluginCollection.addSutInterface(defInterface);
 	}
 
 	public SeleniumConfiguration readConfigFile(

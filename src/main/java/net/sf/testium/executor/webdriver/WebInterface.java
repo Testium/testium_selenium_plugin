@@ -99,7 +99,7 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		return myDriver;
 	}
 
-	@Deprecated
+	@Deprecated  // only internal -> will be changed to protected
 	public void setDriver( WebDriver aDriver )
 	{
 		myDriver = aDriver;
