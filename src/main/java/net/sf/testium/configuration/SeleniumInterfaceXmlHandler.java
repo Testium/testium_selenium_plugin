@@ -2,7 +2,7 @@ package net.sf.testium.configuration;
 
 //import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.configuration.CustomStepXmlHandler;
-import net.sf.testium.executor.CustomizableInterface;
+import net.sf.testium.executor.CustomInterface;
 import net.sf.testium.executor.SupportedInterfaceList;
 import net.sf.testium.executor.TestStepMetaExecutor;
 import net.sf.testium.executor.webdriver.WebInterface;
@@ -156,7 +156,7 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
     			throw new TTIException( "The interface is not defined. Unable to add a step to an unknown interface" );
     		}
     		
-    		if ( ! CustomizableInterface.class.isInstance(myInterface) )
+    		if ( ! CustomInterface.class.isInstance(myInterface) )
     		{
     			throw new TTIException( "The " + myInterface.getInterfaceName() + " interface is not customizable. "
     			                        + "Unable to add a step to it." );
@@ -164,7 +164,7 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 
 			try
 			{
-				myCustomStepXmlHandler.addTestStepExecutor( (CustomizableInterface) myInterface );
+				myCustomStepXmlHandler.addTestStepExecutor( (CustomInterface) myInterface );
 			}
 			catch (TestSuiteException e)
 			{

@@ -12,7 +12,7 @@ import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
 public class CheckListSize_modified extends CheckListSize
 {
-//	private static final String COMMAND = "checkListSize";
+//	private static final String COMMAND = "checkListSize"; // (kept in comments for reference)
 //
 	private static final String PAR_LIST = "list";
 //	private static final String PAR_SIZE = "size";
@@ -35,25 +35,13 @@ public class CheckListSize_modified extends CheckListSize
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception 
 	{
-System.out.println("Running modified checkListSize");
-		if (aVariables.getType(PAR_LIST).isAssignableFrom(SimpleElementList.class) )
+		SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);
+
+		if ( elList != null )
 		{
-			SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);
-			elList.refresh();
-System.out.println("List now has size: " + elList.size() );
+			((SimpleElementList) elList).refresh();
 		}
-		else
-		{
-			super.doExecute(aVariables, parameters, result);
-		}
-//		int expectedSize = (Integer) this.obtainOptionalValue(aVariables, parameters, PARSPEC_SIZE);
-//
-//		String listName = parameters.get(PAR_LIST).getName();
-//		result.setDisplayName( result.getDisplayName() + " " + listName + " " + expectedSize );
-//
-//		if ( list.size() != expectedSize )
-//		{
-//			throw new TestSuiteException( "List size was " + list.size() + ". Expected " + expectedSize );
-//		}
+
+		super.doExecute(aVariables, parameters, result);
 	}
 }

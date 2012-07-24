@@ -29,21 +29,21 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList(by, myInterface, elms);
 //	}
 
-	@Override
-	public SmartWebElement findElement(By by) {
-		WebElement elm = by.findElement(this);
-		if ( elm instanceof SmartWebElement ) {
-			return (SmartWebElement) elm;
-		}
-		return new SimplePageElement( by, myInterface, elm );
-	}
-
-	@Override
-	public SmartWebElement findElementById(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementById(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElement(By by) {
+//		WebElement elm = by.findElement(this);
+//		if ( elm instanceof SmartWebElement ) {
+//			return (SmartWebElement) elm;
+//		}
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
+//
+//	@Override
+//	public SmartWebElement findElementById(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementById(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsById(String using) {
@@ -52,12 +52,12 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByXPath(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByXPath(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByXPath(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByXPath(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByXPath(String using) {
@@ -66,12 +66,12 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByTagName(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByTagName(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByTagName(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByTagName(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByTagName(String using) {
@@ -80,12 +80,12 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByCssSelector(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByCssSelector(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByCssSelector(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByCssSelector(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByCssSelector(String using) {
@@ -94,12 +94,12 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByName(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByName(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByName(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByName(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByName(String using) {
@@ -108,19 +108,19 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByLinkText(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByLinkText(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByLinkText(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByLinkText(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
-	@Override
-	public SmartWebElement findElementByPartialLinkText(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByPartialLinkText(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByPartialLinkText(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByPartialLinkText(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByLinkText(String using) {
@@ -136,12 +136,12 @@ public class TestiumFirefoxDriver extends FirefoxDriver implements FieldPublishe
 //		return new SimpleElementList( by, myInterface, elms );
 //	}
 
-	@Override
-	public SmartWebElement findElementByClassName(String using) {
-		By by = By.id(using);
-		WebElement elm = super.findElementByClassName(using);
-		return new SimplePageElement( by, myInterface, elm );
-	}
+//	@Override
+//	public SmartWebElement findElementByClassName(String using) {
+//		By by = By.id(using);
+//		WebElement elm = super.findElementByClassName(using);
+//		return new SimplePageElement( by, myInterface, elm );
+//	}
 
 //	@Override
 //	public SimpleElementList findElementsByClassName(String using) {

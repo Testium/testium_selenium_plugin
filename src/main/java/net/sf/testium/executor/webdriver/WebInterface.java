@@ -9,7 +9,7 @@ import java.util.Set;
 
 import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import net.sf.testium.executor.CustomizableInterface;
+import net.sf.testium.executor.CustomInterface;
 import net.sf.testium.executor.TestStepCommandExecutor;
 import net.sf.testium.executor.webdriver.commands.*;
 import net.sf.testium.selenium.FieldPublisher;
@@ -26,6 +26,7 @@ import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.testsuiteinterface.DefaultParameterCreator;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 import org.testtoolinterfaces.utils.Trace;
@@ -39,14 +40,14 @@ import org.testtoolinterfaces.utils.Trace;
  * @author Arjan Kranenburg
  *
  */
-public class WebInterface implements SutInterface, CustomizableInterface, FieldPublisher, WebDriverInterface
+public class WebInterface extends CustomInterface implements FieldPublisher, WebDriverInterface
 {
 	private WebDriver myDriver;
 	private String myDriverName;
 	private final RunTimeData myRtData;
 //	private BROWSER_TYPE myBrowserType;
 
-	private Hashtable<String, TestStepCommandExecutor> myCommandExecutors;
+//	private Hashtable<String, TestStepCommandExecutor> myCommandExecutors;
 
 	/**
 	 * 
@@ -54,11 +55,12 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 //	public WebInterface( String aName, BROWSER_TYPE aType )
 	public WebInterface(String aName, RunTimeData aRtData)
 	{
+		super( aName );
 		myDriverName = aName;
 //		myBrowserType = aType;
 		myRtData = aRtData;
 
-		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
+//		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
 		add( new BackCommand( this ) );
 		add( new CheckCurrentUrlCommand( this ) );
@@ -166,50 +168,50 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		}
 	}
 
-	public ArrayList<TestStepCommandExecutor> getCommandExecutors()
-	{
-		Trace.println( Trace.GETTER );
-		Collection<TestStepCommandExecutor> executorCollection = myCommandExecutors.values();
-		return new ArrayList<TestStepCommandExecutor>( executorCollection );
-	}
+//	public ArrayList<TestStepCommandExecutor> getCommandExecutors()
+//	{
+//		Trace.println( Trace.GETTER );
+//		Collection<TestStepCommandExecutor> executorCollection = myCommandExecutors.values();
+//		return new ArrayList<TestStepCommandExecutor>( executorCollection );
+//	}
+//
+//	public String getInterfaceName()
+//	{
+//		return myDriverName;
+//	}
+//	
 
-	public String getInterfaceName()
-	{
-		return myDriverName;
-	}
-	
+//	/**
+//	 * Methods below is an implementation of SutInterface
+//	 */
+//
+//	public ArrayList<String> getCommands()
+//	{
+//		Trace.println( Trace.GETTER );
+//		return Collections.list(myCommandExecutors.keys());
+//	}
 
-	/**
-	 * Methods below is an implementation of SutInterface
-	 */
+//	public boolean hasCommand(String aCommand)
+//	{
+//		Trace.println( Trace.UTIL );
+//		ArrayList<String> commands = getCommands();
+//		return commands.contains(aCommand);
+//	}
 
-	public ArrayList<String> getCommands()
-	{
-		Trace.println( Trace.GETTER );
-		return Collections.list(myCommandExecutors.keys());
-	}
-
-	public boolean hasCommand(String aCommand)
-	{
-		Trace.println( Trace.UTIL );
-		ArrayList<String> commands = getCommands();
-		return commands.contains(aCommand);
-	}
-
-	public boolean verifyParameters( String aCommand,
-	                                 ParameterArrayList aParameters )
-		   throws TestSuiteException
-	{
-		TestStepCommandExecutor executor = this.getCommandExecutor(aCommand);
-		return executor.verifyParameters(aParameters);
-	}
-
-	public TestStepCommandExecutor getCommandExecutor(String aCommand)
-	{
-		Trace.println( Trace.GETTER );
-		return myCommandExecutors.get(aCommand);
-	}
-
+//	public boolean verifyParameters( String aCommand,
+//	                                 ParameterArrayList aParameters )
+//		   throws TestSuiteException
+//	{
+//		TestStepCommandExecutor executor = this.getCommandExecutor(aCommand);
+//		return executor.verifyParameters(aParameters);
+//	}
+//
+//	public TestStepCommandExecutor getCommandExecutor(String aCommand)
+//	{
+//		Trace.println( Trace.GETTER );
+//		return myCommandExecutors.get(aCommand);
+//	}
+//
 	protected void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
@@ -278,22 +280,26 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		}
 	}
 
-	public void add( TestStepCommandExecutor aCommandExecutor )
-	{
-		Trace.println( Trace.UTIL );
-		String command = aCommandExecutor.getCommand();
-		myCommandExecutors.put(command, aCommandExecutor);
-	}
+//	public void add( TestStepCommandExecutor aCommandExecutor )
+//	{
+//		Trace.println( Trace.UTIL );
+//		String command = aCommandExecutor.getCommand();
+//		myCommandExecutors.put(command, aCommandExecutor);
+//	}
 
 	public ParameterImpl createParameter( String aName,
 	                                  String aType,
 	                                  String aValue )
 			throws TestSuiteException
 	{
-		if ( aType.equalsIgnoreCase( "string" ) )
+		try
 		{
-			return new ParameterImpl(aName, (String) aValue);
-		}			
+			return super.createParameter(aName, aType, aValue);
+		}
+		catch ( TestSuiteException ignored )
+		{
+			// continue below
+		}
 
 		if ( aValue.isEmpty() )
 		{
@@ -306,45 +312,6 @@ public class WebInterface implements SutInterface, CustomizableInterface, FieldP
 		if ( by != null ) {
 			return new ParameterImpl(aName, by );
 		}
-//		if ( aType.equalsIgnoreCase( "id" ) )
-//		{
-//			return new ParameterImpl(aName, By.id(aValue) );
-//		}
-//		
-//		if ( aType.equalsIgnoreCase( "name" ) )
-//		{
-//			return new ParameterImpl(aName, By.name(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "linktext" ) )
-//		{
-//			return new ParameterImpl(aName, By.linkText(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "partiallinktext" ) )
-//		{
-//			return new ParameterImpl(aName, By.partialLinkText(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "tagname" ) )
-//		{
-//			return new ParameterImpl(aName, By.tagName(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "xpath" ) )
-//		{
-//			return new ParameterImpl(aName, By.xpath(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "classname" ) )
-//		{
-//			return new ParameterImpl(aName, By.className(aValue) );
-//		}
-//
-//		if ( aType.equalsIgnoreCase( "cssselector" ) )
-//		{
-//			return new ParameterImpl(aName, By.cssSelector(aValue) );
-//		}
 
 		throw new TestSuiteException( "Parameter type " + aType
 		                              + " is not supported for interface "

@@ -12,9 +12,10 @@ import net.sf.testium.Testium;
 import net.sf.testium.configuration.ConfigurationException;
 import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfigurationXmlHandler;
+import net.sf.testium.executor.DefaultInterface;
 import net.sf.testium.executor.SupportedInterfaceList;
 import net.sf.testium.executor.TestStepMetaExecutor;
-import net.sf.testium.executor.webdriver.DefaultInterface_modified;
+import net.sf.testium.executor.webdriver.commands.CheckListSize_modified;
 
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.Trace;
@@ -72,8 +73,8 @@ public final class SeleniumPlugin implements Plugin
 //			aPluginCollection.addSutInterface(webInterface);
 //		}
 		
-//		DefaultInterface_modified defInterface = new DefaultInterface_modified();
-//		aPluginCollection.addSutInterface(defInterface);
+		DefaultInterface defInterface = (DefaultInterface) aPluginCollection.getInterfaces().getInterface(DefaultInterface.NAME);
+		defInterface.add( new CheckListSize_modified( defInterface ) );
 	}
 
 	public SeleniumConfiguration readConfigFile(
