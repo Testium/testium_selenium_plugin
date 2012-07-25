@@ -1,6 +1,8 @@
 package net.sf.testium.configuration;
 
 //import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import java.io.File;
+
 import net.sf.testium.configuration.CustomStepXmlHandler;
 import net.sf.testium.executor.CustomInterface;
 import net.sf.testium.executor.SupportedInterfaceList;
@@ -8,6 +10,7 @@ import net.sf.testium.executor.TestStepMetaExecutor;
 import net.sf.testium.executor.webdriver.WebInterface;
 import org.testtoolinterfaces.testsuite.TestInterface;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
+import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
@@ -20,8 +23,7 @@ import org.xml.sax.XMLReader;
  * @author Arjan Kranenburg 
  * 
  *  <SeleniumInterface name="..." type="...">
- *    <customstep>...</customstep>
- *    <customstep>...</customstep>
+ *    <CustomStepDefinitionsLink>...</CustomStepDefinitionsLink>
  *    <customstep>...</customstep>
  *  ...
  *  </SeleniumInterface>
@@ -34,14 +36,18 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	private static final String	ATTR_NAME			= "name";
 //	private static final String	ATTR_TYPE			= "type";
 
-	private SupportedInterfaceList myInterfaceList;
+	private static final String CUSTOMSTEP_DEFINITIONS_LINK_ELEMENT = "CustomStepDefinitionsLink";
+
 	private CustomStepXmlHandler myCustomStepXmlHandler;
+	private GenericTagAndStringXmlHandler myCustomStepDefinitionsLinkXmlHandler;
 
 	private TestInterface myInterface;
 	private String myInterfaceName;
 //	private BROWSER_TYPE myType;
 //	private BROWSER_TYPE myDefaultType = BROWSER_TYPE.HTMLUNIT;
 	private final RunTimeData myRtData;
+	private SupportedInterfaceList myInterfaceList;
+    private final TestStepMetaExecutor myTestStepMetaExecutor;
 	
 	public SeleniumInterfaceXmlHandler( XMLReader anXmlReader,
 	                                    SupportedInterfaceList anInterfaceList,
@@ -51,11 +57,15 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    myInterfaceList = anInterfaceList;
 	    myRtData = anRtData;
+	    myInterfaceList = anInterfaceList;
+		myTestStepMetaExecutor = aTestStepMetaExecutor;
 	    
 	    myCustomStepXmlHandler = new CustomStepXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
 		this.addElementHandler(myCustomStepXmlHandler);
+
+		myCustomStepDefinitionsLinkXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, CUSTOMSTEP_DEFINITIONS_LINK_ELEMENT);
+		this.addElementHandler(myCustomStepDefinitionsLinkXmlHandler);
 
 	    reset();
 	}
@@ -171,6 +181,30 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
     			throw new TTIException( "Unable to add a step: " + e.getMessage(), e );
 			}
 			myCustomStepXmlHandler.reset();
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( CUSTOMSTEP_DEFINITIONS_LINK_ELEMENT ))
+    	{
+			String fileName = myCustomStepDefinitionsLinkXmlHandler.getValue();
+			myCustomStepDefinitionsLinkXmlHandler.reset();
+
+			fileName = myRtData.substituteVars(fileName);
+			if ( ! (myInterface instanceof CustomInterface) )
+			{
+				throw new TTIException( "Interface is not customizable: " + myInterface.getInterfaceName() );
+			}
+			
+			try
+			{
+				CustomStepDefinitionsXmlHandler.loadElementDefinitions( new File( fileName ),
+																  myRtData,
+																  (CustomInterface) myInterface,
+																  myInterfaceList,
+																  myTestStepMetaExecutor );
+			}
+			catch (ConfigurationException ce)
+			{
+				throw new TTIException( "Failed to load element Definitions from file: " + fileName, ce );
+			}
     	}
 		else
     	{ // Programming fault
