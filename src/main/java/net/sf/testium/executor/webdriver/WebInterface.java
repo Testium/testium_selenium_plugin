@@ -1,20 +1,15 @@
 package net.sf.testium.executor.webdriver;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
 import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.CustomInterface;
-import net.sf.testium.executor.TestStepCommandExecutor;
 import net.sf.testium.executor.webdriver.commands.*;
 import net.sf.testium.selenium.FieldPublisher;
 import net.sf.testium.selenium.WebDriverInterface;
-import net.sf.testium.systemundertest.SutInterface;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,10 +18,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testtoolinterfaces.testresult.TestStepResult;
-import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
-import org.testtoolinterfaces.testsuiteinterface.DefaultParameterCreator;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 import org.testtoolinterfaces.utils.Trace;
@@ -43,7 +36,7 @@ import org.testtoolinterfaces.utils.Trace;
 public class WebInterface extends CustomInterface implements FieldPublisher, WebDriverInterface
 {
 	private WebDriver myDriver;
-	private String myDriverName;
+//	private String myDriverName;
 	private final RunTimeData myRtData;
 //	private BROWSER_TYPE myBrowserType;
 
@@ -56,13 +49,14 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 	public WebInterface(String aName, RunTimeData aRtData)
 	{
 		super( aName );
-		myDriverName = aName;
+//		myDriverName = aName;
 //		myBrowserType = aType;
 		myRtData = aRtData;
 
 //		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
 
 		add( new BackCommand( this ) );
+		add( new CentralizeItem( this ) );
 		add( new CheckCurrentUrlCommand( this ) );
 		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
@@ -81,7 +75,9 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new GetTitleCommand( this ) );
 		add( new LoadElementDefinitions( this ) );
 		add( new QuitCommand( this ) );
+		add( new RefreshCommand( this ) );
 		add( new SavePageSourceCommand( this ) );
+		add( new SelectValue( this ) );
 		add( new SendKeys( this ) );
 		add( new Submit( this ) );
 		add( new WaitFor( this ) );

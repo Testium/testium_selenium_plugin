@@ -8,7 +8,10 @@ import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 import net.sf.testium.selenium.SmartWebElement;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -24,6 +27,28 @@ import org.testtoolinterfaces.utils.Warning;
  */
 public class WaitFor extends GenericSeleniumCommandExecutor
 {
+	private class isNotVisible implements ExpectedCondition<Boolean>
+	{
+		WebElement element;
+		
+		public isNotVisible( WebElement element ) {
+			this.element = element;
+		}
+
+		public Boolean apply(WebDriver input) {
+
+			try {
+				if ( ! element.isDisplayed() ) {
+					return true;
+				}
+			} catch ( WebDriverException ignored ) {
+				return true;
+			}
+			return false;
+		}
+		
+	}
+	
 	private static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
 			"element", SmartWebElement.class, false, false, true, false );
 
@@ -32,11 +57,11 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 			.setDefaultValue( true );
 
 	private static final SpecifiedParameter PARSPEC_TIMEOUT = new SpecifiedParameter( 
-			"timeout", Integer.class, true, true, true, false )
+			"timeout", Long.class, true, true, true, false )
 			.setDefaultValue( 5L ); //seconds
 
 	private static final SpecifiedParameter PARSPEC_SLEEPTIME = new SpecifiedParameter( 
-			"sleeptime", Integer.class, true, true, true, false )
+			"sleeptime", Long.class, true, true, true, false )
 			.setDefaultValue( 500L ); // milli-seconds
 
 	private static final String COMMAND = "waitFor";
@@ -64,16 +89,16 @@ public class WaitFor extends GenericSeleniumCommandExecutor
 		}
 		SmartWebElement smartElement = (SmartWebElement) element;
 		
-		boolean presentFlag = obtainOptionalValue(aVariables, parameters, PARSPEC_PRESENT);
+		Boolean presentFlag = obtainOptionalValue(aVariables, parameters, PARSPEC_PRESENT);
 		Long timeout = obtainOptionalValue(aVariables, parameters, PARSPEC_TIMEOUT);
 		Long sleeptime = obtainOptionalValue(aVariables, parameters, PARSPEC_SLEEPTIME);
 		
 		if ( presentFlag ) {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.visibilityOfElementLocated( smartElement.getBy() ) );
+			.until( ExpectedConditions.visibilityOf( smartElement ) );
 		} else {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.invisibilityOfElementLocated( smartElement.getBy() ) );
+			.until( new isNotVisible( smartElement ) );
 		}
 	}
 }
