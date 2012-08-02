@@ -8,7 +8,10 @@ import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 import net.sf.testium.selenium.SmartWebElement;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -23,6 +26,28 @@ import org.testtoolinterfaces.utils.RunTimeData;
  */
 public class WaitForVisible extends GenericSeleniumCommandExecutor
 {
+	private class isNotVisible implements ExpectedCondition<Boolean>
+	{
+		WebElement element;
+		
+		public isNotVisible( WebElement element ) {
+			this.element = element;
+		}
+
+		public Boolean apply(WebDriver input) {
+
+			try {
+				if ( ! element.isDisplayed() ) {
+					return true;
+				}
+			} catch ( WebDriverException ignored ) {
+				return true;
+			}
+			return false;
+		}
+		
+	}
+
 	private static final String COMMAND = "waitForVisible";
 
 	private static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
@@ -61,16 +86,16 @@ public class WaitForVisible extends GenericSeleniumCommandExecutor
 		}
 		SmartWebElement smartElement = (SmartWebElement) element;
 		
-		boolean presentFlag = obtainOptionalValue(aVariables, parameters, PARSPEC_PRESENT);
+		Boolean presentFlag = obtainOptionalValue(aVariables, parameters, PARSPEC_PRESENT);
 		Long timeout = obtainOptionalValue(aVariables, parameters, PARSPEC_TIMEOUT);
 		Long sleeptime = obtainOptionalValue(aVariables, parameters, PARSPEC_SLEEPTIME);
 		
 		if ( presentFlag ) {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.visibilityOfElementLocated( smartElement.getBy() ) );
+			.until( ExpectedConditions.visibilityOf( smartElement ) );
 		} else {
 			new WebDriverWait( getDriver(), timeout, sleeptime )
-			.until( ExpectedConditions.invisibilityOfElementLocated( smartElement.getBy() ) );
+			.until( new isNotVisible( smartElement ) );
 		}
 	}
 }
