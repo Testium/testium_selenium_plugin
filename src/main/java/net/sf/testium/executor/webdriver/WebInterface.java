@@ -36,24 +36,18 @@ import org.testtoolinterfaces.utils.Trace;
 public class WebInterface extends CustomInterface implements FieldPublisher, WebDriverInterface
 {
 	private WebDriver myDriver;
-//	private String myDriverName;
 	private final RunTimeData myRtData;
-//	private BROWSER_TYPE myBrowserType;
-
-//	private Hashtable<String, TestStepCommandExecutor> myCommandExecutors;
+	private String myBaseUrl;
 
 	/**
 	 * 
 	 */
-//	public WebInterface( String aName, BROWSER_TYPE aType )
-	public WebInterface(String aName, RunTimeData aRtData)
+	public WebInterface(String aName, RunTimeData aRtData, String aBaseUrl)
 	{
 		super( aName );
-//		myDriverName = aName;
-//		myBrowserType = aType;
 		myRtData = aRtData;
 
-//		myCommandExecutors = new Hashtable<String, TestStepCommandExecutor>();
+		this.setBaseUrl( aBaseUrl );
 
 		add( new BackCommand( this ) );
 		add( new CentralizeItem( this ) );
@@ -70,7 +64,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new FindElementCommand( this ) );
 		add( new FindElementsCommand( this ) );
 		add( new ForwardCommand( this ) );
-		add( new GetCommand( this ) );
+		add( new Get( this ) );
 		add( new GetCurrentUrlCommand( this ) );
 		add( new GetTitleCommand( this ) );
 		add( new LoadElementDefinitions( this ) );
@@ -85,29 +79,20 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new WaitForVisible( this ) );
 	}
 
-	/**
-	 * @return the WebDriver. It is created if it does not exist.
-	 */
-	public WebDriver getDriver()
+	public void setBaseUrl(String aBaseUrl)
 	{
-		if (myDriver == null) {
-			BROWSER_TYPE browserType = myRtData.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
-			createDriver( browserType );
-		}
-		return myDriver;
+		myBaseUrl = aBaseUrl;
 	}
 
-	@Deprecated  // only internal -> will be changed to protected
-	public void setDriver( WebDriver aDriver )
+	public String getBaseUrl()
 	{
-		myDriver = aDriver;
+		return myBaseUrl;
 	}
 
 	/**
 	 * @param aType
-	 * @return the WebDriver. It is created if it does not exist.
+	 * @return the WebDriver of the specified type. It is created if it does not exist.
 	 */
-	@Deprecated
 	public WebDriver getDriver( BROWSER_TYPE aType )
 	{
 		if ( myDriver == null )
@@ -116,6 +101,19 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		}
 		
 		return myDriver;
+	}
+
+	/**
+	 * @return the WebDriver of default Browser type. It is created if it does not exist.
+	 */
+	public WebDriver getDriver()
+	{
+		return getDriver( myRtData.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE) );
+	}
+
+	protected void setDriver( WebDriver aDriver )
+	{
+		myDriver = aDriver;
 	}
 
 	public void closeWindow( TestStepResult aTestStepResult )
@@ -164,50 +162,6 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		}
 	}
 
-//	public ArrayList<TestStepCommandExecutor> getCommandExecutors()
-//	{
-//		Trace.println( Trace.GETTER );
-//		Collection<TestStepCommandExecutor> executorCollection = myCommandExecutors.values();
-//		return new ArrayList<TestStepCommandExecutor>( executorCollection );
-//	}
-//
-//	public String getInterfaceName()
-//	{
-//		return myDriverName;
-//	}
-//	
-
-//	/**
-//	 * Methods below is an implementation of SutInterface
-//	 */
-//
-//	public ArrayList<String> getCommands()
-//	{
-//		Trace.println( Trace.GETTER );
-//		return Collections.list(myCommandExecutors.keys());
-//	}
-
-//	public boolean hasCommand(String aCommand)
-//	{
-//		Trace.println( Trace.UTIL );
-//		ArrayList<String> commands = getCommands();
-//		return commands.contains(aCommand);
-//	}
-
-//	public boolean verifyParameters( String aCommand,
-//	                                 ParameterArrayList aParameters )
-//		   throws TestSuiteException
-//	{
-//		TestStepCommandExecutor executor = this.getCommandExecutor(aCommand);
-//		return executor.verifyParameters(aParameters);
-//	}
-//
-//	public TestStepCommandExecutor getCommandExecutor(String aCommand)
-//	{
-//		Trace.println( Trace.GETTER );
-//		return myCommandExecutors.get(aCommand);
-//	}
-//
 	protected void createDriver( BROWSER_TYPE aType )
 	{
 		Trace.println( Trace.UTIL );
@@ -276,13 +230,6 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		}
 	}
 
-//	public void add( TestStepCommandExecutor aCommandExecutor )
-//	{
-//		Trace.println( Trace.UTIL );
-//		String command = aCommandExecutor.getCommand();
-//		myCommandExecutors.put(command, aCommandExecutor);
-//	}
-
 	public ParameterImpl createParameter( String aName,
 	                                  String aType,
 	                                  String aValue )
@@ -295,13 +242,6 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		catch ( TestSuiteException ignored )
 		{
 			// continue below
-		}
-
-		if ( aValue.isEmpty() )
-		{
-			// Strings can be empty, so that's handled before.
-			throw new TestSuiteException( "Value of " + aName + " cannot be empty for type " + aType,
-			                              this.getInterfaceName() );
 		}
 
 		By by = WebInterface.getBy(aType, aValue);
@@ -400,10 +340,5 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		
 		//else
 		return null;
-	}
-
-	public String getBaseUrl()
-	{
-		return "";
 	}
 }

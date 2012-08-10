@@ -5,9 +5,14 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
+import net.sf.testium.executor.general.SpecifiedParameter;
+import net.sf.testium.executor.webdriver.WebInterface;
+import net.sf.testium.selenium.SimplePageElement;
+import net.sf.testium.selenium.SmartWebElement;
+import net.sf.testium.selenium.WebDriverInterface;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
@@ -15,18 +20,8 @@ import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
 
-import net.sf.testium.selenium.WebDriverInterface;
-
-import net.sf.testium.configuration.SeleniumConfiguration;
-import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-
-import net.sf.testium.executor.general.SpecifiedParameter;
-import net.sf.testium.executor.webdriver.WebInterface;
-import net.sf.testium.selenium.SimplePageElement;
-import net.sf.testium.selenium.SmartWebElement;
-
 /**
- * Executes the Selenium 2 findElement command
+ * Executes the Selenium findElement command
  * 
  * @author Arjan Kranenburg
  *
@@ -62,10 +57,6 @@ public class FindElementCommand extends GenericSeleniumCommandExecutor
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception
 	{
-
-		BROWSER_TYPE browserType = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
-		WebDriver driver = this.getDriver(browserType);
-
 		By by = (By) obtainValue(aVariables, parameters, PARSPEC_BY);
 		String elementName = (String) obtainValue(aVariables, parameters, PARSPEC_ELEMENT);
 
@@ -79,7 +70,7 @@ public class FindElementCommand extends GenericSeleniumCommandExecutor
 			}
 			else
 			{
-				element = driver.findElement(by);
+				element = this.getDriver().findElement(by);
 			}
 			SmartWebElement smartElement = new SimplePageElement( by, (WebDriverInterface) this.getInterface(), element );
 

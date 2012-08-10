@@ -46,17 +46,18 @@ public class SendKeys extends GenericSeleniumCommandExecutor
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception {
 
-		WebElement element = (WebElement) obtainValue(aVariables, parameters, PARSPEC_ELEMENT);
+		WebElement element = this.obtainElement(aVariables, parameters, PARSPEC_ELEMENT);
 
 		Object keysToSendObj = obtainValue(aVariables, parameters, PARSPEC_KEYS);
-		if ( keysToSendObj != null ) {
+		if ( keysToSendObj instanceof String )
+		{
 			String keysToSend = (String) keysToSendObj;
 			element.sendKeys(keysToSend);
 			return;
 		} //else
 			
 		Object keysToSendSpecialObj = obtainValue(aVariables, parameters, PARSPEC_SPECIAL_KEY);
-		if ( keysToSendSpecialObj != null ) {
+		if ( keysToSendSpecialObj instanceof String ) {
 			Keys keysToSendSpecial = Keys.valueOf( (String) keysToSendSpecialObj );
 			element.sendKeys(keysToSendSpecial);
 			return;

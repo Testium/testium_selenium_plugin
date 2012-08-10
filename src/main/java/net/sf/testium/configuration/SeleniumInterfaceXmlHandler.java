@@ -1,6 +1,5 @@
 package net.sf.testium.configuration;
 
-//import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import java.io.File;
 
 import net.sf.testium.configuration.CustomStepXmlHandler;
@@ -22,9 +21,10 @@ import org.xml.sax.XMLReader;
 /**
  * @author Arjan Kranenburg 
  * 
- *  <SeleniumInterface name="..." type="...">
+ *  <SeleniumInterface name="...">
+ *    <BaseUrl>...</BaseUrl>
  *    <CustomStepDefinitionsLink>...</CustomStepDefinitionsLink>
- *    <customstep>...</customstep>
+ *    <CustomStep>...</CustomStep>
  *  ...
  *  </SeleniumInterface>
  * 
@@ -36,8 +36,10 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	private static final String	ATTR_NAME			= "name";
 //	private static final String	ATTR_TYPE			= "type";
 
+	private static final String BASE_URL_ELEMENT 	= "BaseUrl";
 	private static final String CUSTOMSTEP_DEFINITIONS_LINK_ELEMENT = "CustomStepDefinitionsLink";
 
+	private GenericTagAndStringXmlHandler myBaseUrlXmlHandler;
 	private CustomStepXmlHandler myCustomStepXmlHandler;
 	private GenericTagAndStringXmlHandler myCustomStepDefinitionsLinkXmlHandler;
 
@@ -47,6 +49,8 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 //	private BROWSER_TYPE myDefaultType = BROWSER_TYPE.HTMLUNIT;
 	private final RunTimeData myRtData;
 	private SupportedInterfaceList myInterfaceList;
+	private String myBaseUrl; 
+	
     private final TestStepMetaExecutor myTestStepMetaExecutor;
 	
 	public SeleniumInterfaceXmlHandler( XMLReader anXmlReader,
@@ -61,6 +65,9 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    myInterfaceList = anInterfaceList;
 		myTestStepMetaExecutor = aTestStepMetaExecutor;
 	    
+		myBaseUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, BASE_URL_ELEMENT);
+		this.addElementHandler(myBaseUrlXmlHandler);
+
 	    myCustomStepXmlHandler = new CustomStepXmlHandler(anXmlReader, anInterfaceList, aTestStepMetaExecutor);
 		this.addElementHandler(myCustomStepXmlHandler);
 
@@ -159,7 +166,17 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
 		    	      aQualifiedName + " )", true);
 		    
-		if (aQualifiedName.equalsIgnoreCase(CustomStepXmlHandler.START_ELEMENT))
+		if (aQualifiedName.equalsIgnoreCase(BASE_URL_ELEMENT))
+    	{
+			myBaseUrl = myBaseUrlXmlHandler.getValue();
+			myBaseUrlXmlHandler.reset();
+			
+			if ( myInterface instanceof WebInterface )
+			{
+				((WebInterface) myInterface).setBaseUrl( myBaseUrl );
+			}
+    	}
+		else if (aQualifiedName.equalsIgnoreCase(CustomStepXmlHandler.START_ELEMENT))
     	{
     		if ( myInterface == null )
     		{
@@ -224,7 +241,7 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		{
 			// Create new interface
 //			myInterface = new WebInterface( myInterfaceName, myType );
-			myInterface = new WebInterface( myInterfaceName, myRtData );
+			myInterface = new WebInterface( myInterfaceName, myRtData, myBaseUrl );
 			myInterfaceList.add(myInterface);
 		}
 	}
@@ -234,6 +251,8 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		myInterface = null;
 		myInterfaceName = "";
 //		myType = myDefaultType;
+
+		myBaseUrl = System.getProperty( "baseUrl" ); // null if system-property is not set
 	}
 
 //	public void setDefaultBrowser(BROWSER_TYPE aBrowser)

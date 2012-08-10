@@ -28,7 +28,7 @@ public class SeleniumConfiguration
 		}
 
 		//overriding valueOf gives a compile error
-		public static BROWSER_TYPE enumOf(Class<BROWSER_TYPE> enumType, String aType)
+		public static BROWSER_TYPE enumOf(String aType)
 		{
 			BROWSER_TYPE value = BROWSER_TYPE.HTMLUNIT;
 			if ( aType == null )

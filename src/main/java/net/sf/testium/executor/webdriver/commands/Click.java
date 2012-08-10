@@ -13,17 +13,18 @@ import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
- * Executes the Selenium 2.0 click command
+ * Executes the Selenium click command
  * 
  * @author Arjan Kranenburg
- *
  */
 public class Click extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "click";
 
+	private static final String PAR_ELEMENT = "element";
+
 	public static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
-			"element", WebElement.class, false, false,	true, true );
+			PAR_ELEMENT, WebElement.class, false, false,	true, true );
 
 	public Click( WebInterface aWebInterface ) {
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
@@ -35,6 +36,9 @@ public class Click extends GenericSeleniumCommandExecutor
 	protected void doExecute(RunTimeData aVariables,
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception {
+
+		String elementName = parameters.get(PAR_ELEMENT).getName();
+		result.setDisplayName( result.getDisplayName() + " " + elementName );
 
 		WebElement element = obtainElement(aVariables, parameters, PARSPEC_ELEMENT);
 		element.click();

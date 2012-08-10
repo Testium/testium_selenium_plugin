@@ -145,8 +145,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 			File sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
 			while ( sourceLog.exists() && ++i<100 )
 			{
-				sourceLogKey = "source_" + i;
-				sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
+				sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + "_" + i + ".html" );
 			}
 			
 			try
@@ -178,8 +177,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 			File screenFile = new File( aLogDir, fileNameBase() + screenFileKey + ".png" );
 			while ( screenFile.exists() && ++i<100 )
 			{
-				screenFileKey = "screen" + i;
-				screenFile = new File( aLogDir, fileNameBase() + screenFileKey + ".png" );
+				screenFile = new File( aLogDir, fileNameBase() + screenFileKey + "_" + i + ".png" );
 			}
 
 			try {
