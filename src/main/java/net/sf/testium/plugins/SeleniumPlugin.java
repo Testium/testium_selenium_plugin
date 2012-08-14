@@ -27,8 +27,10 @@ import org.xml.sax.XMLReader;
  * @author Arjan Kranenburg
  *
  */
-public final class SeleniumPlugin implements Plugin
+public class SeleniumPlugin implements Plugin
 {
+    SeleniumConfigurationXmlHandler myHandler = null;
+
 	public SeleniumPlugin()
 	{
 		// nop
@@ -77,7 +79,7 @@ public final class SeleniumPlugin implements Plugin
 		defInterface.add( new CheckListSize_modified( defInterface ) );
 	}
 
-	public SeleniumConfiguration readConfigFile(
+	public final SeleniumConfiguration readConfigFile(
 	                                                 RunTimeData anRtData,
 	                                                 SupportedInterfaceList anInterfaceList,
 	                                                 TestStepMetaExecutor aTestStepMetaExecutor
@@ -107,7 +109,7 @@ public final class SeleniumPlugin implements Plugin
 		return config;
 	}
 	
-	public SeleniumConfiguration readConfigFile(    RunTimeData anRtData,
+	public final SeleniumConfiguration readConfigFile(    RunTimeData anRtData,
 	                                                File aConfigFile,
 	                                                SupportedInterfaceList anInterfaceList,
 	                                                TestStepMetaExecutor aTestStepMetaExecutor
@@ -118,17 +120,19 @@ public final class SeleniumPlugin implements Plugin
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(false);
         SAXParser saxParser;
-        SeleniumConfigurationXmlHandler handler = null;
 		try
 		{
 			saxParser = spf.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 
 	        // create a handler
-			handler = new SeleniumConfigurationXmlHandler(xmlReader, anInterfaceList, aTestStepMetaExecutor, anRtData);
+			if ( ! (myHandler instanceof SeleniumConfigurationXmlHandler) )
+			{
+				myHandler = new SeleniumConfigurationXmlHandler(xmlReader, anInterfaceList, aTestStepMetaExecutor, anRtData);
+			}
 
 	        // assign the handler to the parser
-	        xmlReader.setContentHandler(handler);
+	        xmlReader.setContentHandler(myHandler);
 
 	        // parse the document
 	        xmlReader.parse( aConfigFile.getAbsolutePath() );
@@ -149,7 +153,7 @@ public final class SeleniumPlugin implements Plugin
 			throw new ConfigurationException( e );
 		}
 
-		SeleniumConfiguration configuration = handler.getConfiguration();
+		SeleniumConfiguration configuration = myHandler.getConfiguration();
 		
 		return configuration;
 	}

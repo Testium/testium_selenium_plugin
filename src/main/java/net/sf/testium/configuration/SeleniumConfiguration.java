@@ -5,6 +5,8 @@ package net.sf.testium.configuration;
 
 import java.io.File;
 
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
 
@@ -14,6 +16,8 @@ import org.testtoolinterfaces.utils.Warning;
  */
 public class SeleniumConfiguration
 {
+	public static final String PROPERTY_WEBDRIVER_IE_IGNORING_SECURITY_DOMAINS = "webdriver.ie.ignoringsecuritydomains";
+
 	public static enum BROWSER_TYPE
 	{
 		FIREFOX,
@@ -78,7 +82,6 @@ public class SeleniumConfiguration
 	public final static String VARNAME_SAVEPAGESOURCE = "savePageSource"; // Used as Variable Name.
 	public final static String VARNAME_SAVESCREENSHOT = "saveScreenShot"; // Used as Variable Name.
 	
-//	private String myInterfaceName;
 	private BROWSER_TYPE myBrowser;
 	private File mySeleniumLibsDir;
 
@@ -86,24 +89,15 @@ public class SeleniumConfiguration
 	 * @param anInterfaceName
 	 * @param aBrowser
 	 */
-	public SeleniumConfiguration( //String anInterfaceName,
+	public SeleniumConfiguration( 
 	                              BROWSER_TYPE aBrowser,
 	                              File aSeleniumLibsDir )
 	{
 	    Trace.println(Trace.CONSTRUCTOR);
 
-//	    myInterfaceName = anInterfaceName;
 	    myBrowser = aBrowser;
 	    mySeleniumLibsDir = aSeleniumLibsDir;
 	}
-
-	/**
-	 * @return the Interface Name
-	 */
-//	public String getInterfaceName()
-//	{
-//		return myInterfaceName;
-//	}
 
 	/**
 	 * @return the seleniumLibsDir
@@ -119,5 +113,33 @@ public class SeleniumConfiguration
 	public BROWSER_TYPE getBrowserType()
 	{
 		return myBrowser;
+	}
+	
+	/**
+	 * In case of Chrome, the chromedriver.exe is found here
+	 */
+	public static void setChromeDriver( File chromeDriver )
+	{
+		System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY,chromeDriver.getAbsolutePath());
+	}
+
+	/**
+	 * In case of InternetExplorer, the ieDriverServer.exe is found here
+	 */
+	/**
+	 * @param ieDriver
+	 */
+	public static void setIeDriver( File ieDriver )
+	{
+		System.setProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY,ieDriver.getAbsolutePath());
+	}
+
+	/**
+	 * In case of InternetExplorer, the security domains can be ignored. 
+	 * @see http://code.google.com/p/selenium/wiki/InternetExplorerDriver#Required_Configuration
+	 */
+	public static void setIeIgnoreSecurityDomains( Boolean aFlag )
+	{
+		System.setProperty(PROPERTY_WEBDRIVER_IE_IGNORING_SECURITY_DOMAINS,aFlag.toString());
 	}
 }

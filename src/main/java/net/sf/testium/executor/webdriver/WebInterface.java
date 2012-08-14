@@ -95,20 +95,30 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 	 */
 	public WebDriver getDriver( BROWSER_TYPE aType )
 	{
+//		if ( myDriver instanceof TestiumDriver )
+//		{
+//			if ( ! aType.equals(((TestiumDriver) myDriver).getType()) )
+//			{
+//				this.myDriver.quit();
+//				setDriver(null);
+//			}
+//		}
+
 		if ( myDriver == null )
 		{
 			createDriver( aType );
 		}
-		
+
 		return myDriver;
 	}
 
 	/**
-	 * @return the WebDriver of default Browser type. It is created if it does not exist.
+	 * @return the WebDriver, null if it is not set.
 	 */
 	public WebDriver getDriver()
 	{
-		return getDriver( myRtData.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE) );
+		return myDriver;
+//		return getDriver( myRtData.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE) );
 	}
 
 	protected void setDriver( WebDriver aDriver )
@@ -198,7 +208,14 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 				ArrayList<String> switches = new ArrayList<String>();
 				switches.add( "disable-translate" );
 				capabilities.setCapability("chrome.switches", switches);
-				setDriver( new TestiumChromeDriver( this, capabilities ) );
+				try
+				{
+					setDriver( new TestiumChromeDriver( this, capabilities ) );
+				}
+				catch (Throwable t )
+				{
+					System.out.println( t.getLocalizedMessage() );
+				}
 			}
 			else if ( aType.equals( BROWSER_TYPE.HTMLUNIT ) )
 			{
@@ -219,7 +236,10 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 			else if ( aType.equals( BROWSER_TYPE.IE ) )
 			{
 				DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
-				capabilities.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+
+				String ignoreSecurityDomains = System.getProperty(SeleniumConfiguration.PROPERTY_WEBDRIVER_IE_IGNORING_SECURITY_DOMAINS);
+				capabilities.setCapability( InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, new Boolean(ignoreSecurityDomains) );
+
 				setDriver(  new TestiumIeDriver( this, capabilities ) );
 			}
 		}

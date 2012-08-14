@@ -58,6 +58,8 @@ public class Get extends GenericSeleniumCommandExecutor
 			throws Exception {
 
 		String url = (String) obtainValue( aVariables, parameters, PARSPEC_URL );
+		result.setDisplayName( result.getDisplayName() + " " + url );
+
 		Boolean relative = (Boolean) this.obtainOptionalValue( aVariables, parameters, PARSPEC_RELATIVE );
 		if ( relative )
 		{
@@ -65,16 +67,43 @@ public class Get extends GenericSeleniumCommandExecutor
 			url = baseUrl + url;
 		}
 
-		BROWSER_TYPE type = aVariables.getValueAs(BROWSER_TYPE.class, SeleniumConfiguration.BROWSERTYPE);
+		BROWSER_TYPE type = getBrowserType(aVariables, parameters);
+
+		WebDriver webDriver = this.getDriver( type );
+		webDriver.get(url);
+	}
+
+	/**
+	 * @param aVariables
+	 * @param parameters
+	 * @return
+	 * @throws Error
+	 * @throws Exception
+	 */
+	private BROWSER_TYPE getBrowserType(RunTimeData aVariables, ParameterArrayList parameters)
+			throws Error, Exception
+	{
+		BROWSER_TYPE type;
+		Object typeObj = aVariables.getValue(SeleniumConfiguration.BROWSERTYPE);
+		if ( typeObj instanceof String )
+		{
+			type = BROWSER_TYPE.enumOf((String) typeObj);
+		}
+		else if ( typeObj instanceof BROWSER_TYPE )
+		{
+			type = (BROWSER_TYPE) typeObj;
+		}
+		else
+		{
+			// Programming error: It should always be set
+			throw new Error( SeleniumConfiguration.BROWSERTYPE + " is not set!" );
+		}
 
 		String browserType = (String) this.obtainOptionalValue( aVariables, parameters, PARSPEC_BROWSER );
 		if ( ! browserType.isEmpty() )
 		{
 			type = BROWSER_TYPE.enumOf(browserType);
 		}
-
-		WebDriver webDriver = this.getDriver( type );
-		webDriver.get(url);
+		return type;
 	}
-
 }

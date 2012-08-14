@@ -22,7 +22,8 @@ import org.xml.sax.XMLReader;
  *  <SeleniumConfiguration>
  *    <DefaultBrowser>...</DefaultBrowser>
  *    <ChromeDriver>...</ChromeDriver>
- *    <IeIgnoreProtectedModeSettings>...</IeIgnoreProtectedModeSettings>
+ *    <IeIntroduceFlakinessByIgnoringSecurityDomains>...</IeIntroduceFlakinessByIgnoringSecurityDomains>
+ *    <IePathToDriverServer>...</IePathToDriverServer>
  *    <SavePageSource>...</SavePageSource>
  *    <SaveScreenshot>...</SaveScreenshot>
  *    <SeleniumLibsDir>...</SeleniumLibsDir>
@@ -37,7 +38,8 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private static final String START_ELEMENT = "SeleniumConfiguration";
 
 	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
-	private static final String IE_IGNORE_PROTECTED_MODE_SETTINGS_ELEMENT = "IeIgnoreProtectedModeSettings";
+	private static final String IE_IGNORING_SECURITY_DOMAINS_ELEMENT = "IeIntroduceFlakinessByIgnoringSecurityDomains";
+	private static final String IE_PATH_TO_DRIVER_SERVER_ELEMENT = "IePathToDriverServer";
 	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
 	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
 	private static final String SELENIUM_LIBS_DIR_ELEMENT = "SeleniumLibsDir";
@@ -48,11 +50,12 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler myChromeDriverXmlHandler;
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
+	private GenericTagAndStringXmlHandler myIeIgnoreSecurityDomainsXmlHandler;
+	private GenericTagAndStringXmlHandler myIePathToDriverServerXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
 	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
 	private File mySeleniumLibsDir;
-	private File myChromeDriver;
 
 	private RunTimeData myRtData;
 	
@@ -66,7 +69,13 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 		File pluginsDir = anRtData.getValueAsFile(Testium.PLUGINSDIR);
 		mySeleniumLibsDir = new File( pluginsDir, "SeleniumLibs" );
-		myChromeDriver = new File( mySeleniumLibsDir, "chromedriver.exe" );
+
+		File baseDir = anRtData.getValueAsFile(Testium.BASEDIR);
+		File dataDir = new File( baseDir, "../../src/data" );
+		SeleniumConfiguration.setChromeDriver( new File( dataDir, "chromedriver.exe" ) );
+		SeleniumConfiguration.setIeDriver( new File( dataDir, "IEDriverServer.exe" ) );
+
+		SeleniumConfiguration.setIeIgnoreSecurityDomains(false);
 
 		myRtData = anRtData;
 		
@@ -78,6 +87,12 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 		myChromeDriverXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, CHROME_DRIVER_ELEMENT);
 		this.addElementHandler(myChromeDriverXmlHandler);
+
+		myIeIgnoreSecurityDomainsXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, IE_IGNORING_SECURITY_DOMAINS_ELEMENT);
+		this.addElementHandler(myIeIgnoreSecurityDomainsXmlHandler);
+
+		myIePathToDriverServerXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, IE_PATH_TO_DRIVER_SERVER_ELEMENT);
+		this.addElementHandler(myIePathToDriverServerXmlHandler);
 
 		mySavePageSourceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_PAGESOURCE);
 		this.addElementHandler(mySavePageSourceXmlHandler);
@@ -137,8 +152,6 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 		    
 		if (aQualifiedName.equalsIgnoreCase( DEF_BROWSER_ELEMENT ))
     	{
-//			myDefaultBrowser = BROWSER_TYPE.valueOf( BROWSER_TYPE.class, myDefaultBrowserXmlHandler.getValue() );
-//			myInterfacesXmlHandler.setDefaultBrowser( myDefaultBrowser );
 			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( myDefaultBrowserXmlHandler.getValue() );
 			RunTimeVariable browserTypeVar = new RunTimeVariable(SeleniumConfiguration.BROWSERTYPE, browserType);
 			myRtData.add(browserTypeVar);
@@ -157,9 +170,24 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
     	{
 			String ChromeDriverName = myChromeDriverXmlHandler.getValue();
 			ChromeDriverName = myRtData.substituteVars(ChromeDriverName);
-			myChromeDriver = new File( ChromeDriverName );
+			SeleniumConfiguration.setChromeDriver( new File( ChromeDriverName ) );
 
 			myChromeDriverXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( IE_IGNORING_SECURITY_DOMAINS_ELEMENT ))
+    	{
+			String ignoreSecurityDomainsFlag = myIeIgnoreSecurityDomainsXmlHandler.getValue();
+			SeleniumConfiguration.setIeIgnoreSecurityDomains( new Boolean(ignoreSecurityDomainsFlag) );
+
+			myIeIgnoreSecurityDomainsXmlHandler.reset();
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( IE_PATH_TO_DRIVER_SERVER_ELEMENT ))
+    	{
+			String ieDriverName = myIePathToDriverServerXmlHandler.getValue();
+			ieDriverName = myRtData.substituteVars(ieDriverName);
+			SeleniumConfiguration.setIeDriver( new File( ieDriverName ) );
+
+			myIePathToDriverServerXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SAVE_PAGESOURCE ))
     	{
@@ -205,9 +233,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		// In case of Chrome, the chromedriver.exe is found here
-		System.setProperty("webdriver.chrome.driver",myChromeDriver.getPath());
-
 		return new SeleniumConfiguration( myDefaultBrowser, mySeleniumLibsDir );
 	}
+
 }
