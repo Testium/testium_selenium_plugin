@@ -51,6 +51,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 
 		add( new BackCommand( this ) );
 		add( new CentralizeItem( this ) );
+		add( new CheckAttribute( this ) );
 		add( new CheckCurrentUrlCommand( this ) );
 		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
@@ -65,6 +66,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new FindElementsCommand( this ) );
 		add( new ForwardCommand( this ) );
 		add( new Get( this ) );
+		add( new GetAttribute( this ) );
 		add( new GetCurrentUrlCommand( this ) );
 		add( new GetTitleCommand( this ) );
 		add( new LoadElementDefinitions( this ) );
