@@ -49,10 +49,10 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 
 		this.setBaseUrl( aBaseUrl );
 
-		add( new BackCommand( this ) );
+		add( new Back( this ) );
 		add( new CentralizeItem( this ) );
 		add( new CheckAttribute( this ) );
-		add( new CheckCurrentUrlCommand( this ) );
+		add( new CheckCurrentUrl( this ) );
 		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
 		add( new CheckTitleCommand( this ) );
