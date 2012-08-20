@@ -16,6 +16,8 @@ import net.sf.testium.executor.DefaultInterface;
 import net.sf.testium.executor.SupportedInterfaceList;
 import net.sf.testium.executor.TestStepMetaExecutor;
 import net.sf.testium.executor.webdriver.commands.CheckListSize_modified;
+import net.sf.testium.executor.webdriver.commands.GetListItem_modified;
+import net.sf.testium.executor.webdriver.commands.GetListSize_modified;
 
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.Trace;
@@ -66,8 +68,6 @@ public class SeleniumPlugin implements Plugin
 			throw new ConfigurationException( e );
 		}
 
-		readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
-
 //		Hashtable<String, SeleniumConfiguration> configs = readConfigFiles( anRtData, interfaceList );
 //		for (Enumeration<String> ids = configs.keys(); ids.hasMoreElements();)
 //		{
@@ -77,6 +77,10 @@ public class SeleniumPlugin implements Plugin
 		
 		DefaultInterface defInterface = (DefaultInterface) aPluginCollection.getInterfaces().getInterface(DefaultInterface.NAME);
 		defInterface.add( new CheckListSize_modified( defInterface ) );
+		defInterface.add( new GetListItem_modified( defInterface ) );
+		defInterface.add( new GetListSize_modified( defInterface ) );
+
+		readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
 	}
 
 	public final SeleniumConfiguration readConfigFile(

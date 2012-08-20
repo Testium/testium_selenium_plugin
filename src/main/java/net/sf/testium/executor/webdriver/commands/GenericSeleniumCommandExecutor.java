@@ -1,9 +1,7 @@
 package net.sf.testium.executor.webdriver.commands;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,9 +15,9 @@ import net.sf.testium.executor.webdriver.WebInterface;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -97,18 +95,18 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		{
 			doExecute(aVariables, parameters, result);
 			result.setResult( VERDICT.PASSED );
-
-			if ( mySavePageSource.equalsIgnoreCase("ALWAYS") ) {
-				this.savePageSource( aLogDir, result );
-			}
-
-			if ( mySaveScreenshot.equalsIgnoreCase("ALWAYS") ) {
-				this.saveScreenShot( aLogDir, result );
-			}
 		}
 		catch (Exception e)
 		{
 			failTest(aLogDir, result, e);
+		}
+
+		if ( mySavePageSource.equalsIgnoreCase("ALWAYS") ) {
+			this.savePageSource( aLogDir, result );
+		}
+
+		if ( mySaveScreenshot.equalsIgnoreCase("ALWAYS") ) {
+			this.saveScreenShot( aLogDir, result );
 		}
 
 		return result;
@@ -135,21 +133,21 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 
 	public void savePageSource( File aLogDir, TestStepResult aResult )
 	{
-		WebDriver driver = this.getDriver();
-		if ( driver instanceof RemoteWebDriver ) {
-			RemoteWebDriver remDriver = (RemoteWebDriver) driver;
-			String pageSource = remDriver.getPageSource();
+		try // We'll try. If it fails we won't fail the test.
+		{
+			WebDriver driver = this.getDriver();
+			if ( driver instanceof RemoteWebDriver ) {
+				RemoteWebDriver remDriver = (RemoteWebDriver) driver;
+				String pageSource = remDriver.getPageSource();
+				
+				int i = 0;
+				String sourceLogKey = "source";
+				File sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
+				while ( sourceLog.exists() && ++i<100 )
+				{
+					sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + "_" + i + ".html" );
+				}
 			
-			int i = 0;
-			String sourceLogKey = "source";
-			File sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
-			while ( sourceLog.exists() && ++i<100 )
-			{
-				sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + "_" + i + ".html" );
-			}
-			
-			try
-			{
 				FileOutputStream sourceLogOS = new FileOutputStream(sourceLog.getAbsolutePath());
 				PrintWriter pw = new PrintWriter(sourceLogOS);
 				pw.println(pageSource);
@@ -157,36 +155,40 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 
 		        aResult.addTestLog(sourceLogKey, sourceLog.getPath());
 			}
-			catch (FileNotFoundException e)
-			{
-				aResult.setComment( "Source file could not be saved: " + e.getMessage() );
-				Trace.print( Trace.SUITE, e );
-			}
+		}
+		catch (Throwable t)
+		{
+			aResult.addComment( "Source file could not be saved: " + t.getMessage() );
+			Trace.print( Trace.SUITE, t );
 		}
 	}
 
 	public void saveScreenShot(File aLogDir, TestStepResult aResult)
 	{
-		WebDriver driver = this.getDriver();
-		if ( driver instanceof RemoteWebDriver ) {
-			TakesScreenshot screenShotDriver = (TakesScreenshot) driver;
-			File tmpScreenFile = screenShotDriver.getScreenshotAs(OutputType.FILE);
-
-			int i = 0;
-			String screenFileKey = "screen";
-			File screenFile = new File( aLogDir, fileNameBase() + screenFileKey + ".png" );
-			while ( screenFile.exists() && ++i<100 )
+		try // We'll try. If it fails we won't fail the test.
+		{
+			WebDriver driver = this.getDriver();
+			if ( driver instanceof RemoteWebDriver )
 			{
-				screenFile = new File( aLogDir, fileNameBase() + screenFileKey + "_" + i + ".png" );
-			}
-
-			try {
+				TakesScreenshot screenShotDriver = (TakesScreenshot) driver;
+				File tmpScreenFile = screenShotDriver.getScreenshotAs(OutputType.FILE);
+	
+				int i = 0;
+				String screenFileKey = "screen";
+				File screenFile = new File( aLogDir, fileNameBase() + screenFileKey + ".png" );
+				while ( screenFile.exists() && ++i<100 )
+				{
+					screenFile = new File( aLogDir, fileNameBase() + screenFileKey + "_" + i + ".png" );
+				}
+	
 				FileUtils.moveFile( tmpScreenFile, screenFile );
 		        aResult.addTestLog(screenFileKey, screenFile.getPath());
-			} catch ( IOException e ) {
-				aResult.setComment( "Screen file could not be saved: " + e.getMessage() );
-				Trace.print( Trace.SUITE, e );
 			}
+		}
+		catch ( Throwable t )
+		{
+				aResult.addComment( "Screen file could not be saved: " + t.getMessage() );
+				Trace.print( Trace.SUITE, t );
 		}
 	}
 
