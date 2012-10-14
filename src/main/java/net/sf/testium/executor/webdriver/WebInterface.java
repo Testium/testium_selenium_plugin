@@ -53,6 +53,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new CentralizeItem( this ) );
 		add( new CheckAttribute( this ) );
 		add( new CheckCurrentUrl( this ) );
+		add( new CheckEditable( this ) );
 		add( new CheckSelected( this ) );
 		add( new CheckText( this ) );
 		add( new CheckTitleCommand( this ) );
