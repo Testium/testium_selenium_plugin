@@ -10,6 +10,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.testium.Testium;
 import net.sf.testium.configuration.ConfigurationException;
+import net.sf.testium.configuration.PersonalSeleniumConfigurationXmlHandler;
 import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfigurationXmlHandler;
 import net.sf.testium.executor.DefaultInterface;
@@ -20,7 +21,9 @@ import net.sf.testium.executor.webdriver.commands.GetListItem_modified;
 import net.sf.testium.executor.webdriver.commands.GetListSize_modified;
 
 import org.testtoolinterfaces.utils.RunTimeData;
+import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
+import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -31,7 +34,6 @@ import org.xml.sax.XMLReader;
  */
 public class SeleniumPlugin implements Plugin
 {
-    SeleniumConfigurationXmlHandler myHandler = null;
 
 	public SeleniumPlugin()
 	{
@@ -49,13 +51,14 @@ public class SeleniumPlugin implements Plugin
 //		SeleniumConfiguration config = readConfigFile( anRtData, interfaceList, testStepMetaExecutor );
 //		File seleniumLibsDir = config.getSeleniumLibsDir();
 
-// WORKAROUND
 // The interfaces can only be created when the seleniumlibs are loaded, but the interfaces are created
 // when configuration is read.
 // TODO possible solutions:
 // 1) Get seleniumLibsDir first from configuration
 // 2) Load seleniumLibs as soon as seleniumLibsDir is read (hence inside SeleniumConfigurationXmlHandler)
-		
+
+// WORKAROUND
+// For now, the seleniumLibs dir is hardcoded.
 		File pluginsDir = anRtData.getValueAsFile( Testium.PLUGINSDIR );	
 		File seleniumLibsDir = new File( pluginsDir, "SeleniumLibs" );
 
@@ -75,7 +78,7 @@ public class SeleniumPlugin implements Plugin
 //			aPluginCollection.addSutInterface(webInterface);
 //		}
 		
-		DefaultInterface defInterface = (DefaultInterface) aPluginCollection.getInterfaces().getInterface(DefaultInterface.NAME);
+		DefaultInterface defInterface = (DefaultInterface) interfaceList.getInterface(DefaultInterface.NAME);
 		defInterface.add( new CheckListSize_modified( defInterface ) );
 		defInterface.add( new GetListItem_modified( defInterface ) );
 		defInterface.add( new GetListSize_modified( defInterface ) );
@@ -101,7 +104,7 @@ public class SeleniumPlugin implements Plugin
 		if ( userConfigFile.exists() )
 		{
 //			userConfig = 
-			readConfigFile( anRtData, userConfigFile, anInterfaceList, aTestStepMetaExecutor );
+			readPersonalConfigFile( anRtData, userConfigFile, anInterfaceList, aTestStepMetaExecutor );
 		}
 
 //		for (Enumeration<String> ids = userConfigs.keys(); ids.hasMoreElements();)
@@ -120,7 +123,10 @@ public class SeleniumPlugin implements Plugin
 	                                           )    throws ConfigurationException
 	{
 		Trace.println(Trace.UTIL, "readConfigFile( " + aConfigFile.getName() + " )", true );
-        // create a parser
+
+	    SeleniumConfigurationXmlHandler myHandler;
+
+	    // create a parser
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(false);
         SAXParser saxParser;
@@ -130,10 +136,7 @@ public class SeleniumPlugin implements Plugin
 			XMLReader xmlReader = saxParser.getXMLReader();
 
 	        // create a handler
-			if ( ! (myHandler instanceof SeleniumConfigurationXmlHandler) )
-			{
-				myHandler = new SeleniumConfigurationXmlHandler(xmlReader, anInterfaceList, aTestStepMetaExecutor, anRtData);
-			}
+		    myHandler = new SeleniumConfigurationXmlHandler(xmlReader, anInterfaceList, aTestStepMetaExecutor, anRtData);
 
 	        // assign the handler to the parser
 	        xmlReader.setContentHandler(myHandler);
@@ -155,6 +158,30 @@ public class SeleniumPlugin implements Plugin
 		{
 			Trace.print(Trace.UTIL, e);
 			throw new ConfigurationException( e );
+		}
+
+		SeleniumConfiguration configuration = myHandler.getConfiguration();
+		
+		return configuration;
+	}
+
+	public final SeleniumConfiguration readPersonalConfigFile(    RunTimeData anRtData,
+            File aConfigFile,
+            SupportedInterfaceList anInterfaceList,
+            TestStepMetaExecutor aTestStepMetaExecutor
+       )    throws ConfigurationException
+	{
+		Trace.println(Trace.UTIL, "readConfigFile( " + aConfigFile.getName() + " )", true );
+		
+		PersonalSeleniumConfigurationXmlHandler myHandler = null;
+		try {
+			XMLReader reader = XmlHandler.getNewXmlReader();
+			myHandler = new PersonalSeleniumConfigurationXmlHandler(reader, anInterfaceList, aTestStepMetaExecutor, anRtData);
+		
+			myHandler.parse(reader, aConfigFile);
+		} catch (TTIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		SeleniumConfiguration configuration = myHandler.getConfiguration();

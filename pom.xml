@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sf.testium</groupId>
   <artifactId>selenium-plugin</artifactId>
-  <version>0.3.12</version>
+  <version>0.3.13-SNAPSHOT</version>
   <name>Testium Selenium Plugin</name>
   <description>Selenium Plugin for the Testium Executor</description>
   <url>http://testium.sf.net/</url>
@@ -23,9 +23,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:ssh://testium.git.sourceforge.net/gitroot/testium/SeleniumPlugin</connection>
-    <developerConnection>scm:git:ssh://testium.git.sourceforge.net/gitroot/testium/SeleniumPlugin</developerConnection>
-    <url>ssh://testium.git.sourceforge.net/gitroot/testium/SeleniumPlugin</url>
+    <connection>scm:git:git@github.com:ArjanKranenburg/testium_selenium_plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:ArjanKranenburg/testium_selenium_plugin.git</developerConnection>
+    <url>git@github.com:ArjanKranenburg/testium_selenium_plugin.git</url>
   </scm>
  
   <developers>
@@ -46,12 +46,12 @@
   	<dependency>
   	  <groupId>net.sf.testium</groupId>
   	  <artifactId>testium</artifactId>
-  	  <version>0.3.11</version>
+  	  <version>0.3.13</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>utils</artifactId>
-  	  <version>0.1.6</version>
+  	  <version>0.1.7</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
@@ -61,13 +61,20 @@
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>testresult</artifactId>
-  	  <version>0.3.6</version>
+  	  <version>0.3.7</version>
   	</dependency>
+  	<dependency>
+  	  <groupId>org.seleniumhq.selenium</groupId>
+  	  <artifactId>selenium-java</artifactId>
+  	  <version>2.26.0</version>
+  	</dependency>
+<!-- 
   	<dependency>
   	  <groupId>net.sf.testium</groupId>
   	  <artifactId>testium-selenium-support</artifactId>
   	  <version>0.1.4</version>
   	</dependency>
+ -->
   </dependencies>
 
   <build>

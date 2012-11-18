@@ -170,7 +170,6 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
     	{
 			myBaseUrl = myBaseUrlXmlHandler.getValue();
 			myBaseUrlXmlHandler.reset();
-			
 			if ( myInterface instanceof WebInterface )
 			{
 				((WebInterface) myInterface).setBaseUrl( myBaseUrl );
