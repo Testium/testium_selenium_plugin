@@ -64,7 +64,6 @@ public class Get extends GenericSeleniumCommandExecutor
 		if ( relative )
 		{
 			String baseUrl = this.getInterface().getBaseUrl();
-System.out.println( "Using baseUrl: " + baseUrl );
 			url = baseUrl + url;
 		}
 
