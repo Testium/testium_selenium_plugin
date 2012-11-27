@@ -59,7 +59,7 @@ public class GetAttribute extends GenericSeleniumCommandExecutor {
 		ParameterVariable parVar = (ParameterVariable) parameters.get(PAR_ELEMENT);
 		String elementName = parVar.getVariableName();
 
-		result.setDisplayName( result.getDisplayName() + " \"" + elementName + "\" \"" + attribute + "\" -> \"" + varName + "\"" );
+		result.setDisplayName( this.toString() + " \"" + elementName + "\" \"" + attribute + "\" -> \"" + varName + "\"" );
 
 		String attributeValue = element.getAttribute(attribute);
 		RunTimeVariable rtVariable = new RunTimeVariable( varName, attributeValue );

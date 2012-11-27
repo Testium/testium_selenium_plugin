@@ -62,7 +62,7 @@ public class CheckAttribute extends GenericSeleniumCommandExecutor {
 		ParameterVariable parVar = (ParameterVariable) parameters.get(PAR_ELEMENT);
 		String elementName = parVar.getVariableName();
 
-		result.setDisplayName( result.getDisplayName() + " \"" + elementName + "\" \"" + attribute + "\" = \"" + expected + "\"" );
+		result.setDisplayName( this.toString() + " \"" + elementName + "\" \"" + attribute + "\" = \"" + expected + "\"" );
 
 		String actualValue = element.getAttribute(attribute);
 		String errorMsg = "Actual Value: \"" + actualValue + "\" is not equal to: \"" + expected + "\"";

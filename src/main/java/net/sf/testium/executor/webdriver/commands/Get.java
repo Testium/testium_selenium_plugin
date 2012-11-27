@@ -58,7 +58,7 @@ public class Get extends GenericSeleniumCommandExecutor
 			throws Exception {
 
 		String url = (String) obtainValue( aVariables, parameters, PARSPEC_URL );
-		result.setDisplayName( result.getDisplayName() + " " + url );
+		result.setDisplayName( this.toString() + " " + url );
 
 		Boolean relative = (Boolean) this.obtainOptionalValue( aVariables, parameters, PARSPEC_RELATIVE );
 		if ( relative )

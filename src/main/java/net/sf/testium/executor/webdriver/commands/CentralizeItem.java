@@ -42,7 +42,7 @@ public class CentralizeItem extends GenericSeleniumCommandExecutor {
 		WebElement element = (WebElement) this.obtainElement(aVariables, parameters, PARSPEC_ELEMENT);
 
 		String elementName = parameters.get(PAR_ELEMENT).getName();
-		result.setDisplayName( result.getDisplayName() + " " + elementName );
+		result.setDisplayName( this.toString() + " " + elementName );
 
 		this.centralizeElement(element);
 	}

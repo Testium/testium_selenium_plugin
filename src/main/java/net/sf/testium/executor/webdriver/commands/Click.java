@@ -43,7 +43,7 @@ public class Click extends GenericSeleniumCommandExecutor
 		if ( elementPar instanceof ParameterVariable )
 		{
 			String elementName = ((ParameterVariable) elementPar).getVariableName();
-			result.setDisplayName( result.getDisplayName() + " " + elementName );
+			result.setDisplayName( this.toString() + " " + elementName );
 		}
 
 		WebElement element = obtainElement(aVariables, parameters, PARSPEC_ELEMENT);

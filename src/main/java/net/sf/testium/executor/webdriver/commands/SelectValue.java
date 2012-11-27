@@ -65,7 +65,7 @@ public class SelectValue extends GenericSeleniumCommandExecutor {
 		Integer index = (Integer) this.obtainOptionalValue(aVariables, parameters, PARSPEC_INDEX);
 
 		String elementName = parameters.get(PAR_ELEMENT).getName();
-		result.setDisplayName( result.getDisplayName() + " " + elementName );
+		result.setDisplayName( this.toString() + " " + elementName );
 
 		Select select = new Select( element );
 		if ( ! value.isEmpty() )
