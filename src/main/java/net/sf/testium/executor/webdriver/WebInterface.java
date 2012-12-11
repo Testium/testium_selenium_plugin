@@ -321,6 +321,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 	
 	public static By getBy( String aType, String aValue )
 	{
+//		String value = myRtData.substituteVars(aValue);
 		if ( aType.equalsIgnoreCase( "id" ) )
 		{
 			return By.id(aValue);
