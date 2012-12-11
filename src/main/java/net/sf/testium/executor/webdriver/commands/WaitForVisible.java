@@ -58,11 +58,11 @@ public class WaitForVisible extends GenericSeleniumCommandExecutor
 			.setDefaultValue( true );
 
 	private static final SpecifiedParameter PARSPEC_TIMEOUT = new SpecifiedParameter( 
-			"timeout", Integer.class, true, true, true, false )
+			"timeout", Long.class, true, true, true, false )
 			.setDefaultValue( 5L ); //seconds
 
 	private static final SpecifiedParameter PARSPEC_SLEEPTIME = new SpecifiedParameter( 
-			"sleeptime", Integer.class, true, true, true, false )
+			"sleeptime", Long.class, true, true, true, false )
 			.setDefaultValue( 500L ); // milli-seconds
 
 	public WaitForVisible( WebInterface aWebInterface ) {
