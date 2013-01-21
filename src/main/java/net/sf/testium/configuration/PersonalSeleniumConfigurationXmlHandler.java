@@ -1,8 +1,10 @@
 package net.sf.testium.configuration;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import net.sf.testium.executor.SupportedInterfaceList;
-import net.sf.testium.executor.TestStepMetaExecutor;
 
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
@@ -21,6 +23,7 @@ import org.xml.sax.XMLReader;
  *    <SavePageSource>...</SavePageSource>
  *    <SaveScreenshot>...</SaveScreenshot>
  *    <SeleniumInterfaces>...</SeleniumInterfaces>
+ *    <SeleniumGridUrl>...</SeleniumGridUrl>
  *  ...
  *  </SeleniumConfiguration>
  * 
@@ -33,28 +36,34 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
 	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
 	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
+	private static final String SELENIUM_GRID_URL_ELEMENT = "SeleniumGridUrl";
 
 	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
+	private GenericTagAndStringXmlHandler mySeleniumGridUrlXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
-	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
+	private BROWSER_TYPE myDefaultBrowser = null;
+	private URL mySeleniumGridUrl = null;
+	private ArrayList<String> myInterfaceNames;
 
 	private RunTimeData myRtData;
 	
-	public PersonalSeleniumConfigurationXmlHandler( XMLReader anXmlReader, 
-	                                        SupportedInterfaceList anInterfaceList,
-	                                        TestStepMetaExecutor aTestStepMetaExecutor,
-	                                        RunTimeData anRtData )
+	public PersonalSeleniumConfigurationXmlHandler( XMLReader anXmlReader, RunTimeData anRtData )
 	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
+
+		mySeleniumGridUrl = null;
 
 		myRtData = anRtData;
 		
 	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
 		this.addElementHandler(myDefaultBrowserXmlHandler);
+
+		mySeleniumGridUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_GRID_URL_ELEMENT);
+		this.addElementHandler(mySeleniumGridUrlXmlHandler);
 
 		mySavePageSourceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_PAGESOURCE);
 		this.addElementHandler(mySavePageSourceXmlHandler);
@@ -62,10 +71,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 		mySaveScreenShotXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_SCREENSHOT);
 		this.addElementHandler(mySaveScreenShotXmlHandler);
 
-		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader,
-		                                                           anInterfaceList,
-		                                                           aTestStepMetaExecutor,
-		                                                           anRtData);
+		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader );
 		this.addElementHandler(myInterfacesXmlHandler);
 	}
 
@@ -111,8 +117,22 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( myDefaultBrowserXmlHandler.getValue() );
 			RunTimeVariable browserTypeVar = new RunTimeVariable(SeleniumConfiguration.BROWSERTYPE, browserType);
 			myRtData.add(browserTypeVar);
+			
+			myDefaultBrowser = browserType;
 
 			myDefaultBrowserXmlHandler.reset();	
+    	}
+		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_GRID_URL_ELEMENT ))
+    	{
+			String seleniumGridUrl = mySeleniumGridUrlXmlHandler.getValue();
+			seleniumGridUrl = myRtData.substituteVars(seleniumGridUrl);
+			try {
+				mySeleniumGridUrl = new URL( seleniumGridUrl );
+			} catch (MalformedURLException e) {
+				throw new TestSuiteException( "\"" + SELENIUM_GRID_URL_ELEMENT + "\" is malformed: " + e.getMessage(), e );
+			}
+
+			mySeleniumGridUrlXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SAVE_PAGESOURCE ))
     	{
@@ -146,7 +166,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
     	}
 		else if (aQualifiedName.equalsIgnoreCase( myInterfacesXmlHandler.getStartElement() ))
     	{
-			// The interfaceList is already updated
+			myInterfaceNames = myInterfacesXmlHandler.getInterfaceNames();
 			myInterfacesXmlHandler.reset();
     	}
 		else
@@ -158,7 +178,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myDefaultBrowser, null );
+		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, null, mySeleniumGridUrl );
 	}
 
 }

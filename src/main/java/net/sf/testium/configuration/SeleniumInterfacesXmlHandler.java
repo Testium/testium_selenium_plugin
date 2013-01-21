@@ -1,8 +1,8 @@
 package net.sf.testium.configuration;
 
-import net.sf.testium.executor.SupportedInterfaceList;
-import net.sf.testium.executor.TestStepMetaExecutor;
-import org.testtoolinterfaces.utils.RunTimeData;
+import java.util.ArrayList;
+
+import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -24,19 +24,18 @@ public class SeleniumInterfacesXmlHandler extends XmlHandler
 {
 	public static final String START_ELEMENT = "SeleniumInterfaces";
 
-	private SeleniumInterfaceXmlHandler myInterfaceXmlHandler;
-	public SeleniumInterfacesXmlHandler( XMLReader anXmlReader,
-	                                     SupportedInterfaceList anInterfaceList,
-	                                     TestStepMetaExecutor aTestStepMetaExecutor,
-	                                     RunTimeData anRtData )
+	private static final String SELENIUM_INTERFACE_ELEMENT 	= "SeleniumInterface";
+	
+	private ArrayList<String> interfaceNames;
+
+	private GenericTagAndStringXmlHandler myInterfaceXmlHandler;
+
+	public SeleniumInterfacesXmlHandler( XMLReader anXmlReader )
 	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    myInterfaceXmlHandler = new SeleniumInterfaceXmlHandler( anXmlReader,
-	                                                             anInterfaceList,
-	                                                             aTestStepMetaExecutor,
-	                                                             anRtData );
+	    myInterfaceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_INTERFACE_ELEMENT);
 		this.addElementHandler(myInterfaceXmlHandler);
 
 	    reset();
@@ -78,9 +77,11 @@ public class SeleniumInterfacesXmlHandler extends XmlHandler
 	    Trace.println(Trace.UTIL, "handleReturnFromChildElement( " + 
 		    	      aQualifiedName + " )", true);
 		    
-		if (aQualifiedName.equalsIgnoreCase(SeleniumInterfaceXmlHandler.START_ELEMENT))
+		if (aQualifiedName.equalsIgnoreCase(SELENIUM_INTERFACE_ELEMENT))
     	{
-			// The interfaceList is already updated
+			String interfaceName = myInterfaceXmlHandler.getValue();
+			interfaceNames.add(interfaceName);
+
 			myInterfaceXmlHandler.reset();
     	}
 		else
@@ -90,13 +91,13 @@ public class SeleniumInterfacesXmlHandler extends XmlHandler
 		}
 	}
 
-	public void reset()
-	{
-		myInterfaceXmlHandler.reset();
+	public ArrayList<String> getInterfaceNames() {
+		return interfaceNames;
 	}
 
-//	public void setDefaultBrowser(BROWSER_TYPE aBrowser)
-//	{
-//		myInterfaceXmlHandler.setDefaultBrowser( aBrowser );
-//	}
+	public void reset()
+	{
+		interfaceNames = new ArrayList<String>();
+	}
+
 }

@@ -1,11 +1,12 @@
 package net.sf.testium.configuration;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 import net.sf.testium.Testium;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import net.sf.testium.executor.SupportedInterfaceList;
-import net.sf.testium.executor.TestStepMetaExecutor;
 
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
@@ -28,6 +29,7 @@ import org.xml.sax.XMLReader;
  *    <SaveScreenshot>...</SaveScreenshot>
  *    <SeleniumLibsDir>...</SeleniumLibsDir>
  *    <SeleniumInterfaces>...</SeleniumInterfaces>
+ *    <SeleniumGridUrl>...</SeleniumGridUrl>
  *  ...
  *  </SeleniumConfiguration>
  * 
@@ -40,9 +42,10 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
 	private static final String IE_IGNORING_SECURITY_DOMAINS_ELEMENT = "IeIntroduceFlakinessByIgnoringSecurityDomains";
 	private static final String IE_PATH_TO_DRIVER_SERVER_ELEMENT = "IePathToDriverServer";
-	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
-	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
+	public static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
+	public static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
 	private static final String SELENIUM_LIBS_DIR_ELEMENT = "SeleniumLibsDir";
+	private static final String SELENIUM_GRID_URL_ELEMENT = "SeleniumGridUrl";
 	private static final String CHROME_DRIVER_ELEMENT = "ChromeDriver";
 
 	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
@@ -52,23 +55,24 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
 	private GenericTagAndStringXmlHandler myIeIgnoreSecurityDomainsXmlHandler;
 	private GenericTagAndStringXmlHandler myIePathToDriverServerXmlHandler;
+	private GenericTagAndStringXmlHandler mySeleniumGridUrlXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
 	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
 	private File mySeleniumLibsDir;
+	private URL mySeleniumGridUrl;
+	private ArrayList<String> myInterfaceNames;
 
 	private RunTimeData myRtData;
-	
-	public SeleniumConfigurationXmlHandler( XMLReader anXmlReader, 
-	                                        SupportedInterfaceList anInterfaceList,
-	                                        TestStepMetaExecutor aTestStepMetaExecutor,
-	                                        RunTimeData anRtData )
-	{
+
+	public SeleniumConfigurationXmlHandler( XMLReader anXmlReader, RunTimeData anRtData ) {
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
 		File pluginsDir = anRtData.getValueAsFile(Testium.PLUGINSDIR);
 		mySeleniumLibsDir = new File( pluginsDir, "SeleniumLibs" );
+		
+		mySeleniumGridUrl = null;
 
 		File baseDir = anRtData.getValueAsFile(Testium.BASEDIR);
 		File dataDir = new File( baseDir, "../../src/data" );
@@ -84,6 +88,9 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 		mySeleniumLibsDirXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_LIBS_DIR_ELEMENT);
 		this.addElementHandler(mySeleniumLibsDirXmlHandler);
+
+		mySeleniumGridUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_GRID_URL_ELEMENT);
+		this.addElementHandler(mySeleniumGridUrlXmlHandler);
 
 		myChromeDriverXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, CHROME_DRIVER_ELEMENT);
 		this.addElementHandler(myChromeDriverXmlHandler);
@@ -106,10 +113,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 		RunTimeVariable saveScreenshotsVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVESCREENSHOT, "NEVER");
 		this.myRtData.add(saveScreenshotsVar);
 
-		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader,
-		                                                           anInterfaceList,
-		                                                           aTestStepMetaExecutor,
-		                                                           anRtData);
+		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader );
 		this.addElementHandler(myInterfacesXmlHandler);
 	}
 
@@ -156,21 +160,35 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 			RunTimeVariable browserTypeVar = new RunTimeVariable(SeleniumConfiguration.BROWSERTYPE, browserType);
 			myRtData.add(browserTypeVar);
 
+			myDefaultBrowser = browserType;
+
 			myDefaultBrowserXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_LIBS_DIR_ELEMENT ))
     	{
-			String SeleniumLibsDirName = mySeleniumLibsDirXmlHandler.getValue();
-			SeleniumLibsDirName = myRtData.substituteVars(SeleniumLibsDirName);
-			mySeleniumLibsDir = new File( SeleniumLibsDirName );
+			String seleniumLibsDirName = mySeleniumLibsDirXmlHandler.getValue();
+			seleniumLibsDirName = myRtData.substituteVars(seleniumLibsDirName);
+			mySeleniumLibsDir = new File( seleniumLibsDirName );
 
 			mySeleniumLibsDirXmlHandler.reset();	
     	}
+		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_GRID_URL_ELEMENT ))
+    	{
+			String seleniumGridUrl = mySeleniumGridUrlXmlHandler.getValue();
+			seleniumGridUrl = myRtData.substituteVars(seleniumGridUrl);
+			try {
+				mySeleniumGridUrl = new URL( seleniumGridUrl );
+			} catch (MalformedURLException e) {
+				throw new TestSuiteException( "\"" + SELENIUM_GRID_URL_ELEMENT + "\" is malformed: " + e.getMessage(), e );
+			}
+
+			mySeleniumGridUrlXmlHandler.reset();	
+    	}
 		else if (aQualifiedName.equalsIgnoreCase( CHROME_DRIVER_ELEMENT ))
     	{
-			String ChromeDriverName = myChromeDriverXmlHandler.getValue();
-			ChromeDriverName = myRtData.substituteVars(ChromeDriverName);
-			SeleniumConfiguration.setChromeDriver( new File( ChromeDriverName ) );
+			String chromeDriverName = myChromeDriverXmlHandler.getValue();
+			chromeDriverName = myRtData.substituteVars(chromeDriverName);
+			SeleniumConfiguration.setChromeDriver( new File( chromeDriverName ) );
 
 			myChromeDriverXmlHandler.reset();	
     	}
@@ -221,7 +239,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
     	}
 		else if (aQualifiedName.equalsIgnoreCase( myInterfacesXmlHandler.getStartElement() ))
     	{
-			// The interfaceList is already updated
+			myInterfaceNames = myInterfacesXmlHandler.getInterfaceNames();
 			myInterfacesXmlHandler.reset();
     	}
 		else
@@ -233,7 +251,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myDefaultBrowser, mySeleniumLibsDir );
+		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, mySeleniumLibsDir, mySeleniumGridUrl );
 	}
 
 }

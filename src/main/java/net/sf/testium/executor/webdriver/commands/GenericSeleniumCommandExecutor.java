@@ -18,6 +18,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -94,6 +95,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		try
 		{
 			doExecute(aVariables, parameters, result);
+
 			result.setResult( VERDICT.PASSED );
 		}
 		catch (Exception e)
@@ -168,6 +170,11 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		try // We'll try. If it fails we won't fail the test.
 		{
 			WebDriver driver = this.getDriver();
+
+			if ( driver != null && driver.getClass().equals(RemoteWebDriver.class) ) {
+				driver = new Augmenter().augment(driver);
+			}
+
 			if ( driver instanceof RemoteWebDriver )
 			{
 				TakesScreenshot screenShotDriver = (TakesScreenshot) driver;
@@ -188,6 +195,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		catch ( Throwable t )
 		{
 				aResult.addComment( "Screen file could not be saved: " + t.getMessage() );
+t.printStackTrace();
 				Trace.print( Trace.SUITE, t );
 		}
 	}

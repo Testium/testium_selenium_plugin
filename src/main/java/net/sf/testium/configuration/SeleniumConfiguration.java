@@ -4,6 +4,8 @@ package net.sf.testium.configuration;
  */
 
 import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
@@ -81,22 +83,37 @@ public class SeleniumConfiguration
 
 	public final static String VARNAME_SAVEPAGESOURCE = "savePageSource"; // Used as Variable Name.
 	public final static String VARNAME_SAVESCREENSHOT = "saveScreenShot"; // Used as Variable Name.
-	
+
+	private ArrayList<String> myInterfaceNames;
 	private BROWSER_TYPE myBrowser;
 	private File mySeleniumLibsDir;
+	private URL mySeleniumGridUrl;
 
 	/**
-	 * @param anInterfaceName
+	 * @param anInterfaceNames 
 	 * @param aBrowser
+	 * @param aSeleniumLibsDir
+	 * @param aSeleniumGridUrl 
 	 */
 	public SeleniumConfiguration( 
+	                              ArrayList<String> anInterfaceNames,
 	                              BROWSER_TYPE aBrowser,
-	                              File aSeleniumLibsDir )
+	                              File aSeleniumLibsDir,
+	                              URL aSeleniumGridUrl )
 	{
 	    Trace.println(Trace.CONSTRUCTOR);
 
+	    myInterfaceNames = anInterfaceNames;
 	    myBrowser = aBrowser;
 	    mySeleniumLibsDir = aSeleniumLibsDir;
+		mySeleniumGridUrl = aSeleniumGridUrl;
+	}
+
+	/**
+	 * @return the myInterfaceNames
+	 */
+	public ArrayList<String> getInterfaceNames() {
+		return myInterfaceNames;
 	}
 
 	/**
@@ -115,6 +132,13 @@ public class SeleniumConfiguration
 		return myBrowser;
 	}
 	
+	/**
+	 * @return the mySeleniumGridUrl
+	 */
+	public URL getSeleniumGridUrl() {
+		return mySeleniumGridUrl;
+	}
+
 	/**
 	 * In case of Chrome, the chromedriver.exe is found here
 	 */
