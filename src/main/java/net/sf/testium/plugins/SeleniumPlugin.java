@@ -73,46 +73,57 @@ public class SeleniumPlugin implements Plugin
 
 	/**
 	 * @param anRtData
-	 * @param interfaceList
-	 * @param testStepMetaExecutor
-	 * @param config
+	 * @param anInterfaceList
+	 * @param aTestStepMetaExecutor
+	 * @param aConfig
 	 * @throws ConfigurationException
 	 */
 	private void createInterfaces(RunTimeData anRtData,
-			SupportedInterfaceList interfaceList,
-			TestStepMetaExecutor testStepMetaExecutor,
-			SeleniumConfiguration config) throws ConfigurationException {
-		Iterator<String> interfaceNamesItr = config.getInterfaceNames().iterator(); 
+			SupportedInterfaceList anInterfaceList,
+			TestStepMetaExecutor aTestStepMetaExecutor,
+			SeleniumConfiguration aConfig) throws ConfigurationException {
+		Iterator<String> interfaceNamesItr = aConfig.getInterfaceNames().iterator(); 
 		while ( interfaceNamesItr.hasNext() )
 		{
 			String interfaceName = interfaceNamesItr.next();
 			
-			createInterface(anRtData, interfaceList, testStepMetaExecutor,
-					config, interfaceName);
+			createInterface(anRtData, anInterfaceList, aTestStepMetaExecutor,
+					aConfig, interfaceName);
 		}
 	}
 
 	/**
 	 * @param anRtData
-	 * @param interfaceList
-	 * @param testStepMetaExecutor
-	 * @param config
-	 * @param interfaceName
+	 * @param anInterfaceList
+	 * @param aTestStepMetaExecutor
+	 * @param aConfig
+	 * @param anInterfaceName
 	 * @throws ConfigurationException
 	 */
 	private void createInterface(RunTimeData anRtData,
-			SupportedInterfaceList interfaceList,
-			TestStepMetaExecutor testStepMetaExecutor,
-			SeleniumConfiguration config, String interfaceName)
+			SupportedInterfaceList anInterfaceList,
+			TestStepMetaExecutor aTestStepMetaExecutor,
+			SeleniumConfiguration aConfig, String anInterfaceName)
 			throws ConfigurationException {
-		SeleniumInterfaceConfiguration ifConfig = 
-				readInterfaceDefintions( interfaceName, anRtData, config );
 
-		ifConfig.setSeleniumGridUrl( config.getSeleniumGridUrl() );
-		WebInterface iface = new WebInterface( interfaceName, anRtData, ifConfig );
-		interfaceList.add(iface);
+		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
+		File interfaceDefinitionsFile = new File( configDir, anInterfaceName + ".xml" );
+		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
+		SeleniumInterfaceConfiguration globalIfConfig = 
+				readInterfaceDefintions( interfaceDefinitionsFile, tmpIfConfig );
 
-		createCustomKeywords(anRtData, interfaceList, testStepMetaExecutor,
+		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
+		File personalInterfaceDefinitionsFile = new File( userConfigDir, anInterfaceName + ".xml" );
+		SeleniumInterfaceConfiguration ifConfig = globalIfConfig;
+		if ( personalInterfaceDefinitionsFile.canRead() ) {
+			ifConfig = readInterfaceDefintions( personalInterfaceDefinitionsFile, globalIfConfig );
+		}
+
+		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
+		WebInterface iface = new WebInterface( anInterfaceName, anRtData, ifConfig );
+		anInterfaceList.add(iface);
+
+		createCustomKeywords(anRtData, anInterfaceList, aTestStepMetaExecutor,
 				ifConfig, iface);
 	}
 
@@ -140,13 +151,36 @@ public class SeleniumPlugin implements Plugin
 		}
 	}
 
-	private SeleniumInterfaceConfiguration readInterfaceDefintions( String interfaceName,
-							              RunTimeData anRtData,
-							              SeleniumConfiguration aConfig ) throws ConfigurationException {
-		Trace.println(Trace.UTIL, "readInterfaceDefintions( " + interfaceName + " )", true );
+//	private SeleniumInterfaceConfiguration readInterfaceDefintions( String anInterfaceName,
+//							              RunTimeData anRtData,
+//							              SeleniumConfiguration aConfig ) throws ConfigurationException {
+//		Trace.println(Trace.UTIL, "readInterfaceDefintions( " + anInterfaceName + " )", true );
+//
+//		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
+//		File interfaceDefinitionsFile = new File( configDir, anInterfaceName + ".xml" );
+//
+//		SeleniumInterfaceXmlHandler handler = null;
+//		try {
+//			XMLReader reader = XmlHandler.getNewXmlReader();
+//			handler = new SeleniumInterfaceXmlHandler( reader );
+//		
+//			handler.parse(reader, interfaceDefinitionsFile);
+//		} catch (TTIException e) {
+//			throw new ConfigurationException( e );
+//		}
+//
+//		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
+//// TODO		tmpIfConfig.setSavePageSource( aConfig.getSave...());
+//		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration(tmpIfConfig);
+//		handler.reset();
+//
+//		return ifConfiguration;
+//	}
 
-		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
-		File interfaceDefinitionsFile = new File( configDir, interfaceName + ".xml" );
+	private SeleniumInterfaceConfiguration readInterfaceDefintions(
+			File interfaceDefinitionsFile,
+			SeleniumInterfaceConfiguration tmpIfConfig) throws ConfigurationException {
+		Trace.println(Trace.UTIL, "readInterfaceDefintions( " + tmpIfConfig.getInterfaceName() + " )", true );
 
 		SeleniumInterfaceXmlHandler handler = null;
 		try {
@@ -158,13 +192,13 @@ public class SeleniumPlugin implements Plugin
 			throw new ConfigurationException( e );
 		}
 
-		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(interfaceName, aConfig.getBrowserType());
 // TODO		tmpIfConfig.setSavePageSource( aConfig.getSave...());
 		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration(tmpIfConfig);
 		handler.reset();
 
 		return ifConfiguration;
 	}
+
 
 	public final SeleniumConfiguration readConfigFile(
 			RunTimeData anRtData ) throws ConfigurationException {

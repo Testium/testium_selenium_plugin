@@ -1,6 +1,8 @@
 package net.sf.testium.configuration;
 
+//import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 
@@ -168,9 +170,20 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 			config.setSavePageSource(new Boolean(mySaveScreenShot));
 		}
 		
-		if ( ! myCustomKeywordLinks.isEmpty() ) {
-			config.setCustomKeywordLinks(myCustomKeywordLinks);
-		}
+//		if ( ! myCustomKeywordLinks.isEmpty() ) {
+//			config.setCustomKeywordLinks(myCustomKeywordLinks); // TODO merge
+			ArrayList<String> customKeywordLinks = config.getCustomKeywordLinks();
+
+			Iterator<String> keywordsDefLinksItr = myCustomKeywordLinks.iterator(); 
+			while ( keywordsDefLinksItr.hasNext() )
+			{
+				String keywordsDefLink = keywordsDefLinksItr.next();
+				if ( ! customKeywordLinks.contains(keywordsDefLink) ) {
+					customKeywordLinks.add(keywordsDefLink);
+				}
+			}
+			config.setCustomKeywordLinks(customKeywordLinks);
+//		}
 		
 		return config;
 	}

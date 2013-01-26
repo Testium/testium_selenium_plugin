@@ -191,11 +191,8 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 				FileUtils.moveFile( tmpScreenFile, screenFile );
 		        aResult.addTestLog(screenFileKey, screenFile.getPath());
 			}
-		}
-		catch ( Throwable t )
-		{
+		} catch ( Throwable t )	{
 				aResult.addComment( "Screen file could not be saved: " + t.getMessage() );
-t.printStackTrace();
 				Trace.print( Trace.SUITE, t );
 		}
 	}
