@@ -127,6 +127,7 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 	}
 
 	public boolean isDisplayed() {
+		this.refreshElement(); // Fix for issue #5 Does it have side-effects?
 		return this.getElement().isDisplayed();
 	}
 

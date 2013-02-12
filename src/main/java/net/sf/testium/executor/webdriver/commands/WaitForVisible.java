@@ -28,9 +28,9 @@ public class WaitForVisible extends GenericSeleniumCommandExecutor
 {
 	private class isNotVisible implements ExpectedCondition<Boolean>
 	{
-		WebElement element;
+		SmartWebElement element;
 		
-		public isNotVisible( WebElement element ) {
+		public isNotVisible( SmartWebElement element ) {
 			this.element = element;
 		}
 
