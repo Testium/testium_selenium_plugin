@@ -22,7 +22,7 @@ public class GetListItem_modified extends GetListItem
 	private static final SpecifiedParameter PARSPEC_LIST = new SpecifiedParameter( 
 			PAR_LIST, List.class, false, false, true, false );
 //	private static final SpecifiedParameter PARSPEC_INDEX = new SpecifiedParameter( 
-//			PAR_INDEX, Integer.class, false, true, false, false );
+//			PAR_INDEX, Integer.class, false, true, true, false );
 //	private static final SpecifiedParameter PARSPEC_OUTPUT = new SpecifiedParameter( 
 //			PAR_OUTPUT, String.class, false, true, false, false );
 
