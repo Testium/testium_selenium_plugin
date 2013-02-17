@@ -35,11 +35,14 @@ public class CheckListSize_modified extends CheckListSize
 			ParameterArrayList parameters, TestStepResult result)
 			throws Exception 
 	{
-		SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);
-
-		if ( elList != null )
-		{
-			((SimpleElementList) elList).refresh();
+		try {
+			SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);
+			if ( elList != null )
+			{
+				((SimpleElementList) elList).refresh();
+			}
+		} catch ( ClassCastException cce ) {
+			// It probably is not a SimpleElementList
 		}
 
 		super.doExecute(aVariables, parameters, result);
