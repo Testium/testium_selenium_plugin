@@ -202,7 +202,7 @@ public class CheckText extends GenericSeleniumCommandExecutor {
 		}
 	}
 
-	protected String getActualText( WebElement elm )
+	protected static String getActualText( WebElement elm )
 	{
 		if ( elm == null )
 		{ 

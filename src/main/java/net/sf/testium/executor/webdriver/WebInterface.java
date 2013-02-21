@@ -75,6 +75,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new Get( this ) );
 		add( new GetAttribute( this ) );
 		add( new GetCurrentUrlCommand( this ) );
+		add( new GetText( this ) );
 		add( new GetTitleCommand( this ) );
 		add( new LoadElementDefinitions( this ) );
 		add( new QuitCommand( this ) );
