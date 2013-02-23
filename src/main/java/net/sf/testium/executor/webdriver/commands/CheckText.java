@@ -209,7 +209,8 @@ public class CheckText extends GenericSeleniumCommandExecutor {
 			return "";
 		} //else
 		
-		if ( elm.getTagName().equalsIgnoreCase("input") )
+		if ( elm.getTagName().equalsIgnoreCase("input") || 
+			 elm.getTagName().equalsIgnoreCase("textarea")	)
 		{
 			String text = elm.getAttribute("value");
 			return text == null ? "" : text;
