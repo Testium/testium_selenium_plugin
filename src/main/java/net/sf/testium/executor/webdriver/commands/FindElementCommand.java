@@ -29,9 +29,11 @@ import org.testtoolinterfaces.utils.RunTimeVariable;
 public class FindElementCommand extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "findElement";
+	
+	private static final String PAR_BY = "by";
 
 	public static final SpecifiedParameter PARSPEC_BY = new SpecifiedParameter( 
-			"by", By.class, false, true, true, false );
+			PAR_BY, By.class, false, true, true, false );
 
 	public static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
 			"element", String.class, false, true, false, false );

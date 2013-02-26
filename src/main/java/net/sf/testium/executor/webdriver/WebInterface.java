@@ -83,6 +83,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new SavePageSourceCommand( this ) );
 		add( new SelectValue( this ) );
 		add( new SendKeys( this ) );
+		add( new SetByVariable( this ) );
 		add( new Submit( this ) );
 		add( new WaitFor( this ) );
 		add( new WaitForPresent( this ) );
