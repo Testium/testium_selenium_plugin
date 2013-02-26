@@ -232,21 +232,17 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	protected void verifyBy( Parameter par, SpecifiedParameter paramSpec )
 			throws TestSuiteException
 	{
-		if ( ! (par instanceof ParameterImpl) )
-		{
-			throw new TestSuiteException( "Parameter " + paramSpec.getName() + " is not a value",
-                    toString() );
-		}
+		if ( par instanceof ParameterImpl ) {
+			ParameterImpl valuePar = (ParameterImpl) par;
 
-		ParameterImpl valuePar = (ParameterImpl) par;
-
-		if ( ! By.class.isAssignableFrom( valuePar.getValueType() ) )
-		{
-			throw new TestSuiteException( "Parameter " + paramSpec.getName() + " must be of type 'id', 'name'," +
-			                              " 'linkText', 'partialLinkText', 'tagName', 'xPath'," +
-			                              " 'className', or 'cssSelector'",
-			                              toString() );
-		}
+			if ( ! By.class.isAssignableFrom( valuePar.getValueType() ) )
+			{
+				throw new TestSuiteException( "Parameter " + paramSpec.getName() + " must be of type 'id', 'name'," +
+				                              " 'linkText', 'partialLinkText', 'tagName', 'xPath'," +
+				                              " 'className', or 'cssSelector'",
+				                              toString() );
+			}
+		} // else, we can't verify it.
 	}
 
 	/**
