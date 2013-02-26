@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sf.testium</groupId>
   <artifactId>testium-selenium-plugin</artifactId>
-  <version>0.3.24</version>
+  <version>0.3.25-SNAPSHOT</version>
   <name>Testium Selenium Plugin</name>
   <description>Selenium Plugin for the Testium Executor</description>
   <url>http://testium.sf.net/</url>
