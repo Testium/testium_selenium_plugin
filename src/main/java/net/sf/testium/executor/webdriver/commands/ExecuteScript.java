@@ -5,6 +5,8 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
+import net.sf.testium.configuration.SeleniumConfiguration;
+import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 
@@ -59,7 +61,7 @@ public class ExecuteScript extends GenericSeleniumCommandExecutor
 		if ( webDriver instanceof JavascriptExecutor ) {
 			return ((JavascriptExecutor) webDriver).executeScript(script, args);
 		} else {
-			throw new Exception( "The chosen driverType does not support execution of javaScript" );
+			throw new Exception( "The chosen browser-type does not support execution of javaScript" );
 		}
 	}
 }
