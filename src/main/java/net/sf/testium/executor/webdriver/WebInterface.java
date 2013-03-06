@@ -89,6 +89,7 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new WaitFor( this ) );
 		add( new WaitForPresent( this ) );
 		add( new WaitForVisible( this ) );
+		add( new WaitForUrl( this ) );
 	}
 
 	public String getBaseUrl()
