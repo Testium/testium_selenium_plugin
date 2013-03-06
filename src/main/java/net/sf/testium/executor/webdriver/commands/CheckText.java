@@ -27,11 +27,11 @@ public class CheckText extends GenericSeleniumCommandExecutor {
 			"expected", String.class, false, true, true, true );
 
 	private static final SpecifiedParameter PARSPEC_MATCH = new SpecifiedParameter( 
-			"match", String.class, true, true, false, false )
+			"match", String.class, true, true, true, false )
 			.setDefaultValue("exact");
 
 	private static final SpecifiedParameter PARSPEC_CASE = new SpecifiedParameter( 
-			"case", Boolean.class, true, true, false, false )
+			"case", Boolean.class, true, true, true, false )
 			.setDefaultValue( true );
 
 	private static final String COMMAND = "checkText";
