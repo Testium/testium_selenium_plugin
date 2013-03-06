@@ -42,7 +42,7 @@ public class Back extends GenericSeleniumCommandExecutor
 		if ( webDriver instanceof FirefoxDriver ) {
 			// Workaround for Selenium issue 3611
 			// See also https://code.google.com/p/selenium/issues/detail?id=3611
-			((FirefoxDriver) webDriver).executeScript("history.go(-1);", new Object[0]);
+			ExecuteScript.executeScript(webDriver, "history.go(-1);", new Object[0]);
 		} else {
 			webDriver.navigate().back();
 		}
