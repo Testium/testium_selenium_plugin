@@ -7,7 +7,7 @@ import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.selenium.SimpleElementList;
 import net.sf.testium.systemundertest.SutInterface;
 
-import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
 
@@ -36,7 +36,7 @@ public class GetListItem_modified extends GetListItem
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
-			ParameterArrayList parameters, TestStepResult result)
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception
 	{
 		SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);

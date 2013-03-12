@@ -14,7 +14,7 @@ import net.sf.testium.selenium.SmartWebElementList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.RunTimeVariable;
@@ -25,7 +25,7 @@ import org.testtoolinterfaces.utils.RunTimeVariable;
  * @author Arjan Kranenburg
  *
  */
-public class FindElementsCommand extends GenericSeleniumCommandExecutor
+public class FindElements extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "findElements";
 
@@ -41,7 +41,7 @@ public class FindElementsCommand extends GenericSeleniumCommandExecutor
     /**
 	 * 
 	 */
-	public FindElementsCommand( WebInterface aWebInterface )
+	public FindElements( WebInterface aWebInterface )
 	{
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
@@ -52,7 +52,7 @@ public class FindElementsCommand extends GenericSeleniumCommandExecutor
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
-			ParameterArrayList parameters, TestStepResult result)
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception {
 
 		WebDriver driver = this.getDriver();

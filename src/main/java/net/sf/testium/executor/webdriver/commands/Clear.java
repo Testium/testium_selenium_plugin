@@ -12,48 +12,37 @@ import org.openqa.selenium.WebElement;
 import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
-import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Command for checking the text of a WebElement
+ * Executes the Selenium 2.0 clear command
  * 
  * @author Arjan Kranenburg
  *
  */
-public class GetText extends GenericSeleniumCommandExecutor {
-	private static final String COMMAND = "getText";
-
+public class Clear extends GenericSeleniumCommandExecutor
+{
+	private static final String COMMAND = "clear";
 	private static final String PAR_ELEMENT = "element";
-	private static final String PAR_VARIABLE = "variable";
 
 	private static final SpecifiedParameter PARSPEC_ELEMENT = new SpecifiedParameter( 
 			PAR_ELEMENT, WebElement.class, false, false, true, false );
 
-	public static final SpecifiedParameter PARSPEC_VARIABLE = new SpecifiedParameter( 
-			PAR_VARIABLE, String.class, false, true, false, false );
-
-
-	public GetText( WebInterface aWebInterface ) {
+    /**
+	 * 
+	 */
+	public Clear( WebInterface aWebInterface )
+	{
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
 		this.addParamSpec( PARSPEC_ELEMENT );
-		this.addParamSpec( PARSPEC_VARIABLE );
 	}
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
 			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception {
-
 		WebElement element = obtainElement( aVariables, parameters, PARSPEC_ELEMENT );
-		String varName = (String) obtainValue(aVariables, parameters, PARSPEC_VARIABLE);
 
-		String text = CheckText.getActualText(element);
-
-		result.setDisplayName( this.toString() + " " + varName + "=\"" + text + "\"" );
-
-		RunTimeVariable rtVariable = new RunTimeVariable( varName, text );
-		aVariables.add(rtVariable);
+		element.clear();
 	}
-
 }

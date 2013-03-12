@@ -46,7 +46,7 @@
   	<dependency>
   	  <groupId>net.sf.testium</groupId>
   	  <artifactId>testium</artifactId>
-  	  <version>0.3.26</version>
+  	  <version>0.3.28</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
@@ -61,7 +61,7 @@
   	<dependency>
   	  <groupId>org.testtoolinterfaces</groupId>
   	  <artifactId>testresult</artifactId>
-  	  <version>0.3.10</version>
+  	  <version>0.3.13</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.seleniumhq.selenium</groupId>

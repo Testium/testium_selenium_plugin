@@ -5,14 +5,14 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.List;
 
-import org.testtoolinterfaces.testresult.TestStepResult;
-import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.utils.RunTimeData;
-
 import net.sf.testium.executor.DefaultInterface;
 import net.sf.testium.executor.general.GetListSize;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.selenium.SimpleElementList;
+
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
+import org.testtoolinterfaces.testsuite.ParameterArrayList;
+import org.testtoolinterfaces.utils.RunTimeData;
 
 /**
  * 
@@ -38,7 +38,7 @@ public class GetListSize_modified extends GetListSize {
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
-			ParameterArrayList parameters, TestStepResult result)
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception
 	{
 		SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);

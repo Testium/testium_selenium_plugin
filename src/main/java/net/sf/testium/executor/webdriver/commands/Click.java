@@ -5,10 +5,11 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
-import org.openqa.selenium.WebElement;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
-import org.testtoolinterfaces.testresult.TestStepResult;
+
+import org.openqa.selenium.WebElement;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterVariable;
@@ -36,7 +37,7 @@ public class Click extends GenericSeleniumCommandExecutor
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
-			ParameterArrayList parameters, TestStepResult result)
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception {
 
 		Parameter elementPar = parameters.get(PAR_ELEMENT);

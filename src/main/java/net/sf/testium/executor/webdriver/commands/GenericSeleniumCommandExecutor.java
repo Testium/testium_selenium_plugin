@@ -21,11 +21,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testresult.impl.TestStepCommandResultImpl;
 import org.testtoolinterfaces.testsuite.Parameter;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
-import org.testtoolinterfaces.testsuite.TestStep;
+import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 import org.testtoolinterfaces.utils.Trace;
@@ -43,7 +45,7 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	 */
 	abstract protected void doExecute( RunTimeData aVariables,
 	                                   ParameterArrayList parameters,
-	                                   TestStepResult result) throws Exception;
+	                                   TestStepCommandResult result) throws Exception;
 
 	/**
 	 * @param command
@@ -81,14 +83,14 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	}
 
 	@Override
-	public TestStepResult execute( TestStep aStep,
+	public TestStepResult execute( TestStepCommand aStep,
 	                               RunTimeData aVariables,
 	                               File aLogDir ) throws TestSuiteException
 	{
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
-		TestStepResult result = new TestStepResult( aStep );
+		TestStepCommandResult result = new TestStepCommandResultImpl( aStep );
 		this.mySavePageSource = aVariables.getValueAsString(SeleniumConfiguration.VARNAME_SAVEPAGESOURCE);
 		this.mySaveScreenshot = aVariables.getValueAsString(SeleniumConfiguration.VARNAME_SAVESCREENSHOT);
 

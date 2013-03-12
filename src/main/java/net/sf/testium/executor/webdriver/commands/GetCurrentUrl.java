@@ -12,26 +12,26 @@ import org.openqa.selenium.WebDriver;
 import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.utils.RunTimeData;
+import org.testtoolinterfaces.utils.RunTimeVariable;
 
 /**
- * Executes the Selenium 2.0 getCurrentUrl command and validates the result against a parameter
+ * Executes the Selenium 2.0 getCurrentUrl command
  * 
  * @author Arjan Kranenburg
  *
  */
-public class CheckCurrentUrl extends GenericSeleniumCommandExecutor
+public class GetCurrentUrl  extends GenericSeleniumCommandExecutor
 {
-	private static final String COMMAND = "checkCurrentUrl";
+	private static final String COMMAND = "getCurrentUrl";
 	private static final String PAR_URL = "url";
 
 	public static final SpecifiedParameter PARSPEC_URL = new SpecifiedParameter( 
 			PAR_URL, String.class, false, true, true, false );
 
-
     /**
 	 * 
 	 */
-	public CheckCurrentUrl( WebInterface aWebInterface )
+	public GetCurrentUrl( WebInterface aWebInterface )
 	{
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
@@ -39,20 +39,18 @@ public class CheckCurrentUrl extends GenericSeleniumCommandExecutor
 	}
 
 	@Override
-	protected void doExecute( RunTimeData aVariables,
-							  ParameterArrayList parameters,
-							  TestStepCommandResult result )
+	protected void doExecute(RunTimeData aVariables,
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception {
+		String variableName = (String) obtainValue( aVariables, parameters, PARSPEC_URL );
+
 		WebDriver webDriver = this.getDriver();
-
-		String expectedUrl = (String) obtainValue( aVariables, parameters, PARSPEC_URL );
-
 		String currentUrl = webDriver.getCurrentUrl();
 
-		if ( ! currentUrl.equalsIgnoreCase( expectedUrl ) )
-		{
-			throw new Exception( PAR_URL + " has value '" + currentUrl
-	                   + "'. Expected '" + expectedUrl + "' (ignoring case)" );
-		}
+		RunTimeVariable rtVariable = new RunTimeVariable( variableName, currentUrl );
+		aVariables.add(rtVariable);
+
+		result.setDisplayName( this.toString() + " " + variableName + "=\"" + currentUrl + "\"" );
 	}
+
 }

@@ -14,7 +14,7 @@ import net.sf.testium.selenium.WebDriverInterface;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
@@ -26,7 +26,7 @@ import org.testtoolinterfaces.utils.RunTimeVariable;
  * @author Arjan Kranenburg
  *
  */
-public class FindElementCommand extends GenericSeleniumCommandExecutor
+public class FindElement extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "findElement";
 	
@@ -45,7 +45,7 @@ public class FindElementCommand extends GenericSeleniumCommandExecutor
     /**
 	 * 
 	 */
-	public FindElementCommand( WebInterface aWebInterface )
+	public FindElement( WebInterface aWebInterface )
 	{
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
@@ -56,7 +56,7 @@ public class FindElementCommand extends GenericSeleniumCommandExecutor
 
 	@Override
 	protected void doExecute(RunTimeData aVariables,
-			ParameterArrayList parameters, TestStepResult result)
+			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception
 	{
 		By by = (By) obtainValue(aVariables, parameters, PARSPEC_BY);

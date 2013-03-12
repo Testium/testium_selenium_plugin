@@ -7,15 +7,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import net.sf.testium.executor.general.SpecifiedParameter;
+import net.sf.testium.executor.webdriver.WebInterface;
 
 import org.openqa.selenium.WebDriver;
-import net.sf.testium.configuration.SeleniumConfiguration;
-import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
-import net.sf.testium.executor.webdriver.WebInterface;
-import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
+import org.testtoolinterfaces.testresult.TestStepCommandResult;
+import org.testtoolinterfaces.testresult.TestStepResult;
+import org.testtoolinterfaces.testresult.impl.TestStepCommandResultImpl;
 import org.testtoolinterfaces.testsuite.ParameterArrayList;
-import org.testtoolinterfaces.testsuite.TestStep;
+import org.testtoolinterfaces.testsuite.TestStepCommand;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.RunTimeData;
 
@@ -25,27 +28,27 @@ import org.testtoolinterfaces.utils.RunTimeData;
  * @author Arjan Kranenburg
  *
  */
-public class SavePageSourceCommand extends WebDriverCommandExecutor
+public class SavePageSource extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "savePageSource";
 
     /**
 	 * 
 	 */
-	public SavePageSourceCommand( WebInterface aWebInterface )
+	public SavePageSource( WebInterface aWebInterface )
 	{
-		super( COMMAND, aWebInterface );
+		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 	}
 
 	@Override
-	public TestStepResult execute( TestStep aStep,
+	public TestStepResult execute( TestStepCommand aStep,
 	                               RunTimeData aVariables,
 	                               File aLogDir ) throws TestSuiteException
 	{
 		ParameterArrayList parameters = aStep.getParameters();
 		verifyParameters(parameters);
 
-		TestStepResult result = new TestStepResult( aStep );
+		TestStepResult result = new TestStepCommandResultImpl( aStep );
 		WebDriver webDriver = this.getDriver();
 
 		String pageSource = webDriver.getPageSource();
@@ -53,6 +56,13 @@ public class SavePageSourceCommand extends WebDriverCommandExecutor
 		savePageSource(aLogDir, result, pageSource);
 
 		return result;
+	}
+
+	@Override
+	protected void doExecute(RunTimeData aVariables,
+			ParameterArrayList parameters, TestStepCommandResult result)
+			throws Exception {
+		throw new Error( "Method should not have been called" );
 	}
 
 	/**
@@ -87,11 +97,4 @@ public class SavePageSourceCommand extends WebDriverCommandExecutor
 			result.setResult( VERDICT.FAILED );
 		}
 	}
-
-	@Override
-	public boolean verifyParameters( ParameterArrayList aParameters ) throws TestSuiteException
-	{
-		return true;
-	}
-
 }
