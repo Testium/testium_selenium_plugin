@@ -30,6 +30,7 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 	private final WebDriverInterface myInterface;
 	private WebElement myElement;
 	private final WebElement myBaseElement;
+	private String myFrame;
 	
 	public SimplePageElement(By by, WebDriverInterface iface) {
 		this(by, iface, null, null);
@@ -64,6 +65,7 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 			SmartWebElement elm = (SmartWebElement) element;
 			myElement = elm.getElement();
 		}
+		myFrame = null;
 	}
 
 	public By getBy() {
@@ -355,7 +357,16 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 								 + "'. Make sure this interface (" + this.getInterface().toString() + ") opens a browser first.");
 			}
 			
+			if ( myFrame == null || myFrame.isEmpty() ) {
+				driver.switchTo().defaultContent();
+			} else {
+				driver.switchTo().frame( myFrame );
+			}
 			myElement = driver.findElement(myBy);
 		}
+	}
+
+	public void setFrame(String frame) {
+		myFrame = frame;
 	}
 }

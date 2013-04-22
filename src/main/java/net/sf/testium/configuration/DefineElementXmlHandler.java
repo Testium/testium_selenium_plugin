@@ -21,6 +21,7 @@ import org.xml.sax.XMLReader;
  *      <Name>...</Name>
  *      <By type="...">...</By>
  *      <BaseElement>...</BaseElement>
+ *      <Frame>...</Frame>
  *    </DefineElement>
  * 
  */
@@ -31,10 +32,12 @@ public class DefineElementXmlHandler extends XmlHandler
 	
 	private static final String NAME_ELEMENT = "Name";
 	private static final String BASE_ELEMENT_ELEMENT = "BaseElement";
+	private static final String FRAME_ELEMENT = "Frame";
 
 	private ByXmlHandler myByXmlHandler;
 	private GenericTagAndStringXmlHandler myNameXmlHandler;
 	private GenericTagAndStringXmlHandler myBaseElementXmlHandler;
+	private GenericTagAndStringXmlHandler myFrameXmlHandler;
 
 	private final RunTimeData myRtData;
 	private final WebDriverInterface myInterface;
@@ -42,6 +45,7 @@ public class DefineElementXmlHandler extends XmlHandler
 	private By myBy;
 	private String myName;
 	private WebElement myBaseElement;
+	private String myFrame;
 
 	public DefineElementXmlHandler( XMLReader anXmlReader, RunTimeData anRtData, WebDriverInterface anInterface )
 	{
@@ -59,6 +63,9 @@ public class DefineElementXmlHandler extends XmlHandler
 		
 		myBaseElementXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, BASE_ELEMENT_ELEMENT);
 		this.addElementHandler(myBaseElementXmlHandler);
+		
+		myFrameXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, FRAME_ELEMENT);
+		this.addElementHandler(myFrameXmlHandler);
 		
 		reset();
 	}
@@ -115,6 +122,11 @@ public class DefineElementXmlHandler extends XmlHandler
 			myBaseElement = myRtData.getValueAs(WebElement.class, baseElementName);
 			myBaseElementXmlHandler.reset();	
     	}
+		else if (aQualifiedName.equalsIgnoreCase( FRAME_ELEMENT ))
+    	{
+			myFrame = myFrameXmlHandler.getValue();
+			myFrameXmlHandler.reset();	
+    	}
 		else
     	{ // Programming fault
 			throw new Error( "Child XML Handler returned, but not recognized. The handler was probably defined " +
@@ -133,6 +145,9 @@ public class DefineElementXmlHandler extends XmlHandler
 		}
 		
 		SimplePageElement elm = new SimplePageElement( myBy, myInterface, null, myBaseElement );
+		if ( ! myFrame.isEmpty() ) {
+			elm.setFrame( myFrame );
+		}
 		RunTimeVariable elementVar = new RunTimeVariable( myName, elm );
 		myRtData.add(elementVar);
 	}
@@ -142,5 +157,6 @@ public class DefineElementXmlHandler extends XmlHandler
 		myBy = null;
 		myName = "";
 		myBaseElement = null;
+		myFrame = "";
 	}
 }
