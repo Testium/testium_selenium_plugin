@@ -45,7 +45,7 @@ public class DefineElementXmlHandler extends XmlHandler
 	private By myBy;
 	private String myName;
 	private WebElement myBaseElement;
-	private String myFrame;
+	private WebElement myFrame;
 
 	public DefineElementXmlHandler( XMLReader anXmlReader, RunTimeData anRtData, WebDriverInterface anInterface )
 	{
@@ -124,7 +124,8 @@ public class DefineElementXmlHandler extends XmlHandler
     	}
 		else if (aQualifiedName.equalsIgnoreCase( FRAME_ELEMENT ))
     	{
-			myFrame = myFrameXmlHandler.getValue();
+			String frameElementName = myFrameXmlHandler.getValue();
+			myFrame = myRtData.getValueAs(WebElement.class, frameElementName);
 			myFrameXmlHandler.reset();	
     	}
 		else
@@ -145,7 +146,7 @@ public class DefineElementXmlHandler extends XmlHandler
 		}
 		
 		SimplePageElement elm = new SimplePageElement( myBy, myInterface, null, myBaseElement );
-		if ( ! myFrame.isEmpty() ) {
+		if ( myFrame != null ) {
 			elm.setFrame( myFrame );
 		}
 		RunTimeVariable elementVar = new RunTimeVariable( myName, elm );
@@ -157,6 +158,6 @@ public class DefineElementXmlHandler extends XmlHandler
 		myBy = null;
 		myName = "";
 		myBaseElement = null;
-		myFrame = "";
+		myFrame = null;
 	}
 }

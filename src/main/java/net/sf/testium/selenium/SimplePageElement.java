@@ -21,8 +21,9 @@ import org.openqa.selenium.internal.FindsByTagName;
 import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.internal.WrapsElement;
 
-public class SimplePageElement implements SmartWebElement, //PageElement,
+public class SimplePageElement implements SmartWebElement, WrapsElement,
 		FindsByLinkText, FindsById, FindsByName, FindsByTagName, FindsByClassName, FindsByCssSelector, FindsByXPath,
 		WrapsDriver, Locatable {
 
@@ -30,7 +31,7 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 	private final WebDriverInterface myInterface;
 	private WebElement myElement;
 	private final WebElement myBaseElement;
-	private String myFrame;
+	private WebElement myFrame;
 	
 	public SimplePageElement(By by, WebDriverInterface iface) {
 		this(by, iface, null, null);
@@ -348,25 +349,38 @@ public class SimplePageElement implements SmartWebElement, //PageElement,
 	 * @throws Error
 	 */
 	private void refreshElement() throws Error {
+		WebDriver driver = getDriver();
+		if ( myFrame == null ) {
+			driver.switchTo().defaultContent();
+		} else {
+			driver.switchTo().frame( myFrame );
+		}
+
 		if ( myBaseElement != null ) {
 			myElement = myBaseElement.findElement(myBy);
 		} else {
-			WebDriver driver = this.getInterface().getDriver();
-			if ( driver == null ) { // should not happen. The interface must make sure it's not null
-				throw new Error( "Element requested, but driver is not yet created: '" + myBy
-								 + "'. Make sure this interface (" + this.getInterface().toString() + ") opens a browser first.");
-			}
-			
-			if ( myFrame == null || myFrame.isEmpty() ) {
-				driver.switchTo().defaultContent();
-			} else {
-				driver.switchTo().frame( myFrame );
-			}
 			myElement = driver.findElement(myBy);
 		}
 	}
 
-	public void setFrame(String frame) {
+	/**
+	 * @return
+	 * @throws Error
+	 */
+	private WebDriver getDriver() throws Error {
+		WebDriver driver = this.getInterface().getDriver();
+		if ( driver == null ) { // should not happen. The interface must make sure it's not null
+			throw new Error( "Element requested, but driver is not yet created: '" + myBy
+							 + "'. Make sure this interface (" + this.getInterface().toString() + ") opens a browser first.");
+		}
+		return driver;
+	}
+
+	public void setFrame(WebElement frame) {
 		myFrame = frame;
+	}
+
+	public WebElement getWrappedElement() {
+		return this.getElement();
 	}
 }
