@@ -23,6 +23,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testtoolinterfaces.testresult.TestStepResult;
 import org.testtoolinterfaces.testsuite.ParameterImpl;
 import org.testtoolinterfaces.testsuite.TestSuiteException;
@@ -134,11 +135,19 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		
 		this.setTestStepResult(aTestStepResult);
 		
-		Set<String> windowHandles = this.myDriver.getWindowHandles();
-		int openWindows = windowHandles.size();
-		this.myDriver.close();
-		if ( openWindows == 1 )
-		{
+		try {
+			Set<String> windowHandles = this.myDriver.getWindowHandles();
+			int openWindows = windowHandles.size();
+			this.myDriver.close();
+			if ( openWindows == 1 )
+			{
+				setDriver(null);
+			}
+		} catch ( UnreachableBrowserException ignored ) {
+System.out.println( "Issue #19: UnreachableBrowserException caught when quiting the browser." );
+			setDriver(null);
+		} catch ( WebDriverException ignored ) {
+System.out.println( "Issue #19: WebDriverException caught when quiting the browser." );
 			setDriver(null);
 		}
 
@@ -153,7 +162,15 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		}
 		this.setTestStepResult(aTestStepResult);
 
-		this.myDriver.quit();
+		try {
+			this.myDriver.quit();
+		} catch ( UnreachableBrowserException ignored ) {
+System.out.println( "Issue #19: UnreachableBrowserException caught when quiting the browser." );
+			// Below we'll set the driver to null
+		} catch ( WebDriverException ignored ) {
+System.out.println( "Issue #19: WebDriverException caught when quiting the browser." );
+			// Below we'll set the driver to null
+		}
 		this.setTestStepResult(null);
 
 		setDriver(null);

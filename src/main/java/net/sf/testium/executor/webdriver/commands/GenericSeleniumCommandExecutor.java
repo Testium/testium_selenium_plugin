@@ -17,9 +17,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -94,14 +96,20 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 		this.mySavePageSource = aVariables.getValueAsString(SeleniumConfiguration.VARNAME_SAVEPAGESOURCE);
 		this.mySaveScreenshot = aVariables.getValueAsString(SeleniumConfiguration.VARNAME_SAVESCREENSHOT);
 
-		try
-		{
+		try	{
 			doExecute(aVariables, parameters, result);
-
 			result.setResult( VERDICT.PASSED );
-		}
-		catch (Exception e)
-		{
+
+		} catch (UnreachableBrowserException e) {
+System.out.println( "Issue #19: UnreachableBrowserException caught when executing command: " + this.getCommand() );
+			this.getInterface().destroy(); //????
+			failTest(aLogDir, result, e);
+
+		} catch (WebDriverException e) {
+System.out.println( "Issue #19: WebDriverException caught when executing command: " + this.getCommand() );	
+			failTest(aLogDir, result, e);
+			
+		} catch (Exception e) {
 			failTest(aLogDir, result, e);
 		}
 
