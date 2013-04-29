@@ -105,10 +105,10 @@ System.out.println( "Issue #19: UnreachableBrowserException caught when executin
 			this.getInterface().destroy(); //????
 			failTest(aLogDir, result, e);
 
-		} catch (WebDriverException e) {
-System.out.println( "Issue #19: WebDriverException caught when executing command: " + this.getCommand() );	
-			failTest(aLogDir, result, e);
-			
+//		} catch (WebDriverException e) {
+//System.out.println( "Issue #19: WebDriverException caught when executing command: " + this.getCommand() );	
+//			failTest(aLogDir, result, e);
+//			
 		} catch (Exception e) {
 			failTest(aLogDir, result, e);
 		}
