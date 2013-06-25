@@ -37,6 +37,7 @@ import org.xml.sax.XMLReader;
  */
 public class SeleniumPlugin implements Plugin
 {
+	public static final String BASEURL = "BaseUrl";
 
 	public SeleniumPlugin()
 	{
@@ -120,6 +121,11 @@ public class SeleniumPlugin implements Plugin
 		}
 
 		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
+		
+		String sysPropBaseUrl = System.getProperty( anInterfaceName + SeleniumPlugin.BASEURL );
+		if ( sysPropBaseUrl != null ) {
+			ifConfig.setBaseUrl( sysPropBaseUrl );
+		}
 		WebInterface iface = new WebInterface( anInterfaceName, anRtData, ifConfig );
 		anInterfaceList.add(iface);
 
