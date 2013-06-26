@@ -122,7 +122,7 @@ public class SeleniumPlugin implements Plugin
 
 		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
 		
-		String sysPropBaseUrl = System.getProperty( anInterfaceName + SeleniumPlugin.BASEURL );
+		String sysPropBaseUrl = System.getProperty( anInterfaceName + "." + SeleniumPlugin.BASEURL );
 		if ( sysPropBaseUrl != null ) {
 			ifConfig.setBaseUrl( sysPropBaseUrl );
 		}
