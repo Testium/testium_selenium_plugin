@@ -25,7 +25,7 @@ import org.testtoolinterfaces.utils.RunTimeVariable;
  */
 public class DefineElementList extends GenericSeleniumCommandExecutor {
 	private static final SpecifiedParameter PARSPEC_BY = new SpecifiedParameter( 
-			"by", By.class, false, true, false, false );
+			"by", By.class, false, true, true, false );
 
 	private static final SpecifiedParameter PARSPEC_NAME = new SpecifiedParameter( 
 			"name", String.class, false, true, false, false );
