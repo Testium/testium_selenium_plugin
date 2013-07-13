@@ -23,9 +23,13 @@ public class CheckCurrentUrl extends GenericSeleniumCommandExecutor
 {
 	private static final String COMMAND = "checkCurrentUrl";
 	private static final String PAR_URL = "url";
+	private static final String PAR_MATCH = "match";
 
 	public static final SpecifiedParameter PARSPEC_URL = new SpecifiedParameter( 
 			PAR_URL, String.class, false, true, true, false );
+	public static final SpecifiedParameter PARSPEC_MATCH = new SpecifiedParameter( 
+			PAR_MATCH, String.class, true, true, true, false )
+				.setDefaultValue("exact");
 
 
     /**
@@ -36,6 +40,7 @@ public class CheckCurrentUrl extends GenericSeleniumCommandExecutor
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
 
 		this.addParamSpec( PARSPEC_URL );
+		this.addParamSpec( PARSPEC_MATCH );
 	}
 
 	@Override
@@ -46,13 +51,66 @@ public class CheckCurrentUrl extends GenericSeleniumCommandExecutor
 		WebDriver webDriver = this.getDriver();
 
 		String expectedUrl = (String) obtainValue( aVariables, parameters, PARSPEC_URL );
+		String match = (String) this.obtainOptionalValue(aVariables, parameters, PARSPEC_MATCH);
 
 		String currentUrl = webDriver.getCurrentUrl();
 
+		if ( match.equalsIgnoreCase( "exact" ) )
+		{
+			checkExact(expectedUrl, currentUrl,
+					"Actual URL: \"" + currentUrl + "\" is not equal to: \"" + expectedUrl + "\"");
+			return;
+		}
+		else if ( match.equalsIgnoreCase( "contains" ) )
+		{
+			checkContains(expectedUrl, currentUrl,
+					"Actual URL: \"" + currentUrl + "\" does not contain: \"" + expectedUrl + "\"");
+			return;
+		}
+		else if ( match.equalsIgnoreCase( "startsWith" ) )
+		{
+			checkStartsWith(expectedUrl, currentUrl,
+					"Actual URL: \"" + currentUrl + "\" does not start with: \"" + expectedUrl + "\"" );
+			return;
+		}
+		else if ( match.equalsIgnoreCase( "endsWith" ) )
+		{
+			checkEndsWith(expectedUrl, currentUrl,
+					"Actual URL: \"" + currentUrl + "\" does not end with: \"" + expectedUrl + "\"" );
+			return;
+		}
+		else
+		{
+			throw new Exception( "match criteria \"" + match + "\" is not supported. Only exact, contains, startsWith, or endsWith" );
+		}
+	}
+
+	private void checkExact(String expectedUrl, String currentUrl,
+			String message) throws Exception {
 		if ( ! currentUrl.equalsIgnoreCase( expectedUrl ) )
 		{
-			throw new Exception( PAR_URL + " has value '" + currentUrl
-	                   + "'. Expected '" + expectedUrl + "' (ignoring case)" );
+			throw new Exception( message );
+		}
+	}
+
+	private void checkContains(String expectedUrl, String currentUrl,
+			String message) throws Exception {
+		if ( ! currentUrl.contains(expectedUrl) ) {
+			throw new Exception( message );
+		}
+	}
+
+	private void checkStartsWith(String expectedUrl, String currentUrl,
+			String message) throws Exception {
+		if ( ! currentUrl.startsWith(expectedUrl) ) {
+			throw new Exception( message );
+		}
+	}
+
+	private void checkEndsWith(String expectedUrl, String currentUrl,
+			String message) throws Exception {
+		if ( ! currentUrl.endsWith(expectedUrl) ) {
+			throw new Exception( message );
 		}
 	}
 }
