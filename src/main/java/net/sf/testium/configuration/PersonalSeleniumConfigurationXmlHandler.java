@@ -1,5 +1,6 @@
 package net.sf.testium.configuration;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
 	private BROWSER_TYPE myDefaultBrowser;
+	private final File mySeleniumLibsDir;
 	private URL mySeleniumGridUrl = null;
 	private ArrayList<String> myInterfaceNames;
 	private SAVE_SOURCE mySavePageSource;
@@ -56,6 +58,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	    Trace.println(Trace.CONSTRUCTOR);
 
 	    myDefaultBrowser = globalConfig.getBrowserType();
+	    mySeleniumLibsDir = globalConfig.getSeleniumLibsDir();
 		mySeleniumGridUrl = globalConfig.getSeleniumGridUrl();
 		myInterfaceNames = globalConfig.getInterfaceNames();
 		mySavePageSource = globalConfig.getSavePageSource();
@@ -158,7 +161,8 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, null, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
+		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser,
+				mySeleniumLibsDir, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
 	}
 
 }
