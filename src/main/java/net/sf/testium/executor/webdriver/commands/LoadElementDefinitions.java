@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.sf.testium.configuration.LoadDefinitionsXmlHandler;
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 
@@ -30,6 +31,9 @@ public class LoadElementDefinitions extends GenericSeleniumCommandExecutor {
 		super(COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>());
 
 		this.addParamSpec(PARSPEC_FILE);
+		
+		this.setSavePageSource(SAVE_SOURCE.NEVER);
+		this.setSaveScreenshot(SAVE_SOURCE.NEVER);
 	}
 
 	@Override

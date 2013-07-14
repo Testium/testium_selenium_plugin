@@ -5,11 +5,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 
 import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
-import org.testtoolinterfaces.utils.RunTimeData;
-import org.testtoolinterfaces.utils.RunTimeVariable;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.XmlHandler;
 import org.xml.sax.Attributes;
@@ -44,21 +43,24 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler mySeleniumGridUrlXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
-	private BROWSER_TYPE myDefaultBrowser = null;
+	private BROWSER_TYPE myDefaultBrowser;
 	private URL mySeleniumGridUrl = null;
 	private ArrayList<String> myInterfaceNames;
+	private SAVE_SOURCE mySavePageSource;
+	private SAVE_SOURCE mySaveScreenShot;
 
-	private RunTimeData myRtData;
-	
-	public PersonalSeleniumConfigurationXmlHandler( XMLReader anXmlReader, RunTimeData anRtData )
+	public PersonalSeleniumConfigurationXmlHandler( XMLReader anXmlReader,
+			SeleniumConfiguration globalConfig)
 	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-		mySeleniumGridUrl = null;
+	    myDefaultBrowser = globalConfig.getBrowserType();
+		mySeleniumGridUrl = globalConfig.getSeleniumGridUrl();
+		myInterfaceNames = globalConfig.getInterfaceNames();
+		mySavePageSource = globalConfig.getSavePageSource();
+		mySaveScreenShot = globalConfig.getSaveScreenShot();
 
-		myRtData = anRtData;
-		
 	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
 		this.addElementHandler(myDefaultBrowserXmlHandler);
 
@@ -115,17 +117,13 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 		if (aQualifiedName.equalsIgnoreCase( DEF_BROWSER_ELEMENT ))
     	{
 			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( myDefaultBrowserXmlHandler.getValue() );
-			RunTimeVariable browserTypeVar = new RunTimeVariable(SeleniumConfiguration.BROWSERTYPE, browserType);
-			myRtData.add(browserTypeVar);
-			
 			myDefaultBrowser = browserType;
-
 			myDefaultBrowserXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_GRID_URL_ELEMENT ))
     	{
 			String seleniumGridUrl = mySeleniumGridUrlXmlHandler.getValue();
-			seleniumGridUrl = myRtData.substituteVars(seleniumGridUrl);
+//			seleniumGridUrl = myRtData.substituteVars(seleniumGridUrl);
 			try {
 				mySeleniumGridUrl = new URL( seleniumGridUrl );
 			} catch (MalformedURLException e) {
@@ -137,31 +135,13 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 		else if (aQualifiedName.equalsIgnoreCase( SAVE_PAGESOURCE ))
     	{
 			String savePageSource = mySavePageSourceXmlHandler.getValue();
-			if ( !savePageSource.equalsIgnoreCase("NEVER")
-					&& !savePageSource.equalsIgnoreCase("ONFAIL")
-					&& !savePageSource.equalsIgnoreCase("ALWAYS") ) {
-				throw new TestSuiteException( "\"" + savePageSource + "\" is not allowed for " + SAVE_PAGESOURCE + ". Only NEVER, ONFAIL, or ALWAYS" );
-			}
-			
-			RunTimeVariable savePageSourceVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVEPAGESOURCE,
-					savePageSource.toUpperCase());
-			this.myRtData.add(savePageSourceVar);
-
+			mySavePageSource = SAVE_SOURCE.enumOf(savePageSource);
 			mySavePageSourceXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SAVE_SCREENSHOT ))
     	{
 			String saveScreenshots = mySaveScreenShotXmlHandler.getValue();
-			if ( !saveScreenshots.equalsIgnoreCase("NEVER")
-					&& !saveScreenshots.equalsIgnoreCase("ONFAIL")
-					&& !saveScreenshots.equalsIgnoreCase("ALWAYS") ) {
-				throw new TestSuiteException( "\"" + saveScreenshots + "\" is not allowed for " + SAVE_SCREENSHOT + ". Only NEVER, ONFAIL, or ALWAYS" );
-			}
-			
-			RunTimeVariable saveScreenshotsVar = new RunTimeVariable(SeleniumConfiguration.VARNAME_SAVESCREENSHOT,
-						saveScreenshots.toUpperCase());
-			this.myRtData.add(saveScreenshotsVar);
-
+			mySaveScreenShot = SAVE_SOURCE.enumOf(saveScreenshots);
 			mySaveScreenShotXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( myInterfacesXmlHandler.getStartElement() ))
@@ -178,7 +158,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, null, mySeleniumGridUrl );
+		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, null, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
 	}
 
 }

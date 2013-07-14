@@ -5,6 +5,7 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 import net.sf.testium.selenium.SimpleElementList;
@@ -41,6 +42,9 @@ public class DefineElementList extends GenericSeleniumCommandExecutor {
 		this.addParamSpec( PARSPEC_BY );
 		this.addParamSpec( PARSPEC_NAME );
 		this.addParamSpec( PARSPEC_BASEELEMENT );
+		
+		this.setSavePageSource(SAVE_SOURCE.NEVER);
+		this.setSaveScreenshot(SAVE_SOURCE.NEVER);
 	}
 
 	@Override

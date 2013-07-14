@@ -1,12 +1,10 @@
 package net.sf.testium.configuration;
 
-//import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 
-import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.GenericTagAndStringXmlHandler;
 import org.testtoolinterfaces.utils.TTIException;
 import org.testtoolinterfaces.utils.Trace;
@@ -40,17 +38,48 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
 
-	private String myType;
+	private BROWSER_TYPE defaultType;
+	private String defaultBaseUrl;
+	private SAVE_SOURCE defaultSavePageSource;
+	private SAVE_SOURCE defaultSaveScreenShot; 
+
+	private BROWSER_TYPE myType;
 	private String myBaseUrl;
-	private String mySavePageSource;
-	private String mySaveScreenShot; 
+	private SAVE_SOURCE mySavePageSource;
+	private SAVE_SOURCE mySaveScreenShot; 
 	private ArrayList<String> myCustomKeywordLinks;
 	
-	public SeleniumInterfaceXmlHandler( XMLReader anXmlReader )	{
+	public SeleniumInterfaceXmlHandler( XMLReader anXmlReader, SeleniumConfiguration selConfig )	{
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    this.reset();
+	    defaultType = selConfig.getBrowserType();
+//	    defaultBaseUrl = selConfig.getBaseUrl();
+//	    defaultBaseUrl = "";
+	    defaultSavePageSource = selConfig.getSavePageSource();
+	    defaultSaveScreenShot = selConfig.getSaveScreenShot();
+
+	    genericConstructor(anXmlReader);
+	}
+
+	public SeleniumInterfaceXmlHandler(XMLReader anXmlReader,
+			SeleniumInterfaceConfiguration globalIfConfig) {
+	    super(anXmlReader, START_ELEMENT);
+	    Trace.println(Trace.CONSTRUCTOR);
+
+	    defaultType = globalIfConfig.getBrowserType();
+	    defaultBaseUrl = globalIfConfig.getBaseUrl();
+	    defaultSavePageSource = globalIfConfig.getSavePageSource();
+	    defaultSaveScreenShot = globalIfConfig.getSaveScreenShot();
+
+	    genericConstructor(anXmlReader);
+	}
+
+	/**
+	 * @param anXmlReader
+	 */
+	private void genericConstructor(XMLReader anXmlReader) {
+		this.reset();
 	    
 		myBaseUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, BASE_URL_ELEMENT);
 		this.addElementHandler(myBaseUrlXmlHandler);
@@ -111,31 +140,20 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
     	}
 		else if (aQualifiedName.equalsIgnoreCase(BROWSER_TYPE_ELEMENT))
     	{
-			this.myType = myBaseUrlXmlHandler.getValue();
-			myBaseUrlXmlHandler.reset();
+			String browserTypeStr = this.myBroserTypeXmlHandler.getValue();
+			myType = BROWSER_TYPE.enumOf(browserTypeStr);
+			myBroserTypeXmlHandler.reset();
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE ))
     	{
 			String savePageSource = mySavePageSourceXmlHandler.getValue();
-			if ( !savePageSource.equalsIgnoreCase("NEVER")
-					&& !savePageSource.equalsIgnoreCase("ONFAIL")
-					&& !savePageSource.equalsIgnoreCase("ALWAYS") ) {
-				throw new TestSuiteException( "\"" + savePageSource + "\" is not allowed for " + SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE + ". Only NEVER, ONFAIL, or ALWAYS" );
-			}
-			
-			this.mySavePageSource = savePageSource.toUpperCase();
-
+			this.mySavePageSource = SAVE_SOURCE.enumOf(savePageSource);
 			mySavePageSourceXmlHandler.reset();				
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT ))
     	{
 			String saveScreenshots = mySaveScreenShotXmlHandler.getValue();
-			if ( !saveScreenshots.equalsIgnoreCase("NEVER")
-					&& !saveScreenshots.equalsIgnoreCase("ONFAIL")
-					&& !saveScreenshots.equalsIgnoreCase("ALWAYS") ) {
-				throw new TestSuiteException( "\"" + saveScreenshots + "\" is not allowed for " + SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT + ". Only NEVER, ONFAIL, or ALWAYS" );
-			}
-			this.mySaveScreenShot = saveScreenshots.toUpperCase();
+			this.mySaveScreenShot = SAVE_SOURCE.enumOf(saveScreenshots);
 			
 			mySaveScreenShotXmlHandler.reset();	
     	}
@@ -152,48 +170,45 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		}
 	}
 	
-	public SeleniumInterfaceConfiguration getConfiguration( SeleniumInterfaceConfiguration config ) {
-		
-		if ( ! myType.isEmpty() ) {
-			config.setType( BROWSER_TYPE.enumOf(myType) );
-		}
-		
-		if ( ! myBaseUrl.isEmpty() ) {
-			config.setBaseUrl(myBaseUrl);
-		}
-		
-		if ( ! mySavePageSource.isEmpty() ) {
-			config.setSavePageSource(new Boolean(mySavePageSource));
-		}
-		
-		if ( ! mySaveScreenShot.isEmpty() ) {
-			config.setSavePageSource(new Boolean(mySaveScreenShot));
-		}
-		
-//		if ( ! myCustomKeywordLinks.isEmpty() ) {
-//			config.setCustomKeywordLinks(myCustomKeywordLinks); // TODO merge
-			ArrayList<String> customKeywordLinks = config.getCustomKeywordLinks();
-
-			Iterator<String> keywordsDefLinksItr = myCustomKeywordLinks.iterator(); 
-			while ( keywordsDefLinksItr.hasNext() )
-			{
-				String keywordsDefLink = keywordsDefLinksItr.next();
-				if ( ! customKeywordLinks.contains(keywordsDefLink) ) {
-					customKeywordLinks.add(keywordsDefLink);
-				}
-			}
-			config.setCustomKeywordLinks(customKeywordLinks);
+//	public SeleniumInterfaceConfiguration getConfiguration( SeleniumInterfaceConfiguration config ) {
+//		
+//		if ( ! myType.isEmpty() ) {
+//			config.setType( BROWSER_TYPE.enumOf(myType) );
 //		}
+//		
+//		if ( ! myBaseUrl.isEmpty() ) {
+//			config.setBaseUrl(myBaseUrl);
+//		}
+//		
+//		config.setSavePageSource(mySavePageSource);
+//		config.setSavePageSource(mySaveScreenShot);
+//		
+//		ArrayList<String> customKeywordLinks = config.getCustomKeywordLinks();
+//
+//		Iterator<String> keywordsDefLinksItr = myCustomKeywordLinks.iterator(); 
+//		while ( keywordsDefLinksItr.hasNext() )
+//		{
+//			String keywordsDefLink = keywordsDefLinksItr.next();
+//			if ( ! customKeywordLinks.contains(keywordsDefLink) ) {
+//				customKeywordLinks.add(keywordsDefLink);
+//			}
+//		}
+//		config.setCustomKeywordLinks(customKeywordLinks);
+//		
+//		return config;
+//	}
+//	
+	public SeleniumInterfaceConfiguration getConfiguration( String ifName ) {
 		
-		return config;
+		return new SeleniumInterfaceConfiguration(ifName, myType, myBaseUrl, mySavePageSource, mySaveScreenShot, myCustomKeywordLinks);
 	}
 	
 	public void reset()
 	{
-	    myType = "";
-	    myBaseUrl = "";
-	    mySavePageSource = "";
-	    mySaveScreenShot = "";
+	    myType = this.defaultType;
+	    myBaseUrl = this.defaultBaseUrl;
+	    mySavePageSource = this.defaultSavePageSource;
+	    mySaveScreenShot = this.defaultSaveScreenShot;
 	    myCustomKeywordLinks = new ArrayList<String>();
 	}
 }

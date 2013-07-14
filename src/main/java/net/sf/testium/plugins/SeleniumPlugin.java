@@ -2,7 +2,6 @@ package net.sf.testium.plugins;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 
 import net.sf.testium.Testium;
@@ -10,7 +9,6 @@ import net.sf.testium.configuration.ConfigurationException;
 import net.sf.testium.configuration.CustomStepDefinitionsXmlHandler;
 import net.sf.testium.configuration.PersonalSeleniumConfigurationXmlHandler;
 import net.sf.testium.configuration.SeleniumConfiguration;
-import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.configuration.SeleniumConfigurationXmlHandler;
 import net.sf.testium.configuration.SeleniumInterfaceConfiguration;
 import net.sf.testium.configuration.SeleniumInterfaceXmlHandler;
@@ -108,19 +106,20 @@ public class SeleniumPlugin implements Plugin
 			throws ConfigurationException {
 
 		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
-		File interfaceDefinitionsFile = new File( configDir, anInterfaceName + ".xml" );
-		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
+		File interfaceConfigurationFile = new File( configDir, anInterfaceName + ".xml" );
+//		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
 		SeleniumInterfaceConfiguration globalIfConfig = 
-				readInterfaceDefintions( interfaceDefinitionsFile, tmpIfConfig );
+//				readInterfaceConfiguration( interfaceDefinitionsFile, aConfig, tmpIfConfig );
+				readGloaInterfaceConfiguration( interfaceConfigurationFile, anInterfaceName, aConfig );
 
 		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
-		File personalInterfaceDefinitionsFile = new File( userConfigDir, anInterfaceName + ".xml" );
+		File personalInterfaceConfigurationFile = new File( userConfigDir, anInterfaceName + ".xml" );
 		SeleniumInterfaceConfiguration ifConfig = globalIfConfig;
-		if ( personalInterfaceDefinitionsFile.canRead() ) {
-			ifConfig = readInterfaceDefintions( personalInterfaceDefinitionsFile, globalIfConfig );
+		if ( personalInterfaceConfigurationFile.canRead() ) {
+			ifConfig = readPersonalInterfaceConfiguration( personalInterfaceConfigurationFile, anInterfaceName, globalIfConfig );
 		}
 
-		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
+//		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
 		
 		String sysPropBaseUrl = System.getProperty( anInterfaceName + "." + SeleniumPlugin.BASEURL );
 		if ( sysPropBaseUrl != null ) {
@@ -157,54 +156,75 @@ public class SeleniumPlugin implements Plugin
 		}
 	}
 
-//	private SeleniumInterfaceConfiguration readInterfaceDefintions( String anInterfaceName,
-//							              RunTimeData anRtData,
-//							              SeleniumConfiguration aConfig ) throws ConfigurationException {
-//		Trace.println(Trace.UTIL, "readInterfaceDefintions( " + anInterfaceName + " )", true );
-//
-//		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
-//		File interfaceDefinitionsFile = new File( configDir, anInterfaceName + ".xml" );
+//	private SeleniumInterfaceConfiguration readInterfaceConfiguration(
+//			File interfaceDefinitionsFile,
+//			SeleniumConfiguration selConfig,
+//			SeleniumInterfaceConfiguration selIfConfig
+//			) throws ConfigurationException {
+//		Trace.println(Trace.UTIL, "readInterfaceConfiguration( " + selIfConfig.getInterfaceName() + " )", true );
 //
 //		SeleniumInterfaceXmlHandler handler = null;
 //		try {
 //			XMLReader reader = XmlHandler.getNewXmlReader();
-//			handler = new SeleniumInterfaceXmlHandler( reader );
+//			handler = new SeleniumInterfaceXmlHandler( reader, selConfig );
 //		
 //			handler.parse(reader, interfaceDefinitionsFile);
 //		} catch (TTIException e) {
 //			throw new ConfigurationException( e );
 //		}
 //
-//		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
 //// TODO		tmpIfConfig.setSavePageSource( aConfig.getSave...());
-//		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration(tmpIfConfig);
+//		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration(selIfConfig);
 //		handler.reset();
 //
 //		return ifConfiguration;
 //	}
 
-	private SeleniumInterfaceConfiguration readInterfaceDefintions(
+	private SeleniumInterfaceConfiguration readGloaInterfaceConfiguration(
 			File interfaceDefinitionsFile,
-			SeleniumInterfaceConfiguration tmpIfConfig) throws ConfigurationException {
-		Trace.println(Trace.UTIL, "readInterfaceDefintions( " + tmpIfConfig.getInterfaceName() + " )", true );
+			String ifName,
+			SeleniumConfiguration selConfig) throws ConfigurationException {
+
+		Trace.println(Trace.UTIL, "readInterfaceConfiguration( " + interfaceDefinitionsFile.getName()
+				+ ", " + ifName + " )", true );
 
 		SeleniumInterfaceXmlHandler handler = null;
 		try {
 			XMLReader reader = XmlHandler.getNewXmlReader();
-			handler = new SeleniumInterfaceXmlHandler( reader );
+			handler = new SeleniumInterfaceXmlHandler( reader, selConfig );
 		
 			handler.parse(reader, interfaceDefinitionsFile);
 		} catch (TTIException e) {
 			throw new ConfigurationException( e );
 		}
 
-// TODO		tmpIfConfig.setSavePageSource( aConfig.getSave...());
-		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration(tmpIfConfig);
+		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration( ifName );
 		handler.reset();
 
 		return ifConfiguration;
 	}
 
+	private SeleniumInterfaceConfiguration readPersonalInterfaceConfiguration(
+			File personalInterfaceConfigurationFile, String ifName,
+			SeleniumInterfaceConfiguration globalIfConfig) throws ConfigurationException {
+		Trace.println(Trace.UTIL, "readInterfaceConfiguration( " + personalInterfaceConfigurationFile.getName()
+				+ ", " + ifName + " )", true );
+
+		SeleniumInterfaceXmlHandler handler = null;
+		try {
+			XMLReader reader = XmlHandler.getNewXmlReader();
+			handler = new SeleniumInterfaceXmlHandler( reader, globalIfConfig );
+		
+			handler.parse(reader, personalInterfaceConfigurationFile);
+		} catch (TTIException e) {
+			throw new ConfigurationException( e );
+		}
+
+		SeleniumInterfaceConfiguration ifConfiguration = handler.getConfiguration( ifName );
+		handler.reset();
+
+		return ifConfiguration;
+	}
 
 	public final SeleniumConfiguration readConfigFile(
 			RunTimeData anRtData ) throws ConfigurationException {
@@ -212,28 +232,15 @@ public class SeleniumPlugin implements Plugin
 
 		File configDir = (File) anRtData.getValue(Testium.CONFIGDIR);
 		File configFile = new File( configDir, "selenium.xml" );
-		SeleniumConfiguration config = readConfigFile( anRtData, configFile );
-
-		BROWSER_TYPE browserType = config.getBrowserType();
-		URL gridUrl = config.getSeleniumGridUrl();
+		SeleniumConfiguration globalConfig = readConfigFile( anRtData, configFile );
 
 		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
 		File userConfigFile = new File( userConfigDir, "selenium.xml" );
-		if ( userConfigFile.exists() )
-		{
-			SeleniumConfiguration userConfig = 
-					readPersonalConfigFile( anRtData, userConfigFile );
-
-			if ( userConfig.getBrowserType() != null ) {
-				browserType = userConfig.getBrowserType();
-			}
-
-			if ( userConfig.getSeleniumGridUrl() != null ) {
-				gridUrl = userConfig.getSeleniumGridUrl();
-			}
+		if ( userConfigFile.exists() ) {
+			return readPersonalConfigFile( globalConfig, userConfigFile );
 		}
 
-		return new SeleniumConfiguration(config.getInterfaceNames(), browserType, config.getSeleniumLibsDir(), gridUrl);
+		return globalConfig;
 	}
 	
 	public final SeleniumConfiguration readConfigFile( 
@@ -257,13 +264,13 @@ public class SeleniumPlugin implements Plugin
 	}
 
 	public final SeleniumConfiguration readPersonalConfigFile(
-			RunTimeData anRtData, File aConfigFile ) throws ConfigurationException {
+			SeleniumConfiguration globalConfig, File aConfigFile ) throws ConfigurationException {
 		Trace.println(Trace.UTIL, "readConfigFile( " + aConfigFile.getName() + " )", true );
 		
 		PersonalSeleniumConfigurationXmlHandler myHandler;
 		try {
 			XMLReader reader = XmlHandler.getNewXmlReader();
-			myHandler = new PersonalSeleniumConfigurationXmlHandler(reader, anRtData);
+			myHandler = new PersonalSeleniumConfigurationXmlHandler(reader, globalConfig);
 		
 			myHandler.parse(reader, aConfigFile);
 		} catch (TTIException e) {

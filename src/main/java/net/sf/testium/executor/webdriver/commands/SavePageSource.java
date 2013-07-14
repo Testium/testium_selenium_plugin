@@ -4,15 +4,11 @@
 package net.sf.testium.executor.webdriver.commands;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 
-import org.openqa.selenium.WebDriver;
 import org.testtoolinterfaces.testresult.TestResult.VERDICT;
 import org.testtoolinterfaces.testresult.TestStepCommandResult;
 import org.testtoolinterfaces.testresult.TestStepResult;
@@ -49,11 +45,11 @@ public class SavePageSource extends GenericSeleniumCommandExecutor
 		verifyParameters(parameters);
 
 		TestStepResult result = new TestStepCommandResultImpl( aStep );
-		WebDriver webDriver = this.getDriver();
-
-		String pageSource = webDriver.getPageSource();
-
-		savePageSource(aLogDir, result, pageSource);
+		if ( this.savePageSource(aLogDir, result) ) {
+			result.setResult( VERDICT.PASSED );			
+		} else {
+			result.setResult( VERDICT.FAILED );
+		}
 
 		return result;
 	}
@@ -63,38 +59,5 @@ public class SavePageSource extends GenericSeleniumCommandExecutor
 			ParameterArrayList parameters, TestStepCommandResult result)
 			throws Exception {
 		throw new Error( "Method should not have been called" );
-	}
-
-	/**
-	 * @param aLogDir
-	 * @param result
-	 * @param pageSource
-	 */
-	public void savePageSource(File aLogDir, TestStepResult result,
-			String pageSource) {
-		int i = 0;
-		String sourceLogKey = "source";
-		File sourceLog = new File( aLogDir, "page_" + sourceLogKey + ".html" );
-		while ( sourceLog.exists() && ++i<100 )
-		{
-			sourceLogKey = "source_" + i;
-			sourceLog = new File( aLogDir, "page_" + sourceLogKey + ".html" );
-		}
-		
-		try
-		{
-			FileOutputStream sourceLogOS = new FileOutputStream(sourceLog.getAbsolutePath());
-			PrintWriter pw = new PrintWriter(sourceLogOS);
-			pw.println(pageSource);
-	        pw.flush();
-
-	        result.addTestLog(sourceLogKey, sourceLog.getPath());
-			result.setResult( VERDICT.PASSED );
-		}
-		catch (FileNotFoundException e)
-		{
-			result.setComment( "Source file could not be saved: " + e.getMessage() );
-			result.setResult( VERDICT.FAILED );
-		}
 	}
 }

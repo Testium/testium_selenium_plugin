@@ -7,6 +7,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
+
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.testtoolinterfaces.utils.Trace;
@@ -81,13 +83,12 @@ public class SeleniumConfiguration
 
 	public final static String BROWSERTYPE		= "browsertype";
 
-	public final static String VARNAME_SAVEPAGESOURCE = "savePageSource"; // Used as Variable Name.
-	public final static String VARNAME_SAVESCREENSHOT = "saveScreenShot"; // Used as Variable Name.
-
 	private ArrayList<String> myInterfaceNames;
 	private BROWSER_TYPE myBrowser;
 	private File mySeleniumLibsDir;
 	private URL mySeleniumGridUrl;
+	private SAVE_SOURCE mySavePageSource;
+	private SAVE_SOURCE mySaveScreenShot;
 
 	/**
 	 * @param anInterfaceNames 
@@ -99,7 +100,9 @@ public class SeleniumConfiguration
 	                              ArrayList<String> anInterfaceNames,
 	                              BROWSER_TYPE aBrowser,
 	                              File aSeleniumLibsDir,
-	                              URL aSeleniumGridUrl )
+	                              URL aSeleniumGridUrl,
+	                              SAVE_SOURCE savePageSource,
+	                              SAVE_SOURCE saveScreenShot )
 	{
 	    Trace.println(Trace.CONSTRUCTOR);
 
@@ -107,6 +110,8 @@ public class SeleniumConfiguration
 	    myBrowser = aBrowser;
 	    mySeleniumLibsDir = aSeleniumLibsDir;
 		mySeleniumGridUrl = aSeleniumGridUrl;
+		mySavePageSource = savePageSource;
+		mySaveScreenShot = saveScreenShot;
 	}
 
 	/**
@@ -137,6 +142,14 @@ public class SeleniumConfiguration
 	 */
 	public URL getSeleniumGridUrl() {
 		return mySeleniumGridUrl;
+	}
+
+	public SAVE_SOURCE getSavePageSource() {
+		return this.mySavePageSource;
+	}
+
+	public SAVE_SOURCE getSaveScreenShot() {
+		return this.mySaveScreenShot;
 	}
 
 	/**

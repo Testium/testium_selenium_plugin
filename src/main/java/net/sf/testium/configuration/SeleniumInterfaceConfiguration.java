@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 
 /**
@@ -16,11 +17,51 @@ import org.testtoolinterfaces.utils.Trace;
  */
 public class SeleniumInterfaceConfiguration
 {
+	public enum SAVE_SOURCE {
+		NEVER,
+		ONFAIL,
+		ALWAYS;
+		
+		public String toString()
+		{
+			return super.toString().toLowerCase();
+		}
+
+		//overriding valueOf gives a compile error
+		public static SAVE_SOURCE enumOf(String strValue) throws TestSuiteException
+		{
+			SAVE_SOURCE value = SAVE_SOURCE.NEVER;
+			if ( strValue == null ) {
+				throw new TestSuiteException( "String is null. Allowed values are " + valuesString() );
+			}
+			else if ( strValue.isEmpty() )	{
+				throw new TestSuiteException( "String is empty. Allowed values are " + valuesString() );
+			} else {
+				try	{
+					value = Enum.valueOf( SAVE_SOURCE.class, strValue.toUpperCase() );
+				}
+				catch( IllegalArgumentException iae ) {
+					throw new TestSuiteException( "\"" + strValue + "\" is not allowed. Only " + valuesString() );
+				}
+			}
+
+			return value;
+		}
+
+		public static String valuesString() {
+			String allValues = "";
+			for( SAVE_SOURCE supportedValues : SAVE_SOURCE.values() ) {
+				allValues = (allValues.isEmpty() ? supportedValues.toString() : allValues + ", " + supportedValues);
+			}
+			return allValues;
+		}
+	}
+
 	private String interfaceName;
 	private BROWSER_TYPE browserType;
 	private String baseUrl;
-	private boolean saveScreenShot = false;
-	private boolean savePageSource = false;
+	private SAVE_SOURCE saveScreenShot = SAVE_SOURCE.NEVER;
+	private SAVE_SOURCE savePageSource = SAVE_SOURCE.NEVER;
 	private ArrayList<String> customKeywordLinks;
 	private URL seleniumGridUrl;
 
@@ -42,7 +83,7 @@ public class SeleniumInterfaceConfiguration
 
 	public SeleniumInterfaceConfiguration(
 			String anInterfaceName, BROWSER_TYPE aBrowserType,
-			String aBaseUrl, boolean aSavePageSource, boolean aSaveScreenShot,
+			String aBaseUrl, SAVE_SOURCE aSavePageSource, SAVE_SOURCE aSaveScreenShot,
 			ArrayList<String> aCustomKeywordLinks) {
 	    Trace.println(Trace.CONSTRUCTOR);
 
@@ -52,8 +93,6 @@ public class SeleniumInterfaceConfiguration
 	    this.savePageSource = aSavePageSource;
 	    this.saveScreenShot = aSaveScreenShot;
 	    this.setCustomKeywordLinks(aCustomKeywordLinks);
-	    
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -82,28 +121,28 @@ public class SeleniumInterfaceConfiguration
 	/**
 	 * @return the saveScreenShot
 	 */
-	public boolean getSaveScreenShot() {
+	public SAVE_SOURCE getSaveScreenShot() {
 		return saveScreenShot;
 	}
 
 	/**
 	 * @param saveScreenShot the saveScreenShot to set
 	 */
-	public void setSaveScreenShot(boolean saveScreenShot) {
+	public void setSaveScreenShot(SAVE_SOURCE saveScreenShot) {
 		this.saveScreenShot = saveScreenShot;
 	}
 
 	/**
 	 * @return the savePageSource
 	 */
-	public boolean getSavePageSource() {
+	public SAVE_SOURCE getSavePageSource() {
 		return savePageSource;
 	}
 
 	/**
 	 * @param savePageSource the savePageSource to set
 	 */
-	public void setSavePageSource(boolean savePageSource) {
+	public void setSavePageSource(SAVE_SOURCE savePageSource) {
 		this.savePageSource = savePageSource;
 	}
 

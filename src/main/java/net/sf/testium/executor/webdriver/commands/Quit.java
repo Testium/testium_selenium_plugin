@@ -5,6 +5,7 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
+import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
 
@@ -28,6 +29,9 @@ public class Quit extends GenericSeleniumCommandExecutor
 	public Quit( WebInterface aWebInterface )
 	{
 		super( COMMAND, aWebInterface, new ArrayList<SpecifiedParameter>() );
+		
+		this.setSavePageSource(SAVE_SOURCE.NEVER);
+		this.setSaveScreenshot(SAVE_SOURCE.NEVER);
 	}
 
 	@Override

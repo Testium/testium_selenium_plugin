@@ -94,6 +94,10 @@ public class WebInterface extends CustomInterface implements FieldPublisher, Web
 		add( new WaitForUrl( this ) );
 	}
 
+	public SeleniumInterfaceConfiguration getConfig() {
+		return config;
+	}
+
 	public String getBaseUrl()
 	{
 		return this.config.getBaseUrl();

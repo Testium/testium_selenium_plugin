@@ -5,7 +5,6 @@ package net.sf.testium.executor.webdriver.commands;
 
 import java.util.ArrayList;
 
-import net.sf.testium.configuration.SeleniumConfiguration;
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
 import net.sf.testium.executor.general.SpecifiedParameter;
 import net.sf.testium.executor.webdriver.WebInterface;
@@ -83,21 +82,7 @@ public class Get extends GenericSeleniumCommandExecutor
 	private BROWSER_TYPE getBrowserType(RunTimeData aVariables, ParameterArrayList parameters)
 			throws Error, Exception
 	{
-		BROWSER_TYPE type;
-		Object typeObj = aVariables.getValue(SeleniumConfiguration.BROWSERTYPE);
-		if ( typeObj instanceof String )
-		{
-			type = BROWSER_TYPE.enumOf((String) typeObj);
-		}
-		else if ( typeObj instanceof BROWSER_TYPE )
-		{
-			type = (BROWSER_TYPE) typeObj;
-		}
-		else
-		{
-			// Programming error: It should always be set
-			throw new Error( SeleniumConfiguration.BROWSERTYPE + " is not set!" );
-		}
+		BROWSER_TYPE type = this.getInterface().getConfig().getBrowserType();
 
 		String browserType = (String) this.obtainOptionalValue( aVariables, parameters, PARSPEC_BROWSER );
 		if ( ! browserType.isEmpty() )
