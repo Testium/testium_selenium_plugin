@@ -50,8 +50,11 @@ public class SeleniumPlugin implements Plugin
 		// Interfaces
 		SupportedInterfaceList interfaceList = aPluginCollection.getInterfaces();
 		TestStepMetaExecutor testStepMetaExecutor = aPluginCollection.getTestStepExecutor();
+System.out.println("Check 1");
 		SeleniumConfiguration config = readConfigFile( anRtData );
+System.out.println("Check 2");
 		File seleniumLibsDir = config.getSeleniumLibsDir();
+System.out.println("Check 3");
 
 		try
 		{
@@ -61,13 +64,16 @@ public class SeleniumPlugin implements Plugin
 		{
 			throw new ConfigurationException( e );
 		}
+System.out.println("Check 4");
 
 		DefaultInterface defInterface = (DefaultInterface) interfaceList.getInterface(DefaultInterface.NAME);
 		defInterface.add( new CheckListSize_modified( defInterface ) );
 		defInterface.add( new GetListItem_modified( defInterface ) );
 		defInterface.add( new GetListSize_modified( defInterface ) );
 
+System.out.println("Check 5");
 		createInterfaces(anRtData, interfaceList, testStepMetaExecutor, config);
+System.out.println("Check 6");
 	}
 
 	/**
@@ -81,6 +87,7 @@ public class SeleniumPlugin implements Plugin
 			SupportedInterfaceList anInterfaceList,
 			TestStepMetaExecutor aTestStepMetaExecutor,
 			SeleniumConfiguration aConfig) throws ConfigurationException {
+System.out.println("Custom Interfaces (1): " + aConfig.getInterfaceNames().size() );
 		Iterator<String> interfaceNamesItr = aConfig.getInterfaceNames().iterator(); 
 		while ( interfaceNamesItr.hasNext() )
 		{
@@ -110,14 +117,15 @@ public class SeleniumPlugin implements Plugin
 //		SeleniumInterfaceConfiguration tmpIfConfig = new SeleniumInterfaceConfiguration(anInterfaceName, aConfig.getBrowserType());
 		SeleniumInterfaceConfiguration globalIfConfig = 
 //				readInterfaceConfiguration( interfaceDefinitionsFile, aConfig, tmpIfConfig );
-				readGloaInterfaceConfiguration( interfaceConfigurationFile, anInterfaceName, aConfig );
-
+				readGlobalInterfaceConfiguration( interfaceConfigurationFile, anInterfaceName, aConfig );
+System.out.println("Custom Keyword definitions (1): " + globalIfConfig.getCustomKeywordLinks().size() );
 		File userConfigDir = (File) anRtData.getValue(Testium.USERCONFIGDIR);
 		File personalInterfaceConfigurationFile = new File( userConfigDir, anInterfaceName + ".xml" );
 		SeleniumInterfaceConfiguration ifConfig = globalIfConfig;
 		if ( personalInterfaceConfigurationFile.canRead() ) {
 			ifConfig = readPersonalInterfaceConfiguration( personalInterfaceConfigurationFile, anInterfaceName, globalIfConfig );
 		}
+System.out.println("Custom Keyword definitions (2): " + ifConfig.getCustomKeywordLinks().size() );
 
 //		ifConfig.setSeleniumGridUrl( aConfig.getSeleniumGridUrl() );
 		
@@ -145,12 +153,15 @@ public class SeleniumPlugin implements Plugin
 			TestStepMetaExecutor testStepMetaExecutor,
 			SeleniumInterfaceConfiguration ifConfig, WebInterface iface)
 			throws ConfigurationException {
+System.out.println("Creating Custom Keywords: " + ifConfig.getCustomKeywordLinks().size() );
+
 		Iterator<String> keywordsDefLinksItr = ifConfig.getCustomKeywordLinks().iterator(); 
 		while ( keywordsDefLinksItr.hasNext() )
 		{
 			String keywordsDefLink = keywordsDefLinksItr.next();
 
 			String fileName = anRtData.substituteVars(keywordsDefLink);
+System.out.println("Creating Custom Keyword: " + fileName );
 			CustomStepDefinitionsXmlHandler.loadElementDefinitions( new File( fileName ),
 						anRtData, iface, interfaceList, testStepMetaExecutor );
 		}
@@ -180,7 +191,7 @@ public class SeleniumPlugin implements Plugin
 //		return ifConfiguration;
 //	}
 
-	private SeleniumInterfaceConfiguration readGloaInterfaceConfiguration(
+	private SeleniumInterfaceConfiguration readGlobalInterfaceConfiguration(
 			File interfaceDefinitionsFile,
 			String ifName,
 			SeleniumConfiguration selConfig) throws ConfigurationException {
