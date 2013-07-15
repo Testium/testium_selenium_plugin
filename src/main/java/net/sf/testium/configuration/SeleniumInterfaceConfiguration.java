@@ -59,36 +59,39 @@ public class SeleniumInterfaceConfiguration
 
 	private String interfaceName;
 	private BROWSER_TYPE browserType;
+	private URL seleniumGridUrl;
 	private String baseUrl;
 	private SAVE_SOURCE saveScreenShot = SAVE_SOURCE.NEVER;
 	private SAVE_SOURCE savePageSource = SAVE_SOURCE.NEVER;
 	private ArrayList<String> customKeywordLinks;
-	private URL seleniumGridUrl;
 
-	/**
-	 * @param anInterfaceName 
-	 * @param aBrowserType
-	 */
-	public SeleniumInterfaceConfiguration( 
-	                              String anInterfaceName,
-	                              BROWSER_TYPE aBrowserType )
-	{
-	    Trace.println(Trace.CONSTRUCTOR);
-
-	    this.interfaceName = anInterfaceName;
-	    this.browserType = aBrowserType;
-	    this.setBaseUrl("");
-	    this.setCustomKeywordLinks(new ArrayList<String>());
-	}
-
+//	/**
+//	 * @param anInterfaceName 
+//	 * @param aBrowserType
+//	 */
+//	public SeleniumInterfaceConfiguration( 
+//	                              String anInterfaceName,
+//	                              BROWSER_TYPE aBrowserType )
+//	{
+//	    Trace.println(Trace.CONSTRUCTOR);
+//
+//	    this.interfaceName = anInterfaceName;
+//	    this.browserType = aBrowserType;
+//	    this.setBaseUrl("");
+//	    this.setCustomKeywordLinks(new ArrayList<String>());
+//	}
+//
 	public SeleniumInterfaceConfiguration(
-			String anInterfaceName, BROWSER_TYPE aBrowserType,
+			String anInterfaceName,
+			BROWSER_TYPE aBrowserType,
+			URL aSeleniumGridUrl,
 			String aBaseUrl, SAVE_SOURCE aSavePageSource, SAVE_SOURCE aSaveScreenShot,
 			ArrayList<String> aCustomKeywordLinks) {
 	    Trace.println(Trace.CONSTRUCTOR);
 
 	    this.interfaceName = anInterfaceName;
 	    this.browserType = aBrowserType;
+	    this.seleniumGridUrl = aSeleniumGridUrl;
 	    this.setBaseUrl(aBaseUrl);
 	    this.savePageSource = aSavePageSource;
 	    this.saveScreenShot = aSaveScreenShot;

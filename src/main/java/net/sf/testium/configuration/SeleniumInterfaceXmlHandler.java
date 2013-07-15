@@ -1,5 +1,6 @@
 package net.sf.testium.configuration;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.testium.configuration.SeleniumConfiguration.BROWSER_TYPE;
@@ -38,13 +39,15 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
 
-	private BROWSER_TYPE defaultType;
-	private String defaultBaseUrl;
-	private SAVE_SOURCE defaultSavePageSource;
-	private SAVE_SOURCE defaultSaveScreenShot; 
+	private final BROWSER_TYPE defaultType;
+	private final String defaultBaseUrl;
+	private final SAVE_SOURCE defaultSavePageSource;
+	private final SAVE_SOURCE defaultSaveScreenShot; 
+	private final ArrayList<String> defaultCustomKeywordLinks;
 
 	private BROWSER_TYPE myType;
 	private String myBaseUrl;
+	private final URL mySeleniumGridUrl;
 	private SAVE_SOURCE mySavePageSource;
 	private SAVE_SOURCE mySaveScreenShot; 
 	private ArrayList<String> myCustomKeywordLinks;
@@ -55,10 +58,13 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 
 	    defaultType = selConfig.getBrowserType();
 //	    defaultBaseUrl = selConfig.getBaseUrl();
-//	    defaultBaseUrl = "";
+	    defaultBaseUrl = "localhost";
 	    defaultSavePageSource = selConfig.getSavePageSource();
 	    defaultSaveScreenShot = selConfig.getSaveScreenShot();
+	    defaultCustomKeywordLinks = new ArrayList<String>();
 
+	    mySeleniumGridUrl = selConfig.getSeleniumGridUrl();
+	    
 	    genericConstructor(anXmlReader);
 	}
 
@@ -71,6 +77,9 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    defaultBaseUrl = globalIfConfig.getBaseUrl();
 	    defaultSavePageSource = globalIfConfig.getSavePageSource();
 	    defaultSaveScreenShot = globalIfConfig.getSaveScreenShot();
+	    defaultCustomKeywordLinks = globalIfConfig.getCustomKeywordLinks();
+
+	    mySeleniumGridUrl = globalIfConfig.getSeleniumGridUrl();
 
 	    genericConstructor(anXmlReader);
 	}
@@ -170,37 +179,10 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 		}
 	}
 	
-//	public SeleniumInterfaceConfiguration getConfiguration( SeleniumInterfaceConfiguration config ) {
-//		
-//		if ( ! myType.isEmpty() ) {
-//			config.setType( BROWSER_TYPE.enumOf(myType) );
-//		}
-//		
-//		if ( ! myBaseUrl.isEmpty() ) {
-//			config.setBaseUrl(myBaseUrl);
-//		}
-//		
-//		config.setSavePageSource(mySavePageSource);
-//		config.setSavePageSource(mySaveScreenShot);
-//		
-//		ArrayList<String> customKeywordLinks = config.getCustomKeywordLinks();
-//
-//		Iterator<String> keywordsDefLinksItr = myCustomKeywordLinks.iterator(); 
-//		while ( keywordsDefLinksItr.hasNext() )
-//		{
-//			String keywordsDefLink = keywordsDefLinksItr.next();
-//			if ( ! customKeywordLinks.contains(keywordsDefLink) ) {
-//				customKeywordLinks.add(keywordsDefLink);
-//			}
-//		}
-//		config.setCustomKeywordLinks(customKeywordLinks);
-//		
-//		return config;
-//	}
-//	
 	public SeleniumInterfaceConfiguration getConfiguration( String ifName ) {
 		
-		return new SeleniumInterfaceConfiguration(ifName, myType, myBaseUrl, mySavePageSource, mySaveScreenShot, myCustomKeywordLinks);
+		return new SeleniumInterfaceConfiguration(ifName, myType, mySeleniumGridUrl, myBaseUrl,
+				mySavePageSource, mySaveScreenShot, myCustomKeywordLinks);
 	}
 	
 	public void reset()
@@ -209,6 +191,6 @@ public class SeleniumInterfaceXmlHandler extends XmlHandler
 	    myBaseUrl = this.defaultBaseUrl;
 	    mySavePageSource = this.defaultSavePageSource;
 	    mySaveScreenShot = this.defaultSaveScreenShot;
-	    myCustomKeywordLinks = new ArrayList<String>();
+	    myCustomKeywordLinks = this.defaultCustomKeywordLinks;
 	}
 }

@@ -34,8 +34,8 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	private static final String START_ELEMENT = "SeleniumConfiguration";
 
 	private static final String DEF_BROWSER_ELEMENT = "DefaultBrowser";
-	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
-	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
+//	private static final String SAVE_PAGESOURCE = "SavePageSource"; // NEVER, ONFAIL, ALWAYS
+//	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
 	private static final String SELENIUM_GRID_URL_ELEMENT = "SeleniumGridUrl";
 
 	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
@@ -70,10 +70,10 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 		mySeleniumGridUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_GRID_URL_ELEMENT);
 		this.addElementHandler(mySeleniumGridUrlXmlHandler);
 
-		mySavePageSourceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_PAGESOURCE);
+		mySavePageSourceXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE);
 		this.addElementHandler(mySavePageSourceXmlHandler);
 
-		mySaveScreenShotXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SAVE_SCREENSHOT);
+		mySaveScreenShotXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT);
 		this.addElementHandler(mySaveScreenShotXmlHandler);
 
 		myInterfacesXmlHandler = new SeleniumInterfacesXmlHandler( anXmlReader );
@@ -127,21 +127,26 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
     	{
 			String seleniumGridUrl = mySeleniumGridUrlXmlHandler.getValue();
 //			seleniumGridUrl = myRtData.substituteVars(seleniumGridUrl);
-			try {
-				mySeleniumGridUrl = new URL( seleniumGridUrl );
-			} catch (MalformedURLException e) {
-				throw new TestSuiteException( "\"" + SELENIUM_GRID_URL_ELEMENT + "\" is malformed: " + e.getMessage(), e );
+			
+			if ( !seleniumGridUrl.isEmpty() ) {
+				try {
+					mySeleniumGridUrl = new URL( seleniumGridUrl );
+				} catch (MalformedURLException e) {
+					throw new TestSuiteException( "\"" + SELENIUM_GRID_URL_ELEMENT + "\" is malformed: " + e.getMessage(), e );
+				}
+			} else {
+				mySeleniumGridUrl = null;
 			}
 
 			mySeleniumGridUrlXmlHandler.reset();	
     	}
-		else if (aQualifiedName.equalsIgnoreCase( SAVE_PAGESOURCE ))
+		else if (aQualifiedName.equalsIgnoreCase( SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE ))
     	{
 			String savePageSource = mySavePageSourceXmlHandler.getValue();
 			mySavePageSource = SAVE_SOURCE.enumOf(savePageSource);
 			mySavePageSourceXmlHandler.reset();	
     	}
-		else if (aQualifiedName.equalsIgnoreCase( SAVE_SCREENSHOT ))
+		else if (aQualifiedName.equalsIgnoreCase( SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT ))
     	{
 			String saveScreenshots = mySaveScreenShotXmlHandler.getValue();
 			mySaveScreenShot = SAVE_SOURCE.enumOf(saveScreenshots);
