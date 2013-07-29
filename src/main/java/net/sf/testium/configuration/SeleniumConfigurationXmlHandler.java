@@ -48,7 +48,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private static final String SELENIUM_GRID_URL_ELEMENT = "SeleniumGridUrl";
 	private static final String CHROME_DRIVER_ELEMENT = "ChromeDriver";
 
-	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
+	private GenericTagAndStringXmlHandler myBrowserTypeXmlHandler;
 	private GenericTagAndStringXmlHandler mySeleniumLibsDirXmlHandler;
 	private GenericTagAndStringXmlHandler myChromeDriverXmlHandler;
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
@@ -58,7 +58,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	private GenericTagAndStringXmlHandler mySeleniumGridUrlXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
-	private BROWSER_TYPE myDefaultBrowser = BROWSER_TYPE.HTMLUNIT;
+	private BROWSER_TYPE myBrowserType = BROWSER_TYPE.HTMLUNIT;
 	private File mySeleniumLibsDir;
 	private URL mySeleniumGridUrl;
 	private ArrayList<String> myInterfaceNames;
@@ -85,8 +85,8 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 
 		myRtData = anRtData;
 		
-	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
-		this.addElementHandler(myDefaultBrowserXmlHandler);
+	    myBrowserTypeXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
+		this.addElementHandler(myBrowserTypeXmlHandler);
 
 		mySeleniumLibsDirXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_LIBS_DIR_ELEMENT);
 		this.addElementHandler(mySeleniumLibsDirXmlHandler);
@@ -152,9 +152,8 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 		    
 		if (aQualifiedName.equalsIgnoreCase( DEF_BROWSER_ELEMENT ))
     	{
-			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( myDefaultBrowserXmlHandler.getValue() );
-			myDefaultBrowser = browserType;
-			myDefaultBrowserXmlHandler.reset();	
+			myBrowserType = BROWSER_TYPE.enumOf( myBrowserTypeXmlHandler.getValue() );
+			myBrowserTypeXmlHandler.reset();	
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_LIBS_DIR_ELEMENT ))
     	{
@@ -225,7 +224,7 @@ public class SeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser, mySeleniumLibsDir, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
+		return new SeleniumConfiguration( myInterfaceNames, myBrowserType, mySeleniumLibsDir, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
 	}
 
 }

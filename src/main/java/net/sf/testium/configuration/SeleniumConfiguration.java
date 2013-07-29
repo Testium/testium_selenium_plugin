@@ -11,6 +11,7 @@ import net.sf.testium.configuration.SeleniumInterfaceConfiguration.SAVE_SOURCE;
 
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
+import org.testtoolinterfaces.testsuite.TestSuiteException;
 import org.testtoolinterfaces.utils.Trace;
 import org.testtoolinterfaces.utils.Warning;
 
@@ -36,7 +37,7 @@ public class SeleniumConfiguration
 		}
 
 		//overriding valueOf gives a compile error
-		public static BROWSER_TYPE enumOf(String aType)
+		public static BROWSER_TYPE enumOf(String aType) throws TestSuiteException
 		{
 			BROWSER_TYPE value = BROWSER_TYPE.HTMLUNIT;
 			if ( aType == null )
@@ -47,31 +48,24 @@ public class SeleniumConfiguration
 			{
 				Warning.println( "Browser type is empty.\nContinuing with " + value.toString() );
 			}
-			else
-			{
-				try
-				{
+			else {
+				try	{
 					value = Enum.valueOf( BROWSER_TYPE.class, aType.toUpperCase() );
 				}
-				catch( IllegalArgumentException iae )
-				{
-	    			String allTypes = "";
-	    			for( BROWSER_TYPE supportedType : BROWSER_TYPE.values() )
-	    			{
-	    				if (allTypes.isEmpty())
-	    				{
-	    					allTypes = supportedType.toString();
-	    				}
-	    				else
-	    				{
-	    					allTypes += ", " + supportedType;
-	    				}
-	    			}
-					Warning.println( "Browser type " + aType + " is not supported.\nSupported types are " + allTypes + ".\nContinuing with " + value.toString() );
+				catch( IllegalArgumentException iae ) {
+					throw new TestSuiteException( "\"" + aType + "\" is not allowed. Only " + valuesString() );
 				}
 			}
 
 			return value;
+		}
+
+		public static String valuesString() {
+			String allValues = "";
+			for( BROWSER_TYPE supportedValues : BROWSER_TYPE.values() ) {
+				allValues = (allValues.isEmpty() ? supportedValues.toString() : allValues + ", " + supportedValues);
+			}
+			return allValues;
 		}
 	}
 

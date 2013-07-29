@@ -38,13 +38,13 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 //	private static final String SAVE_SCREENSHOT = "SaveScreenshot"; // NEVER, ONFAIL, ALWAYS
 	private static final String SELENIUM_GRID_URL_ELEMENT = "SeleniumGridUrl";
 
-	private GenericTagAndStringXmlHandler myDefaultBrowserXmlHandler;
+	private GenericTagAndStringXmlHandler myBrowserTypeXmlHandler;
 	private GenericTagAndStringXmlHandler mySavePageSourceXmlHandler;
 	private GenericTagAndStringXmlHandler mySaveScreenShotXmlHandler;
 	private GenericTagAndStringXmlHandler mySeleniumGridUrlXmlHandler;
 	private SeleniumInterfacesXmlHandler myInterfacesXmlHandler;
 	
-	private BROWSER_TYPE myDefaultBrowser;
+	private BROWSER_TYPE myBrowserType;
 	private final File mySeleniumLibsDir;
 	private URL mySeleniumGridUrl = null;
 	private ArrayList<String> myInterfaceNames;
@@ -57,15 +57,15 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	    super(anXmlReader, START_ELEMENT);
 	    Trace.println(Trace.CONSTRUCTOR);
 
-	    myDefaultBrowser = globalConfig.getBrowserType();
+	    myBrowserType = globalConfig.getBrowserType();
 	    mySeleniumLibsDir = globalConfig.getSeleniumLibsDir();
 		mySeleniumGridUrl = globalConfig.getSeleniumGridUrl();
 		myInterfaceNames = globalConfig.getInterfaceNames();
 		mySavePageSource = globalConfig.getSavePageSource();
 		mySaveScreenShot = globalConfig.getSaveScreenShot();
 
-	    myDefaultBrowserXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
-		this.addElementHandler(myDefaultBrowserXmlHandler);
+	    myBrowserTypeXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, DEF_BROWSER_ELEMENT);
+		this.addElementHandler(myBrowserTypeXmlHandler);
 
 		mySeleniumGridUrlXmlHandler = new GenericTagAndStringXmlHandler(anXmlReader, SELENIUM_GRID_URL_ELEMENT);
 		this.addElementHandler(mySeleniumGridUrlXmlHandler);
@@ -119,9 +119,8 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 		    
 		if (aQualifiedName.equalsIgnoreCase( DEF_BROWSER_ELEMENT ))
     	{
-			BROWSER_TYPE browserType = BROWSER_TYPE.enumOf( myDefaultBrowserXmlHandler.getValue() );
-			myDefaultBrowser = browserType;
-			myDefaultBrowserXmlHandler.reset();	
+			myBrowserType = BROWSER_TYPE.enumOf( myBrowserTypeXmlHandler.getValue() );
+			myBrowserTypeXmlHandler.reset();
     	}
 		else if (aQualifiedName.equalsIgnoreCase( SELENIUM_GRID_URL_ELEMENT ))
     	{
@@ -166,7 +165,7 @@ public class PersonalSeleniumConfigurationXmlHandler extends XmlHandler
 	
 	public SeleniumConfiguration getConfiguration()
 	{
-		return new SeleniumConfiguration( myInterfaceNames, myDefaultBrowser,
+		return new SeleniumConfiguration( myInterfaceNames, myBrowserType,
 				mySeleniumLibsDir, mySeleniumGridUrl, mySavePageSource, mySaveScreenShot );
 	}
 
