@@ -166,14 +166,6 @@ public class SimplePageElement implements SmartWebElement, WrapsElement,
 		return null;
 	}
 
-	public Point getLocationOnScreenOnceScrolledIntoView() {
-		WebElement element = this.getElement();
-		if ( element instanceof Locatable ) {
-			return ((Locatable) element).getLocationOnScreenOnceScrolledIntoView();
-		}
-		return null;
-	}
-
 	public WebDriver getWrappedDriver() {
 		return myInterface.getDriver();
 	}
