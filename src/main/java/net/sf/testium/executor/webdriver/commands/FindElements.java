@@ -62,15 +62,17 @@ public class FindElements extends GenericSeleniumCommandExecutor
 
 		List<WebElement> elements;
 		WebElement baseElement = this.obtainElement(aVariables, parameters, PARSPEC_BASEELEMENT);
+		SmartWebElementList smartElements;
 		if ( baseElement != null )
 		{
 			elements = baseElement.findElements(by);
+			smartElements = new SimpleElementList( by, this.getInterface(), elements, baseElement );
 		}
 		else
 		{
 			elements = driver.findElements(by);
+			smartElements = new SimpleElementList( by, this.getInterface(), elements );
 		}
-		SmartWebElementList smartElements = new SimpleElementList( by, this.getInterface(), elements );
 
 		RunTimeVariable rtVariable = new RunTimeVariable( elementName, smartElements );
 		aVariables.add(rtVariable);

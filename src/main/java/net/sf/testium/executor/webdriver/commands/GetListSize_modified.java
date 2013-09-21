@@ -26,10 +26,10 @@ public class GetListSize_modified extends GetListSize {
 //	private static final String PAR_VARIABLE = "variable";
 //
 	public static final SpecifiedParameter PARSPEC_LIST = new SpecifiedParameter( 
-			PAR_LIST, List.class, false, false, true, false );
+			PAR_LIST, List.class, "The list", false, false, true, false );
 
 //	private static final SpecifiedParameter PARSPEC_VARIABLE = new SpecifiedParameter( 
-//			PAR_VARIABLE, String.class, false, true, false, false );
+//			PAR_VARIABLE, String.class, "A variableName that will be used to store the size of the list", false, true, false, false );
 //
 	public GetListSize_modified( DefaultInterface defInterface )
 	{
@@ -39,12 +39,10 @@ public class GetListSize_modified extends GetListSize {
 	@Override
 	protected void doExecute(RunTimeData aVariables,
 			ParameterArrayList parameters, TestStepCommandResult result)
-			throws Exception
-	{
+			throws Exception {
 		SimpleElementList elList = (SimpleElementList) this.obtainValue(aVariables, parameters, PARSPEC_LIST);
 
-		if ( elList != null )
-		{
+		if ( elList != null ) {
 			((SimpleElementList) elList).refresh();
 		}
 
