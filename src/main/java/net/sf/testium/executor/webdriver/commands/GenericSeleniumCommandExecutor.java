@@ -39,12 +39,13 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 	private SAVE_SOURCE mySavePageSource;
 	private SAVE_SOURCE mySaveScreenshot;
 
+	private static final String SAVE_PAGE_SOURCE_DESCR = "When the Page-source must be saved";
 	public static final SpecifiedParameter PARSPEC_SAVE_PAGE_SOURCE = new SpecifiedParameter( 
-			SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE, String.class, true, true, true, true )
-				.setDefaultValue("");
+			SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE, String.class, SAVE_PAGE_SOURCE_DESCR, true, true, true, false );
+	
+	private static final String SAVE_SCREEN_SHOT_DESCR = "When a screen-shot must be saved";
 	public static final SpecifiedParameter PARSPEC_SAVE_SCREEN_SHOT = new SpecifiedParameter( 
-			SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT, String.class, true, true, true, true )
-				.setDefaultValue("");
+			SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT, String.class, SAVE_SCREEN_SHOT_DESCR, true, true, true, false );
 
 	/**
 	 * @param aVariables
@@ -58,19 +59,28 @@ public abstract class GenericSeleniumCommandExecutor extends GenericCommandExecu
 
 	/**
 	 * @param command
+	 * @param description
+	 * @param webInterface
 	 * @param parameterSpecs
 	 */
 	public GenericSeleniumCommandExecutor( String command,
-	                               WebInterface aWebInterface,
-	                               ArrayList<SpecifiedParameter> parameterSpecs )
-	{
-		super( command, aWebInterface, parameterSpecs );
+			   String description,
+			   WebInterface webInterface,
+			   ArrayList<SpecifiedParameter> parameterSpecs ) {
+		super( command, description, webInterface, parameterSpecs );
 
-		mySavePageSource = aWebInterface.getConfig().getSavePageSource();
-		mySaveScreenshot = aWebInterface.getConfig().getSaveScreenShot();
+		mySavePageSource = webInterface.getConfig().getSavePageSource();
+		mySaveScreenshot = webInterface.getConfig().getSaveScreenShot();
 		
-		this.addParamSpec( PARSPEC_SAVE_PAGE_SOURCE );
-		this.addParamSpec( PARSPEC_SAVE_SCREEN_SHOT );
+		this.addParamSpec( PARSPEC_SAVE_PAGE_SOURCE.setDefaultValue(mySavePageSource) );
+		this.addParamSpec( PARSPEC_SAVE_SCREEN_SHOT.setDefaultValue(mySaveScreenshot) );
+	}
+
+	@Deprecated
+	public GenericSeleniumCommandExecutor( String command,
+            WebInterface webInterface,
+            ArrayList<SpecifiedParameter> parameterSpecs ) {
+		this( command, "", webInterface, parameterSpecs );	
 	}
 
 	protected WebInterface getInterface()
@@ -128,7 +138,7 @@ System.out.println( "Issue #19: UnreachableBrowserException caught when executin
 		}
 
 		if ( savePageSource.equals(SAVE_SOURCE.ALWAYS) ) {
-			this.savePageSource( aLogDir, result );
+			this.savePageSource( aLogDir, null, result );
 		}
 
 		if ( saveScreenShot.equals(SAVE_SOURCE.ALWAYS) ) {
@@ -149,7 +159,7 @@ System.out.println( "Issue #19: UnreachableBrowserException caught when executin
 
 		if ( savePageSource.equals(SAVE_SOURCE.ONFAIL)
 				|| savePageSource.equals(SAVE_SOURCE.ALWAYS) ) {
-			this.savePageSource( aLogDir, aResult );
+			this.savePageSource( aLogDir, null, aResult );
 		}
 
 		if ( saveScreenShot.equals(SAVE_SOURCE.ONFAIL)
@@ -176,33 +186,37 @@ System.out.println( "Issue #19: UnreachableBrowserException caught when executin
 		this.failTest(aLogDir, aResult, e, mySavePageSource, mySaveScreenshot);
 	}
 	
-	public boolean savePageSource( File aLogDir, TestStepResult aResult )
+	public boolean savePageSource( File aLogDir, String fileName, TestStepResult aResult )
 	{
-		try // We'll try. If it fails we won't fail the test.
-		{
+		try { // We'll try. If it fails we won't fail the test.
+			File sourceLog;
+			String sourceLogKey = "source";
+			if (fileName == null || fileName.isEmpty() ) {
+				int i = 0;
+				sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
+
+				while ( sourceLog.exists() && ++i<1000 ) {
+					sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + "_" + i + ".html" );
+				}
+			} else {
+				sourceLog = new File( aLogDir, fileName );
+			}
+
 			WebDriver driver = this.getDriver();
 			if ( driver instanceof RemoteWebDriver ) {
 				RemoteWebDriver remDriver = (RemoteWebDriver) driver;
 				String pageSource = remDriver.getPageSource();
-				
-				int i = 0;
-				String sourceLogKey = "source";
-				File sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + ".html" );
-				while ( sourceLog.exists() && ++i<1000 )
-				{
-					sourceLog = new File( aLogDir, fileNameBase() + sourceLogKey + "_" + i + ".html" );
-				}
-			
+
 				FileOutputStream sourceLogOS = new FileOutputStream(sourceLog.getAbsolutePath());
 				PrintWriter pw = new PrintWriter(sourceLogOS);
 				pw.println(pageSource);
 		        pw.flush();
+		        pw.close();
 
 		        aResult.addTestLog(sourceLogKey, sourceLog.getPath());
 			}
 		}
-		catch (Throwable t)
-		{
+		catch (Throwable t)	{
 			aResult.addComment( "Source file could not be saved: " + t.getMessage() );
 			Trace.print( Trace.SUITE, t );
 			return false;
@@ -244,10 +258,22 @@ System.out.println( "Issue #19: UnreachableBrowserException caught when executin
 	}
 
 	public void setSavePageSource(SAVE_SOURCE savePageSource) {
+		this.getParameterSpecs().remove( PARSPEC_SAVE_PAGE_SOURCE );
+		SpecifiedParameter savePageSourceParam = new SpecifiedParameter( 
+				SeleniumConfigurationXmlHandler.SAVE_PAGESOURCE, String.class, SAVE_PAGE_SOURCE_DESCR, true, true, true, false )
+					.setDefaultValue(savePageSource);
+		this.addParamSpec(savePageSourceParam);
+
 		this.mySavePageSource = savePageSource;
 	}
 
 	public void setSaveScreenshot(SAVE_SOURCE saveScreenshot) {
+		this.getParameterSpecs().remove( PARSPEC_SAVE_SCREEN_SHOT );
+		SpecifiedParameter saveScreenShotParam = new SpecifiedParameter( 
+				SeleniumConfigurationXmlHandler.SAVE_SCREENSHOT, String.class, SAVE_SCREEN_SHOT_DESCR, true, true, true, false )
+					.setDefaultValue(saveScreenshot);
+		this.addParamSpec(saveScreenShotParam);
+		
 		this.mySaveScreenshot = saveScreenshot;
 	}
 
